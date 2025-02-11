@@ -145,6 +145,11 @@ public class Board
     public Dictionary<int, Property> Properties = new Dictionary<int, Property>(); // Key: Propery ID, Value: Property name
     public Dictionary<int, int> Houses = new Dictionary<int, int>(); // Key: Property ID, Value: Number of houses
 
+    
+
+   
+        
+
     public void MovePlayer(Player player, int spaces)
     {
         // move player by 'spaces'
@@ -183,8 +188,15 @@ public class Card
 }
 
 
-public static class Program
+
+
+public class Program
 {
+
+    void Start()
+    {
+        //CreateBoardCoords();
+    }
     public static void Main()
     {
         Debug.Log("Game started");
