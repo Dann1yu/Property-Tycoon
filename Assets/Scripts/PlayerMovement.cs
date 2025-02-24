@@ -3,43 +3,33 @@ using UnityEngine.XR;
 
 public class PlayerMovement : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private GameObject Player;
+    
+    public GameObject CurrentPlayer;
+    public int playerTurn = -1;
 
-    [SerializeField] private GameObject Player1;
+    Vector3[] boardPosition = new Vector3[40];
 
-    public int position =0;
-    // the players current position on the board, will change in future as this does not allow multiple players
-
-    int[,] boardposition = new int[41, 2];
-
-
-    public void CreateBoardCoords()
+    public void CreateBoard()
     {
         for (int i = 0; i < 11; i++)
         {
-            boardposition[i, 0] = i;
-            boardposition[i, 1] = 0;
+            boardPosition[i] = new Vector3 (i, 0.5f, 0);
         }
         for (int i = 11; i < 21; i++)
         {
-            boardposition[i, 0] = 10;
-            boardposition[i, 1] = i-10;
+            boardPosition[i] = new Vector3(10, 0.5f, i-10);
         }
-        //for the positive axis board movement
-
         for (int i = 21; i < 31; i++)
         {
-            boardposition[i, 0] = 30-i;
-            boardposition[i, 1] = 10;
+            boardPosition[i] = new Vector3(30-i, 0.5f, 10);
         }
         for (int i = 31; i < 40; i++)
         {
-            boardposition[i, 0] = 0;
-            boardposition[i, 1] = 40-i;
+            boardPosition[i] = new Vector3(0, 0.5f, 40-i);
         }
-        Debug.Log("board made");
-        //for the negative corrdinate movemebt board coords
     }
+    
 
     public int DiceRoll()
     {
@@ -50,38 +40,59 @@ public class PlayerMovement : MonoBehaviour
         //returns random number that is calculate through 2 virtual dice
         // will be upgraded in future
     }
+
+    public void NextTurn()
+    {
+        playerTurn++;
+
+        if (GameObject.Find($"Player {playerTurn}") ==  null) //makes sure that only works for amount of players that are playing
+        {
+            playerTurn = 0;
+        }
+
+        CurrentPlayer = GameObject.Find($"Player {playerTurn}");
+    }
+
+    
     void Start()
     {
-        CreateBoardCoords();
+       CurrentPlayer = GameObject.Find("Player0");//will always have 1 player minimum so they start playing first
+        
+        CreateBoard();
        //instantiates the boards coordinates
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             //for now to test movement up arrow presses in order to simulate players turn
-            moveForward(DiceRoll(), position);
+            NextTurn();
+            moveForward(DiceRoll(), CurrentPlayer.transform.position);
         }
     }
-    void moveForward(int distance, int currentpos)
+    void moveForward(int distance, Vector3 currentpos)
     {
-        int new_position = distance + currentpos;
-        
+        int oldposition=0;
+        for (int i = 0; i < boardPosition.Length; i++)
+        {
+            if (currentpos == boardPosition[i])
+            {
+                oldposition = i;
+                //finds the square that the current player is standing on
+            }
+        }
+
+
+        int new_position =  distance + oldposition;
+
         if (new_position >= 40)
         {
             new_position = new_position - 40;
-            position = new_position;
-            //this accounts for the board looping overitself and resets the arrary
+            //for the loop back to start of game (GO!)
         }
-        else
-        {
-            position = position + distance;
-        }
-
         Debug.Log("newpos: " + new_position);
-        Player1.transform.position = new Vector3(boardposition[new_position, 0], 0.5f, boardposition[new_position, 1]);
+        CurrentPlayer.transform.position = boardPosition[new_position];
             
         //potential to add animation herre
            

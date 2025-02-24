@@ -1,10 +1,13 @@
 using UnityEngine;
+using UnityEngine.XR;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using UnityEngine.UIElements;
 
 // Base Player class
-public abstract class Player
+public class Player : MonoBehaviour
 {
     public string Name;
     public int Money;
@@ -13,6 +16,13 @@ public abstract class Player
     public int numberOfGetOutOfJailFreeCards;
     public bool InJail;
     public int GoesInJail;
+
+    [SerializeField] private int playerAmount = 2;
+    [SerializeField] private GameObject Player1;
+    Vector3[] boardPosition = new Vector3[40];
+
+    public GameObject CurrentPlayer;
+    public int playerTurn = -1;
 
     public Player(string name, int startingMoney)
     {
@@ -23,11 +33,32 @@ public abstract class Player
         GoesInJail = 0;
     }
 
-    public abstract void TakeTurn(); // travels down to the individual derived classes
-    public void Move(int spaces)
+    private void Start()
     {
-        // implement move by amount 'spaces'
+        spawnPlayers(playerAmount);
+        //Player first = new Player("Player", 20000); //check default starting money
+
+        CurrentPlayer = GameObject.Find("Player0");
+
+
     }
+
+    
+
+    void spawnPlayers(int amount)
+    {
+
+        //will potentially be changed in order to accomodate choosing how many players and names etc...
+        for (int i = 0; i < amount; i++)
+        {
+            
+            var spawnedPlayer = Instantiate(Player1, new Vector3(0, 0.5f, 0), Quaternion.identity);
+            spawnedPlayer.name = $"Player {i}";
+            
+        }       
+        
+    }
+    
 
     public void BuyProperty(Property property)
     {
@@ -73,33 +104,29 @@ public abstract class Player
 public class Bot : Player
 {
     public Bot(string name, int startingMoney) : base(name, startingMoney) { }
-    public override void TakeTurn()
-    {
-        Console.WriteLine($"{Name} (Bot) is taking a turn...");
-        // Implement AI logic here
-    }
+    //public override void TakeTurn()
+    //{
+    //    Console.WriteLine($"{Name} (Bot) is taking a turn...");
+    //    // Implement AI logic here
+    //}
 }
 
 // HumanPlayer class, controlled by a user)
 public class HumanPlayer : Player
 {
     public HumanPlayer(string name, int startingMoney) : base(name, startingMoney) { }
-    public override void TakeTurn()
-    {
-        Console.WriteLine($"{Name} (Human) is taking a turn...");
-        // Implement UI and player choices here
-    }
+    //public override void TakeTurn()
+    //{
+    //    Console.WriteLine($"{Name} (Human) is taking a turn...");
+    //    // Implement UI and player choices here
+    //}
 }
 
 // Banker class, TBD HOW THIS CLASS IS RUN
 public class Banker : Player
 {
     public Banker(string name, int startingMoney) : base(name, startingMoney) { }
-    public override void TakeTurn()
-    {
-        Console.WriteLine($"{Name} (Banker) is managing the finances...");
-        // Implement banker responsibilities here
-    }
+    
 }
 
 // Bank class
@@ -147,8 +174,8 @@ public class Board
 
     
 
-   
-        
+    
+
 
     public void MovePlayer(Player player, int spaces)
     {
@@ -157,6 +184,8 @@ public class Board
         // if player owns space pay them and move on
         // if no one owns space offer the space to the player that landed
     }
+
+   
 }
 
 // Property class
@@ -190,13 +219,11 @@ public class Card
 
 
 
-public class Program
+public class Program : MonoBehaviour
 {
 
-    void Start()
-    {
-        //CreateBoardCoords();
-    }
+
+    
     public static void Main()
     {
         Debug.Log("Game started");
@@ -208,7 +235,8 @@ public class Program
         Player player2 = new Bot("Bot1", 1500);
 
         Debug.Log("Game has started!");
-        player1.TakeTurn();
-        player2.TakeTurn();
+        //player1.TakeTurn();
+        //player2.TakeTurn();
+
     }
 }
