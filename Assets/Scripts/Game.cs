@@ -10,15 +10,16 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour
 {
     public string Name;
-    public int Money;
+    public int Balance;
     public int Position;
     public List<Property> OwnedProperties;
     public int numberOfGetOutOfJailFreeCards;
     public bool InJail;
     public int GoesInJail;
 
-    [SerializeField] private int playerAmount = 2;
-    [SerializeField] private GameObject Player1;
+    
+
+    
     Vector3[] boardPosition = new Vector3[40];
 
     public GameObject CurrentPlayer;
@@ -27,7 +28,7 @@ public class Player : MonoBehaviour
     public Player(string name, int startingMoney)
     {
         Name = name;
-        Money = startingMoney;
+        Balance = startingMoney;
         Position = 0;
         InJail = false;
         GoesInJail = 0;
@@ -35,7 +36,8 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        spawnPlayers(playerAmount);
+        
+        //spawnPlayers(playerAmount);
         //Player first = new Player("Player", 20000); //check default starting money
 
         CurrentPlayer = GameObject.Find("Player0");
@@ -45,19 +47,7 @@ public class Player : MonoBehaviour
 
     
 
-    void spawnPlayers(int amount)
-    {
-
-        //will potentially be changed in order to accomodate choosing how many players and names etc...
-        for (int i = 0; i < amount; i++)
-        {
-            
-            var spawnedPlayer = Instantiate(Player1, new Vector3(0, 0.5f, 0), Quaternion.identity);
-            spawnedPlayer.name = $"Player {i}";
-            
-        }       
-        
-    }
+    
     
 
     public void BuyProperty(Property property)
@@ -130,17 +120,36 @@ public class Banker : Player
 }
 
 // Bank class
-public class Bank
+public class Bank : Player
 {
-    public int Money;
+    public int BankBalance = 300000;
     public List<Property> AvailableProperties;
     public List<Card> PotLuckCards;
     public List<Card> OppurtunityKnocksCards;
-    public int FreeParkingMoney = 0;
+    
+    
 
-    public Bank(int startingMoney)
+    public Bank(string name, int startingMoney) : base(name, startingMoney)
     {
-        Money = startingMoney;
+        //Balance = startingMoney;
+    }
+
+    public void Withdraw(int amount, Player player)
+    {
+        player.Balance  += amount;
+        BankBalance -= amount;
+    }
+
+    public void Deposit(int amount, Player player)
+    {
+        player.Balance -= amount;
+        BankBalance += amount;
+    }
+
+    public bool canAfford(int amount, Player player) // check if player can play for something
+    {
+       
+        return !(amount > player.Balance);
     }
 
     public void DepositToFreeParking(int amount)
@@ -229,7 +238,7 @@ public class Program : MonoBehaviour
         Debug.Log("Game started");
 
         // Sample game setup
-        Bank bank = new Bank(10000);
+        //Bank bank = new Bank(10000);
         Board board = new Board();
         Player player1 = new HumanPlayer("Alice", 1500);
         Player player2 = new Bot("Bot1", 1500);

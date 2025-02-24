@@ -1,12 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private GameObject Player;
-    
+
+    [SerializeField] private int playerAmount = 2;
+    [SerializeField] private GameObject Player1;
+
     public GameObject CurrentPlayer;
     public int playerTurn = -1;
+
+    List<Player> playerlist = new List<Player>();
 
     Vector3[] boardPosition = new Vector3[40];
 
@@ -53,13 +60,38 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer = GameObject.Find($"Player {playerTurn}");
     }
 
-    
+    void spawnPlayers(int amount)
+    {
+
+        //will potentially be changed in order to accomodate choosing how many players and names etc...
+        for (int i = 0; i < amount; i++)
+        {
+
+            var spawnedPlayer = Instantiate(Player1, new Vector3(0, 0.5f, 0), Quaternion.identity);
+            spawnedPlayer.name = $"Player {i}";
+
+            //Player player = new Player($"Player {i}", 1500); //check initaly starting money
+            //Debug.Log(player.name + player.Balance);
+            //playerlist.Add(player);
+
+
+
+        }
+
+    }
+
+
     void Start()
     {
-       CurrentPlayer = GameObject.Find("Player0");//will always have 1 player minimum so they start playing first
+        
+        
         
         CreateBoard();
-       //instantiates the boards coordinates
+
+        spawnPlayers(playerAmount);
+
+        CurrentPlayer = GameObject.Find("Player0");//will always have 1 player minimum so they start playing first
+                                                   //instantiates the boards coordinates
     }
 
     void Update()
