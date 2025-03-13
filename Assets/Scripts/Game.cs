@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using UnityEngine.UIElements;
+//using static PlayerMovement;
 
 // Base Player class
 public class Player : MonoBehaviour
@@ -12,13 +13,10 @@ public class Player : MonoBehaviour
     public string Name;
     public int Balance;
     public int Position;
-    public List<Property> OwnedProperties;
+    public List<PropertyTEMP> OwnedProperties;
     public int numberOfGetOutOfJailFreeCards;
     public bool InJail;
     public int GoesInJail;
-
-    
-
     
     Vector3[] boardPosition = new Vector3[40];
 
@@ -34,49 +32,33 @@ public class Player : MonoBehaviour
         GoesInJail = 0;
     }
 
-    private void Start()
+    public void BuyPropertyTEMP(PropertyTEMP PropertyTEMP)
     {
-        
-        //spawnPlayers(playerAmount);
-        //Player first = new Player("Player", 20000); //check default starting money
-
-        CurrentPlayer = GameObject.Find("Player0");
-
-
+        // if money > price of PropertyTEMP
+        // give bank price of PropertyTEMP
+        // add PropertyTEMP to OwnedProperties
+        // remove PropertyTEMP from bank
     }
 
-    
-
-    
-    
-
-    public void BuyProperty(Property property)
+    public void MortgagePropertyTEMP(PropertyTEMP PropertyTEMP)
     {
-        // if money > price of property
-        // give bank price of property
-        // add property to OwnedProperties
-        // remove property from bank
-    }
-
-    public void MortgageProperty(Property property)
-    {
-        // set property mortgaged state to true
+        // set PropertyTEMP mortgaged state to true
         // recieve mortgage amount from bank
     }
 
-    public void UpgradeProperty(Property property)
+    public void UpgradePropertyTEMP(PropertyTEMP PropertyTEMP)
     {
-        // if property can be upgraded
+        // if PropertyTEMP can be upgraded
         // if money > propert upgrade price
-        // upgrade property
-        // transfer property upgrade price to bank
+        // upgrade PropertyTEMP
+        // transfer PropertyTEMP upgrade price to bank
     }
 
-    public void DowngradeProperty(Property property)
+    public void DowngradePropertyTEMP(PropertyTEMP PropertyTEMP)
     {
-        // if property can be downgraded
-        // downgrade property
-        // transfer property downgrade amount to player from bank
+        // if PropertyTEMP can be downgraded
+        // downgrade PropertyTEMP
+        // transfer PropertyTEMP downgrade amount to player from bank
     }
 
     public void PayMoney(int amount)
@@ -123,7 +105,7 @@ public class Banker : Player
 public class Bank : Player
 {
     public int BankBalance = 300000;
-    public List<Property> AvailableProperties;
+    public List<PropertyTEMP> AvailableProperties;
     public List<Card> PotLuckCards;
     public List<Card> OppurtunityKnocksCards;
     
@@ -178,8 +160,8 @@ public class Dice
 public class Board
 {
     public static int TotalSpaces = 40;
-    public Dictionary<int, Property> Properties = new Dictionary<int, Property>(); // Key: Propery ID, Value: Property name
-    public Dictionary<int, int> Houses = new Dictionary<int, int>(); // Key: Property ID, Value: Number of houses
+    public Dictionary<int, PropertyTEMP> Properties = new Dictionary<int, PropertyTEMP>(); // Key: Propery ID, Value: PropertyTEMP name
+    public Dictionary<int, int> Houses = new Dictionary<int, int>(); // Key: PropertyTEMP ID, Value: Number of houses
 
     
 
@@ -189,7 +171,7 @@ public class Board
     public void MovePlayer(Player player, int spaces)
     {
         // move player by 'spaces'
-        // if space is a 'special property' act accordingly
+        // if space is a 'special PropertyTEMP' act accordingly
         // if player owns space pay them and move on
         // if no one owns space offer the space to the player that landed
     }
@@ -197,14 +179,14 @@ public class Board
    
 }
 
-// Property class
-public class Property
+// PropertyTEMP class
+public class PropertyTEMP
 {
     public string Name;
     public int Price;
     public Player Owner;
 
-    public Property(string name, int price)
+    public PropertyTEMP(string name, int price)
     {
         Name = name;
         Price = price;
