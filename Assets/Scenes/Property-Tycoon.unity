@@ -1697,6 +1697,7 @@ GameObject:
   - component: {fileID: 1754829403}
   - component: {fileID: 1754829405}
   - component: {fileID: 1754829406}
+  - component: {fileID: 1754829407}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -1765,11 +1766,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c23bed64c496b440b655acaca2073c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 0}
   playerAmount: 2
-  Player1: {fileID: 0}
+  PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
+--- !u!114 &1754829407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754829402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f78bcf5bcdd51ce4489e2a8cfb7b834b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Balance: 0
 --- !u!1 &2107050831
 GameObject:
   m_ObjectHideFlags: 0
