@@ -5,6 +5,17 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+
+    /*
+    -   detect whether going to jail versu just visinng, also going to have to telelport players to different spots onthe ajil tile depending
+        on why they are there
+    -   ergo add a teleprotation fucntion
+    -   checking at start of each turn if you are in jaile (will use global int for each player) in next turn function probably
+    -   add doubles fucntionalitly
+    */
+
+
     // In unity objects / vars
     [SerializeField] private int playerAmount = 2;
     [SerializeField] private GameObject PlayerObject;
