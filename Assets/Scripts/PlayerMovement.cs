@@ -115,10 +115,10 @@ public class PlayerMovement : MonoBehaviour
             NextTurn();
             moveForward(DiceRoll(), CurrentPlayer.transform.position);
 
-            BankTrans(100);
-            BankTrans(-150);
-            PlayerTrans(0, 1, 10);
-            PlayerTrans(1, 0, 15);
+            //BankTrans(100);
+            //BankTrans(-150);
+            //PlayerTrans(0, 1, 10);
+            //PlayerTrans(1, 0, 15);
 
         }
     }
@@ -158,7 +158,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (amount > 0)
         {
-            currentPlayerScript.ReceiveMoney(amount);
+            currentPlayerScript.ReceiveMoneyFromBank(amount);
         }
         else
         {

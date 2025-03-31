@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static Bank_;
 
 // Class that handles all unique player information 
 public class Player_ : MonoBehaviour
@@ -9,6 +10,8 @@ public class Player_ : MonoBehaviour
     public List<string> properties;
     public int pos;
 
+    private Bank_ bank;
+
     // Initializes the players variables
     public void Initialize(string name, int startBalance)
     {
@@ -16,6 +19,7 @@ public class Player_ : MonoBehaviour
         balance = startBalance;
         properties = new List<string>();
         pos = 0;
+        bank = FindObjectOfType<Bank_>();
     }
 
     // returns whether player has enough money for the payment
@@ -26,6 +30,15 @@ public class Player_ : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    // Receive money from the bank
+    public void ReceiveMoneyFromBank(int amount)
+    {
+        balance += amount;
+        bank.Balance -= amount;
+        Debug.Log($"{playerName} received ${amount}. New balance: ${balance}");
+        Debug.Log($"!!{bank.Balance}");
     }
 
     // Receive money from the bank
@@ -41,6 +54,7 @@ public class Player_ : MonoBehaviour
         if (BalanceCheck(amount))
         {
             balance -= amount;
+            bank.Balance += amount;
             Debug.Log($"{playerName} paid ${amount} to the bank. New balance: ${balance}");
             return true;
         }
