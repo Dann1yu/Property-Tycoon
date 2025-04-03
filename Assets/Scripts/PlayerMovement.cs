@@ -205,12 +205,14 @@ public class PlayerMovement : MonoBehaviour
         if (position == 7 | position == 36)
         {
             Debug.Log("opp knock");
+            oppKnock(player);
         }
 
         // Landed on pot luck
         if (position == 17 | position == 33)
         {
             Debug.Log("pot luck");
+            potLuck(player);
         }
 
         // Landed on income tax
@@ -278,6 +280,15 @@ public class PlayerMovement : MonoBehaviour
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
         
+        void potLuck(Player_ player)
+        {
+
+        }
+
+        void oppKnock(Player_ player)
+        {
+
+        }
     }
 
 }
