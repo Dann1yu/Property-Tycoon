@@ -220,15 +220,14 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log(player.balance);
             Debug.Log("super tax");
-            player.PayBank(200);
-            bank.DepositToFreeParking(100);
+            player.DepositToFreeParking(200);
         }
 
         // Landed on free parking
         if (position == 20)
         {
-            player.balance += bank.freeParkingBalance;
-            bank.WithdrawFromFreeParking();
+            player.balance += bank.FreeParkingBalance;
+            bank.FreeParkingBalance = 0;
         }
 
         // Landed on go to jail
@@ -236,7 +235,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("go to jail");
             player.inJail=1;
-            player.teleport(11);
+            teleport(player, 10);
         }
 
         // Landed on super tax
@@ -244,8 +243,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log(player.balance);
             Debug.Log("super tax");
-            player.PayBank(100);
-            bank.DepositToFreeParking(100);
+            player.DepositToFreeParking(100);
         }
 
         // Landed on go
@@ -290,9 +288,6 @@ public class PlayerMovement : MonoBehaviour
         {
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
-
-    
-        } 
     }
         
     public void potLuck(Player_ player) {
@@ -302,5 +297,11 @@ public class PlayerMovement : MonoBehaviour
     public void oppKnock(Player_ player) {
 
      }
+
+    public void teleport(Player_ player, int newPosition)
+    {
+        player.pos = newPosition;
+        CurrentPlayer.transform.position = boardPosition[newPosition];
+    }
     
 }

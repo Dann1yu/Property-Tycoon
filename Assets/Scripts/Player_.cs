@@ -81,9 +81,10 @@ public class Player_ : MonoBehaviour
         bank.BankOwnedProperties.Remove(idx);
     }
 
-    public void teleport(int positionIndex)
+    public void DepositToFreeParking(int amount)
     {
-        pos = positionIndex;
+        balance -= amount;
+        bank.FreeParkingBalance += amount;
     }
 
 }
