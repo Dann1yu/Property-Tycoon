@@ -204,14 +204,15 @@ public class PlayerMovement : MonoBehaviour
         if (position == 7 | position == 36)
         {
             Debug.Log("opp knock");
-            //cardHandling function to be implemented
+            oppKnock(player);
         }
 
         // Landed on pot luck
         if (position == 17 | position == 33)
         {
             Debug.Log("pot luck");
-            //cardHandling function to be implemented
+
+            potLuck(player);
         }
 
         // Landed on income tax
@@ -291,7 +292,15 @@ public class PlayerMovement : MonoBehaviour
         }
 
     
+        } 
+    }
         
+    public void potLuck(Player_ player) {
+
     }
 
+    public void oppKnock(Player_ player) {
+
+     }
+    
 }
