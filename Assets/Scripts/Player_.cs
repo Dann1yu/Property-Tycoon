@@ -9,7 +9,7 @@ public class Player_ : MonoBehaviour
     public int balance;
     public List<int> properties;
     public int pos;
-
+    public int inJail; // -1 for not in jail and +1 each turn starting from 1 in jail
     private Bank_ bank;
 
     // Initializes the players variables
@@ -19,6 +19,7 @@ public class Player_ : MonoBehaviour
         balance = startBalance;
         pos = 1;
         properties = new List<int>();
+        inJail = -1;
         bank = FindFirstObjectByType<Bank_>();
     }
 
@@ -79,4 +80,10 @@ public class Player_ : MonoBehaviour
         properties.Add(idx);
         bank.BankOwnedProperties.Remove(idx);
     }
+
+    public void teleport(int positionIndex)
+    {
+        pos = positionIndex;
+    }
+
 }

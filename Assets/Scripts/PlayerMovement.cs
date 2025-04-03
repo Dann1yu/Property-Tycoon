@@ -23,7 +23,6 @@ public class PlayerMovement : MonoBehaviour
     // Default values
     public GameObject CurrentPlayer;
     public int playerTurn = -1;
-
     private Bank_ bank;
 
     // Empty values to be set
@@ -177,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
         // handling
         var position = player.pos;
         var location = bank.Properties[position];
-
+        
         // bank.info(position);
 
         //Debug.Log($"{position}");
@@ -212,42 +211,54 @@ public class PlayerMovement : MonoBehaviour
         if (position == 17 | position == 33)
         {
             Debug.Log("pot luck");
+
             potLuck(player);
         }
 
         // Landed on income tax
         if (position == 4)
         {
-            Debug.Log("income tax");
+            Debug.Log(player.balance);
+            Debug.Log("super tax");
+            player.PayBank(200);
+            bank.DepositToFreeParking(100);
         }
 
         // Landed on free parking
         if (position == 20)
         {
-            Debug.Log("free parking");
+            player.balance += bank.freeParkingBalance;
+            bank.WithdrawFromFreeParking();
         }
 
         // Landed on go to jail
         if (position == 30)
         {
             Debug.Log("go to jail");
+            player.inJail=1;
+            player.teleport(11);
         }
 
         // Landed on super tax
         if (position == 38)
         {
+            Debug.Log(player.balance);
             Debug.Log("super tax");
+            player.PayBank(100);
+            bank.DepositToFreeParking(100);
         }
 
         // Landed on go
         if (position == 0)
         {
+            // should not need any logic if there is pass go logic implemented in move forward
             Debug.Log("go");
         }
 
 
         Debug.Log($"{position}");
         Debug.Log($"{location.Name}");
+        //end turn function
     }
 
     void purchaseProperty(Player_ player, Property location)
@@ -278,6 +289,9 @@ public class PlayerMovement : MonoBehaviour
         } else if (location.NumberOfHouses == 5)
         {
             PlayerTrans(player, location.Owner, location.RentHotel);
+        }
+
+    
         } 
     }
         

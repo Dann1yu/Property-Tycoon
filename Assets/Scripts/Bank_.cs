@@ -7,8 +7,6 @@ public class Bank_ : MonoBehaviour
 {
     public int Balance;
     public List<Property> Properties { get; private set; } = new List<Property>();
-    public List<int> BankOwnedProperties = new List<int>();
-
     public void LoadProperties(string filePath)
     {
         try
@@ -18,21 +16,16 @@ public class Bank_ : MonoBehaviour
             foreach (string line in lines)
             {
                 string[] values = line.Split(',');
-                //Debug.Log(line);
+                Debug.Log(line);
 
                 // Parsing values
-                //Debug.Log(values[0]);
+                Debug.Log(values[0]);
                 //int position = int.TryParse(values[0]) - 1;
                 int position = int.Parse(values[0]) - 1;
                 string name = values[1];
                 string group = values[3];
                 string action = values[4];
                 bool canBeBought = values[5].Trim().ToLower() == "yes";
-
-                if (canBeBought )
-                {
-                    BankOwnedProperties.Add(position);
-                }
 
                 int cost = int.TryParse(values[7], out int noValue) ? noValue : -1;
                 int rentUnimproved = int.TryParse(values[8], out int noValue1) ? noValue1 : -1;
@@ -55,9 +48,7 @@ public class Bank_ : MonoBehaviour
                     Rent2Houses = rent2Houses,
                     Rent3Houses = rent3Houses,
                     Rent4Houses = rent4Houses,
-                    RentHotel = rentHotel,
-                    Owner = null,
-                    NumberOfHouses = 0
+                    RentHotel = rentHotel
                 };
 
                 Properties.Add(property);
@@ -76,6 +67,7 @@ public class Bank_ : MonoBehaviour
         Balance = 15000;
         string path = Application.dataPath + "/Resources/BoardData.csv"; // Ensure the file is inside 'Assets/Resources/'
         LoadProperties(path);
+        Debug.Log($"Properties Loaded: {Properties.Count}"); // Verify it loaded
     }
 
 
