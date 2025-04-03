@@ -55,7 +55,9 @@ public class Bank_ : MonoBehaviour
                     Rent2Houses = rent2Houses,
                     Rent3Houses = rent3Houses,
                     Rent4Houses = rent4Houses,
-                    RentHotel = rentHotel
+                    RentHotel = rentHotel,
+                    Owner = null,
+                    NumberOfHouses = 0
                 };
 
                 Properties.Add(property);

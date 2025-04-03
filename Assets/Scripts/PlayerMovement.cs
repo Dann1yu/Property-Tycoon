@@ -167,11 +167,8 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void PlayerTrans(int playerFromIdx, int playerToIdx, int amount)
+    public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
-        Player_ sender = playerlist[playerFromIdx];
-        Player_ receiver = playerlist[playerToIdx];
-
         sender.PayPlayer(receiver, amount);
     }
 
@@ -199,7 +196,8 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("property owned by the same player");
             }
             else {
-                Debug.Log("property owned by another player"); 
+                Debug.Log("property owned by another player");
+                payRent(player, location);
             }
         }
 
@@ -239,6 +237,12 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("super tax");
         }
 
+        // Landed on go
+        if (position == 0)
+        {
+            Debug.Log("go");
+        }
+
 
         Debug.Log($"{position}");
         Debug.Log($"{location.Name}");
@@ -248,8 +252,32 @@ public class PlayerMovement : MonoBehaviour
     {
         player.addProperty(player.pos);
         BankTrans(-location.Cost);
+        location.Owner = player;
         //Debug.Log($"{player.properties}");
         //Debug.Log($"{bank.BankOwnedProperties}");
+    }
+
+    void payRent(Player_ player, Property location)
+    {
+        if (location.NumberOfHouses == 0) {
+            PlayerTrans(player, location.Owner, location.RentUnimproved);
+        } else if (location.NumberOfHouses == 1)
+        {
+            PlayerTrans(player, location.Owner, location.Rent1House);
+        } else if (location.NumberOfHouses == 2)
+        {
+            PlayerTrans(player, location.Owner, location.Rent2Houses);
+        } else if (location.NumberOfHouses == 3)
+        {
+            PlayerTrans(player, location.Owner, location.Rent3Houses);
+        } else if (location.NumberOfHouses == 4)
+        {
+            PlayerTrans(player, location.Owner, location.Rent4Houses);
+        } else if (location.NumberOfHouses == 5)
+        {
+            PlayerTrans(player, location.Owner, location.RentHotel);
+        }
+        
     }
 
 }

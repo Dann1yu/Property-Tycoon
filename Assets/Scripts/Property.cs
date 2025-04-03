@@ -12,4 +12,6 @@ public class Property
     public int Rent3Houses { get; set; }
     public int Rent4Houses { get; set; }
     public int RentHotel { get; set; }
+    public Player_ Owner { get; set; }
+    public int NumberOfHouses { get; set; }
 }
