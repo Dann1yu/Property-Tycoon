@@ -7,8 +7,12 @@ public class Bank_ : MonoBehaviour
 {
     public int Balance;
     public List<Property> Properties { get; private set; } = new List<Property>();
+    public List<Card> PLCards { get; private set; } = new List<Card>();
+    public List<Card> OKCards { get; private set; } = new List<Card>();
     public List<int> BankOwnedProperties = new List<int>();
     public int FreeParkingBalance = 0;
+
+    private static System.Random rng = new System.Random();
 
     public void LoadProperties(string filePath)
     {
@@ -21,8 +25,6 @@ public class Bank_ : MonoBehaviour
                 string[] values = line.Split(',');
                 Debug.Log(line);
 
-                // Parsing values
-                Debug.Log(values[0]);
                 //int position = int.TryParse(values[0]) - 1;
                 int position = int.Parse(values[0]) - 1;
                 string name = values[1];
@@ -70,11 +72,89 @@ public class Bank_ : MonoBehaviour
         }
     }
 
+    public void LoadCards(string filePath)
+    {
+        try
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            int count = 0;
+            bool oppKnocks = false;
+            foreach (string line in lines)
+            {
+                if (line == ",,") {
+                    Debug.Log($"HERE: {count}");
+                    oppKnocks = true;
+                    count = 0;
+                }
+                
+
+                string[] values = line.Split(',');
+
+                // Basic logging
+                Debug.Log(line);
+
+                // Parse each field safely
+                int id = count;
+                count += 1;
+                string description = values[0];
+                string action = values[1];
+
+                // Optional integer field — use -1 if not parseable
+                int integerValue = int.TryParse(values[2], out int parsedValue) ? parsedValue : -1;
+
+                Card card = new Card
+                {
+                    Id = id,
+                    Description = description,
+                    Action = action,
+                    Integer = integerValue
+                };
+
+                if (oppKnocks) {
+                    OKCards.Add(card);
+                } else {
+                    PLCards.Add(card);
+                }
+            }
+
+            foreach (Card card in OKCards)
+            {
+                Debug.Log($"{card.Id}");
+            }
+            foreach (Card card in PLCards)
+            {
+                Debug.Log($"{card.Id}");
+            }
+
+            shuffle(OKCards);
+            shuffle(PLCards);
+
+            Debug.Log($"Successfully loaded {OKCards.Count} oppurtunity knocks cards.");
+            Debug.Log($"Successfully loaded {PLCards.Count} pot luck cards.");
+
+            foreach (Card card in OKCards)
+            {
+                Debug.Log($"{card.Id}");
+            }
+            foreach (Card card in PLCards)
+            {
+                Debug.Log($"{card.Id}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error loading cards: {ex.Message}");
+        }
+    }
+
+
     void Start()
     {
         Balance = 15000;
         string path = Application.dataPath + "/Resources/BoardData.csv"; // Ensure the file is inside 'Assets/Resources/'
         LoadProperties(path);
+        path = Application.dataPath + "/Resources/CardData.csv";
+        LoadCards(path);
         Debug.Log($"Properties Loaded: {Properties.Count}"); // Verify it loaded
     }
 
@@ -96,6 +176,20 @@ public class Bank_ : MonoBehaviour
             $"Three house rent: {property.Rent3Houses} \n" +
             $"Four house rent: {property.Rent4Houses} \n" +
             $"One hotel rent: {property.RentHotel}");
+    }
+
+    private void shuffle(List<Card> cards)
+    {
+        System.Random rng = new System.Random();
+        int n = cards.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            Card value = cards[k];
+            cards[k] = cards[n];
+            cards[n] = value;
+        }
     }
 }
 

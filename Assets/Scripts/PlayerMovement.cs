@@ -300,7 +300,12 @@ public class PlayerMovement : MonoBehaviour
     }
         
     public void potLuck(Player_ player) {
+        Card card = bank.PLCards[0];
+        bank.PLCards.RemoveAt(0);
 
+        Debug.Log($"{card.Description}");
+
+        bank.PLCards.Add(card);
     }
 
     public void oppKnock(Player_ player) {
