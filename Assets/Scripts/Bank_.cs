@@ -7,6 +7,7 @@ public class Bank_ : MonoBehaviour
 {
     public int Balance;
     public List<Property> Properties { get; private set; } = new List<Property>();
+    public List<int> BankOwnedProperties = new List<int>();
 
     public void LoadProperties(string filePath)
     {
@@ -27,6 +28,11 @@ public class Bank_ : MonoBehaviour
                 string group = values[3];
                 string action = values[4];
                 bool canBeBought = values[5].Trim().ToLower() == "yes";
+
+                if (canBeBought )
+                {
+                    BankOwnedProperties.Add(position);
+                }
 
                 int cost = int.TryParse(values[7], out int noValue) ? noValue : -1;
                 int rentUnimproved = int.TryParse(values[8], out int noValue1) ? noValue1 : -1;

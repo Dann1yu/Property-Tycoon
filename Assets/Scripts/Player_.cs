@@ -7,7 +7,7 @@ public class Player_ : MonoBehaviour
 {
     public string playerName;
     public int balance;
-    public List<string> properties;
+    public List<int> properties;
     public int pos;
 
     private Bank_ bank;
@@ -17,9 +17,9 @@ public class Player_ : MonoBehaviour
     {
         playerName = name;
         balance = startBalance;
-        properties = new List<string>();
-        pos = 0;
-        bank = FindObjectOfType<Bank_>();
+        pos = 1;
+        properties = new List<int>();
+        bank = FindFirstObjectByType<Bank_>();
     }
 
     // returns whether player has enough money for the payment
@@ -72,5 +72,11 @@ public class Player_ : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public void addProperty(int idx)
+    {
+        properties.Add(idx);
+        bank.BankOwnedProperties.Remove(idx);
     }
 }

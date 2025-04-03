@@ -98,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
     {
         CreateBoard();
 
-        bank = FindObjectOfType<Bank_>(); // Finds the Bank_ instance in the scene
+        bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
 
 
         spawnPlayers(playerAmount);
@@ -125,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
     void moveForward(int distance, Vector3 currentpos)
     {
         Player_ currentPlayerScript = CurrentPlayer.GetComponent<Player_>();
-        int oldposition=0;
+        int oldposition=1;
         for (int i = 0; i < boardPosition.Length; i++)
         {
             if (currentpos == boardPosition[i])
@@ -149,7 +149,8 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer.transform.position = boardPosition[new_position];
         currentPlayerScript.pos = new_position;
         //potential to add animation herre
-        bank.info(new_position);
+
+        positionHandling(currentPlayerScript);
     }
 
     public void BankTrans(int amount)
@@ -172,6 +173,73 @@ public class PlayerMovement : MonoBehaviour
         Player_ receiver = playerlist[playerToIdx];
 
         sender.PayPlayer(receiver, amount);
+    }
+
+    void positionHandling(Player_ player)
+    {
+        // handling
+        var position = player.pos;
+        var location = bank.Properties[position];
+
+        // bank.info(position);
+
+        Debug.Log($"{position}");
+        Debug.Log($"{location.Position}");
+
+        // Landed on property that can be purchased
+        if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
+        {
+            purchaseProperty(player, location);
+            Debug.Log("property for sale");
+        }
+
+        // Landed on oppurtunity knocks 8, 37
+        if (position == 8 | position == 37)
+        {
+            Debug.Log("opp knock");
+        }
+
+        // Landed on pot luck
+        if (position == 18 | position == 34)
+        {
+            Debug.Log("pot luck");
+        }
+
+        // Landed on income tax
+        if (position == 5)
+        {
+            Debug.Log("income tax");
+        }
+
+        // Landed on free parking
+        if (position == 21)
+        {
+            Debug.Log("free parking");
+        }
+
+        // Landed on go to jail
+        if (position == 31)
+        {
+            Debug.Log("go to jail");
+        }
+
+        // Landed on super tax
+        if (position == 39)
+        {
+            Debug.Log("super tax");
+        }
+
+
+        Debug.Log($"{position}");
+        Debug.Log($"{location.Name}");
+    }
+
+    void purchaseProperty(Player_ player, Property location)
+    {
+        player.addProperty(player.pos);
+        BankTrans(-location.Cost);
+        Debug.Log($"{player.properties}");
+        Debug.Log($"{bank.BankOwnedProperties}");
     }
 
 }
