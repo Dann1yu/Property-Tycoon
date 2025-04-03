@@ -29,6 +29,8 @@ public class PlayerMovement : MonoBehaviour
     List<Player_> playerlist = new List<Player_>();
     Vector3[] boardPosition = new Vector3[40];
 
+    private DiceRoller diceRoller;
+
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
     {
@@ -56,10 +58,11 @@ public class PlayerMovement : MonoBehaviour
     // Emulation of two dice rolls (2x 1->6)
     public int DiceRoll()
     {
-        int dice1 = Random.Range(1, 7);
-        int dice2 = Random.Range(1, 7);
-        Debug.Log("you rolled a: " + (dice1 + dice2));
-        return (dice1 + dice2);
+        return diceRoller.RollDice();
+        //int dice1 = Random.Range(1, 7);
+        //int dice2 = Random.Range(1, 7);
+        //Debug.Log("you rolled a: " + (dice1 + dice2));
+        //return (dice1 + dice2);
     }
 
     // Ends current term and starts next player's go
@@ -102,15 +105,23 @@ public class PlayerMovement : MonoBehaviour
 
         spawnPlayers(playerAmount);
 
+        diceRoller = FindFirstObjectByType<DiceRoller>();
+
         CurrentPlayer = GameObject.Find("Player0");
     }
 
     // Updates on next players turn
-    void Update()
+    public void Update()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             //for now to test movement up arrow presses in order to simulate players turn
+            // if the dice is rolling do nothing
+            if (diceRoller.isRolling)
+            {
+                return;
+            }
+            
             NextTurn();
             moveForward(DiceRoll(), CurrentPlayer.transform.position);
 
@@ -185,17 +196,17 @@ public class PlayerMovement : MonoBehaviour
         // Landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
         {
+            Debug.Log("Property for sale");
             purchaseProperty(player, location);
-            Debug.Log("property for sale");
         }
         // Landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
         {
             if (player.properties.Contains(position)) {
-                Debug.Log("property owned by the same player");
+                Debug.Log("Property owned by the same player");
             }
             else {
-                Debug.Log("property owned by another player");
+                Debug.Log("Property owned by another player");
                 payRent(player, location);
             }
         }
@@ -203,37 +214,38 @@ public class PlayerMovement : MonoBehaviour
         // Landed on oppurtunity knocks 8, 37
         if (position == 7 | position == 36)
         {
-            Debug.Log("opp knock");
+            Debug.Log("Landed on oppurtunity knocks");
             oppKnock(player);
         }
 
         // Landed on pot luck
         if (position == 17 | position == 33)
         {
-            Debug.Log("pot luck");
-
+            Debug.Log("Landed on pot luck");
             potLuck(player);
         }
 
         // Landed on income tax
         if (position == 4)
         {
-            Debug.Log(player.balance);
-            Debug.Log("super tax");
+            Debug.Log("Landed on Income Tax and charged $200");
             player.DepositToFreeParking(200);
+            Debug.Log($"New balance: {player.balance}");
         }
 
         // Landed on free parking
         if (position == 20)
         {
+            Debug.Log($"Landed on free parking you have gained {bank.FreeParkingBalance}");
             player.balance += bank.FreeParkingBalance;
             bank.FreeParkingBalance = 0;
+            Debug.Log($"New balance: {player.balance}");
         }
 
         // Landed on go to jail
         if (position == 30)
         {
-            Debug.Log("go to jail");
+            Debug.Log("Go to jail");
             player.inJail=1;
             teleport(player, 10);
         }
@@ -241,21 +253,18 @@ public class PlayerMovement : MonoBehaviour
         // Landed on super tax
         if (position == 38)
         {
+            Debug.Log("Landed on Super Tax and charged $100");
             Debug.Log(player.balance);
-            Debug.Log("super tax");
             player.DepositToFreeParking(100);
+            Debug.Log($"New balance: {player.balance}");
         }
 
         // Landed on go
         if (position == 0)
         {
             // should not need any logic if there is pass go logic implemented in move forward
-            Debug.Log("go");
+            Debug.Log("Landed on GO");
         }
-
-
-        Debug.Log($"{position}");
-        Debug.Log($"{location.Name}");
         //end turn function
     }
 

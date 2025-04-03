@@ -8,10 +8,12 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public Image diceImage;
     public Sprite[] diceFaces;
     public Sprite rollDiceSprite;
-    private bool isRolling = false;
+    public bool isRolling = false;
 
     public Texture2D handCursor; // Assign a hand cursor texture in the Inspector
     private Texture2D defaultCursor;
+
+    // public DiceRoller diceRoller = new DiceRoller();
 
     void Start()
     {
@@ -30,21 +32,27 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        RollDice();
+        
+        // RollDice();
     }
 
-    private void RollDice()
+    public int RollDice()
     {
         if (!isRolling)
         {
-            StartCoroutine(RollAnimation());
+            int finalRoll = 0;
+            finalRoll = Random.Range(0, diceFaces.Length);
+            StartCoroutine(RollAnimation(finalRoll));
+            finalRoll += Random.Range(0, diceFaces.Length) + 2;
+            return finalRoll;
         }
+        return 0;
+
     }
 
-    private IEnumerator RollAnimation()
+    private IEnumerator RollAnimation(int finalRoll)
     {
         isRolling = true;
-        int finalRoll = Random.Range(0, diceFaces.Length);
 
         for (int i = 0; i < 10; i++)
         {
