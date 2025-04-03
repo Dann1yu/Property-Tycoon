@@ -3018,9 +3018,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAmount: 2
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
+=======
+<<<<<<< HEAD
+  PlayerObject: {fileID: 0}
+  CurrentPlayer: {fileID: 0}
+  playerTurn: -1
+=======
+  PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
+  CurrentPlayer: {fileID: 0}
+  playerTurn: -1
+>>>>>>> Stashed changes
 =======
 <<<<<<< HEAD
   PlayerObject: {fileID: 0}
