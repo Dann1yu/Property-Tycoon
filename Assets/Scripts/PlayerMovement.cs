@@ -183,8 +183,8 @@ public class PlayerMovement : MonoBehaviour
 
         // bank.info(position);
 
-        Debug.Log($"{position}");
-        Debug.Log($"{location.Position}");
+        //Debug.Log($"{position}");
+        //Debug.Log($"{location.Position}");
 
         // Landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
@@ -192,39 +192,49 @@ public class PlayerMovement : MonoBehaviour
             purchaseProperty(player, location);
             Debug.Log("property for sale");
         }
+        // Landed on property that is owned by a player
+        else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
+        {
+            if (player.properties.Contains(position)) {
+                Debug.Log("property owned by the same player");
+            }
+            else {
+                Debug.Log("property owned by another player"); 
+            }
+        }
 
         // Landed on oppurtunity knocks 8, 37
-        if (position == 8 | position == 37)
+        if (position == 7 | position == 36)
         {
             Debug.Log("opp knock");
         }
 
         // Landed on pot luck
-        if (position == 18 | position == 34)
+        if (position == 17 | position == 33)
         {
             Debug.Log("pot luck");
         }
 
         // Landed on income tax
-        if (position == 5)
+        if (position == 4)
         {
             Debug.Log("income tax");
         }
 
         // Landed on free parking
-        if (position == 21)
+        if (position == 20)
         {
             Debug.Log("free parking");
         }
 
         // Landed on go to jail
-        if (position == 31)
+        if (position == 30)
         {
             Debug.Log("go to jail");
         }
 
         // Landed on super tax
-        if (position == 39)
+        if (position == 38)
         {
             Debug.Log("super tax");
         }
@@ -238,8 +248,8 @@ public class PlayerMovement : MonoBehaviour
     {
         player.addProperty(player.pos);
         BankTrans(-location.Cost);
-        Debug.Log($"{player.properties}");
-        Debug.Log($"{bank.BankOwnedProperties}");
+        //Debug.Log($"{player.properties}");
+        //Debug.Log($"{bank.BankOwnedProperties}");
     }
 
 }

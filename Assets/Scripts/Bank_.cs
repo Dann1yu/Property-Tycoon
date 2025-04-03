@@ -18,10 +18,10 @@ public class Bank_ : MonoBehaviour
             foreach (string line in lines)
             {
                 string[] values = line.Split(',');
-                Debug.Log(line);
+                //Debug.Log(line);
 
                 // Parsing values
-                Debug.Log(values[0]);
+                //Debug.Log(values[0]);
                 //int position = int.TryParse(values[0]) - 1;
                 int position = int.Parse(values[0]) - 1;
                 string name = values[1];
@@ -74,7 +74,6 @@ public class Bank_ : MonoBehaviour
         Balance = 15000;
         string path = Application.dataPath + "/Resources/BoardData.csv"; // Ensure the file is inside 'Assets/Resources/'
         LoadProperties(path);
-        Debug.Log($"Properties Loaded: {Properties.Count}"); // Verify it loaded
     }
 
 
