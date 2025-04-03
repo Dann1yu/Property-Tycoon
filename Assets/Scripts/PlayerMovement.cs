@@ -309,8 +309,14 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public void oppKnock(Player_ player) {
+        Card card = bank.OKCards[0];
+        bank.PLCards.RemoveAt(0);
 
-     }
+        Debug.Log($"{card.Description}");
+
+        bank.OKCards.Add(card);
+
+    }
 
     public void teleport(Player_ player, int newPosition)
     {
