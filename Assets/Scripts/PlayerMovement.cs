@@ -278,17 +278,15 @@ public class PlayerMovement : MonoBehaviour
         } else if (location.NumberOfHouses == 5)
         {
             PlayerTrans(player, location.Owner, location.RentHotel);
-        }
+        } 
+    }
         
-        public void potLuck(Player_ player)
-        {
+    public void potLuck(Player_ player) {
 
-        }
-
-        public void oppKnock(Player_ player)
-        {
-
-        }
     }
 
+    public void oppKnock(Player_ player) {
+
+     }
+    
 }
