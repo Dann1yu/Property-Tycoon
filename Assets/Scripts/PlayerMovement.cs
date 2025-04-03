@@ -280,12 +280,12 @@ public class PlayerMovement : MonoBehaviour
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
         
-        void potLuck(Player_ player)
+        public void potLuck(Player_ player)
         {
 
         }
 
-        void oppKnock(Player_ player)
+        public void oppKnock(Player_ player)
         {
 
         }
