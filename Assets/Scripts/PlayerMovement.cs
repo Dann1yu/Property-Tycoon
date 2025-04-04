@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
 using static UnityEditor.Experimental.GraphView.GraphView;
@@ -19,6 +21,9 @@ public class PlayerMovement : MonoBehaviour
     // In unity objects / vars
     [SerializeField] private int playerAmount = 2;
     [SerializeField] private GameObject PlayerObject;
+
+    public TextMeshProUGUI displayName1;
+    public TextMeshProUGUI displayName2;
 
     // Default values
     public GameObject CurrentPlayer;
@@ -76,6 +81,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         CurrentPlayer = playerlist[playerTurn].gameObject; // Get GameObject of current player
+
+        string current = playerlist[playerTurn].ToString();
+        current = current.Remove(current.Length - 9);
+        displayName1.text = current;
+        displayName2.text = "Balance: $" +playerlist[playerTurn].balance.ToString();
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
@@ -90,14 +100,28 @@ public class PlayerMovement : MonoBehaviour
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
             playerComponent.Initialize($"Player {i}", 1500);
 
+
             // Add to player list for tracking
             playerlist.Add(playerComponent);
+            Debug.Log("player count" + playerlist.Count);
         }
+    }
+
+    public string findPlayerName()
+    {
+        if (playerTurn >= playerlist.Count) // Loops back to first player
+        {
+            playerTurn = 0;
+        }
+
+        //Debug.Log("ttest" + playerlist[0]);
+        return playerlist[1].ToString();
     }
 
     // Creates the board, spawns the player and sets current player to player 0
     void Start()
     {
+        Debug.Log("started");
         CreateBoard();
 
         bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
@@ -108,6 +132,9 @@ public class PlayerMovement : MonoBehaviour
         diceRoller = FindFirstObjectByType<DiceRoller>();
 
         CurrentPlayer = GameObject.Find("Player0");
+        //Debug.Log("current" + CurrentPlayer);
+        //Player_ thisPlayer = CurrentPlayer.GetComponent<Player_>();
+        //Debug.Log("name" + thisPlayer.playerName);
     }
 
     // Updates on next players turn
@@ -268,6 +295,7 @@ public class PlayerMovement : MonoBehaviour
         //end turn function
     }
 
+
     void purchaseProperty(Player_ player, Property location)
     {
         player.addProperty(player.pos);
@@ -324,4 +352,6 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer.transform.position = boardPosition[newPosition];
     }
     
+   
+
 }
