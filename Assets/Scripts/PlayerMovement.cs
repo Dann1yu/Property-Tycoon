@@ -1,8 +1,12 @@
+using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Properties;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR;
+using static System.Net.Mime.MediaTypeNames;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerMovement : MonoBehaviour
@@ -25,10 +29,23 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI displayName1;
     public TextMeshProUGUI displayName2;
 
+    public GameObject ButtonObject;
+    public TextMeshProUGUI txt;
+    public Transform WhereYouWantButtonsParented;
+
+
+
+    private bool bought = false;
+    private bool endedTurn = true;
+    private bool options = false;
+    private bool chose = false;
     // Default values
     public GameObject CurrentPlayer;
     public int playerTurn = -1;
     private Bank_ bank;
+
+    public Player_ PlayerInControl;
+    private UI UserInterface;
 
     // Empty values to be set
     List<Player_> playerlist = new List<Player_>();
@@ -86,6 +103,7 @@ public class PlayerMovement : MonoBehaviour
         current = current.Remove(current.Length - 9);
         displayName1.text = current;
         displayName2.text = "Balance: $" +playerlist[playerTurn].balance.ToString();
+        
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
@@ -131,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
 
         diceRoller = FindFirstObjectByType<DiceRoller>();
 
-        CurrentPlayer = GameObject.Find("Player0");
+        CurrentPlayer = GameObject.Find("Player 0");
         //Debug.Log("current" + CurrentPlayer);
         //Player_ thisPlayer = CurrentPlayer.GetComponent<Player_>();
         //Debug.Log("name" + thisPlayer.playerName);
@@ -140,17 +158,28 @@ public class PlayerMovement : MonoBehaviour
     // Updates on next players turn
     public void Update()
     {
+  
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
+           
             //for now to test movement up arrow presses in order to simulate players turn
             // if the dice is rolling do nothing
             if (diceRoller.isRolling)
             {
                 return;
             }
-            
+            endedTurn = false;
             NextTurn();
             moveForward(DiceRoll(), CurrentPlayer.transform.position);
+
+            bool firstroll = true;
+            if (firstroll)
+            {
+                
+                firstroll = false;
+            }
+
+            //all decision making after roll:
 
             //BankTrans(100);
             //BankTrans(-150);
@@ -161,6 +190,8 @@ public class PlayerMovement : MonoBehaviour
     }
     void moveForward(int distance, Vector3 currentpos)
     {
+
+        Debug.Log("ran moveforward");
         Player_ currentPlayerScript = CurrentPlayer.GetComponent<Player_>();
         int oldposition=1;
         for (int i = 0; i < boardPosition.Length; i++)
@@ -204,6 +235,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public bool waitForDecision()
+    {
+        return true;
+    }
+
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
         sender.PayPlayer(receiver, amount);
@@ -214,7 +250,8 @@ public class PlayerMovement : MonoBehaviour
         // handling
         var position = player.pos;
         var location = bank.Properties[position];
-        
+        canEndTurn();
+        canHaveOptions();
         // bank.info(position);
 
         //Debug.Log($"{position}");
@@ -223,8 +260,22 @@ public class PlayerMovement : MonoBehaviour
         // Landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
         {
+            
             Debug.Log("Property for sale");
-            purchaseProperty(player, location);
+            if (location.Cost < player.balance)
+            {
+                canBuyProperty();
+            }
+           
+            if (bought)
+            {
+                purchaseProperty(player, location);
+                bought = false;
+                chose = true;
+                Destroy(ButtonObject);
+            } 
+                
+            
         }
         // Landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
@@ -292,7 +343,11 @@ public class PlayerMovement : MonoBehaviour
             // should not need any logic if there is pass go logic implemented in move forward
             Debug.Log("Landed on GO");
         }
-        //end turn function
+        //end turn functionff
+        if (endedTurn)
+        {
+            Destroy(ButtonObject);
+        }
     }
 
 
@@ -303,6 +358,7 @@ public class PlayerMovement : MonoBehaviour
         location.Owner = player;
         //Debug.Log($"{player.properties}");
         //Debug.Log($"{bank.BankOwnedProperties}");
+        // needs checking if there isnt enough money
     }
 
     void payRent(Player_ player, Property location)
@@ -351,7 +407,63 @@ public class PlayerMovement : MonoBehaviour
         player.pos = newPosition;
         CurrentPlayer.transform.position = boardPosition[newPosition];
     }
-    
-   
+
+    //ui section tried to make a script for it didnt work
+
+
+    public void canBuyProperty()
+    {
+
+        var spawnedButtonP = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
+        spawnedButtonP.name = "propertyBtn";
+        spawnedButtonP.transform.position = new Vector3(Screen.width - 380, Screen.height - 50, 0);
+        Debug.Log("ui worked");
+        
+    }
+
+    public void canEndTurn()
+    {
+        var spawnedButtonE = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
+        spawnedButtonE.name = "EndBtn";
+        GameObject.Find("EndBtn").GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
+        spawnedButtonE.transform.position = new Vector3(Screen.width -60, Screen.height - 50, 0);
+    }
+
+    public void canHaveOptions()
+    {
+        var spawnedButtonO = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
+        spawnedButtonO.name = "optionsBtn";
+        GameObject.Find("optionsBtn").GetComponentInChildren<TextMeshProUGUI>().text = "Options";
+        spawnedButtonO.transform.position = new Vector3(Screen.width - 220, Screen.height - 50, 0);
+    }
+
+    public void DecidedToClick(string buttonName)
+    {
+        Debug.Log("button name " + buttonName);
+        if (buttonName == "propertyBtn")
+        {
+           
+            bought = true;
+            chose = true;
+        }
+        if (buttonName == "EndBtn")
+        {
+            endedTurn = true;
+            chose = true;
+        }
+        if (buttonName == "optionsBtn")
+        {
+            options = true;
+            chose = true;
+        }
+
+    }
+
+    public void EndedTurn()
+    {
+        endedTurn = true;
+    }
+
+ 
 
 }
