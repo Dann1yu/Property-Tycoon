@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using static UnityEditor.Experimental.GraphView.GraphView;
+using System.Reflection;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -212,7 +213,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on oppurtunity knocks 8, 37
-        if (position == 7 | position == 36)
+        if (position == 7 | position==22 | position == 36)
         {
             Debug.Log("Landed on oppurtunity knocks");
             oppKnock(player);
@@ -247,7 +248,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("Go to jail");
             player.inJail=1;
-            teleport(player, 10);
+            _Teleport(player, 10);
         }
 
         // Landed on super tax
@@ -298,30 +299,93 @@ public class PlayerMovement : MonoBehaviour
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
     }
-        
+    
+    // works but only for pay (not go to jail)
     public void potLuck(Player_ player) {
         Card card = bank.PLCards[0];
         bank.PLCards.RemoveAt(0);
 
         Debug.Log($"{card.Description}");
+        
+        var action = card.Action;
+        var amount = card.Integer;
+
+        runMethod(player, action, amount);
 
         bank.PLCards.Add(card);
     }
 
     public void oppKnock(Player_ player) {
         Card card = bank.OKCards[0];
-        bank.PLCards.RemoveAt(0);
+        bank.OKCards.RemoveAt(0);
 
         Debug.Log($"{card.Description}");
+
+        var action = card.Action;
+        var amount = card.Integer;
+
+        runMethod(player, action, amount);
 
         bank.OKCards.Add(card);
 
     }
 
-    public void teleport(Player_ player, int newPosition)
+    public void runMethod(Player_ player, string action, int Integer)
+    {
+        var method = this.GetType().GetMethod(action, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        if (method != null)
+        {
+            method.Invoke(this, new object[] { player, Integer });
+        }
+    }
+
+
+    // ALL FOR CARD USAGE
+    public void _Teleport(Player_ player, int newPosition)
     {
         player.pos = newPosition;
         CurrentPlayer.transform.position = boardPosition[newPosition];
     }
-    
+
+    public void _ReceiveMoneyFromBank(Player_ player, int amount)
+    {
+        Debug.Log("_ReceiveMoneyFromBank");
+    }
+    public void _PayBank(Player_ player, int amount)
+    {
+        Debug.Log("_PayBank");
+    }
+    public void _OppKnocksOption(Player_ player, int amount)
+    {
+        Debug.Log("_OppKnocksOption");
+    }
+    public void _DepositToFreeParking(Player_ player, int amount)
+    {
+        Debug.Log("_DepositToFreeParking");
+    }
+    public void _GoToJail(Player_ player, int amount)
+    {
+        Debug.Log("_GoToJail");
+    }
+    public void _ReceiveMoneyFromAll(Player_ player, int amount)
+    {
+        Debug.Log("_ReceiveMoneyFromAll");
+    }
+    public void _JailFreeCard(Player_ player, int amount)
+    {
+        Debug.Log("_JailFreeCard");
+    }
+    public void _CardMove(Player_ player, int amount)
+    {
+        Debug.Log("_CardMove");
+
+    }
+    public void _Repairs(Player_ player, int amount)
+    {
+        Debug.Log("_Repairs");
+
+    }
+
+
+
 }

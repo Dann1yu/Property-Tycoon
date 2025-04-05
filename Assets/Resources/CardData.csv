@@ -1,34 +1,34 @@
-You inherit £200,ReceiveMoneyFromBank,200
-You have won 2nd prize in a beauty contest, collect £50,ReceiveMoneyFromBank,50
-You are up the creek with no paddle - go back to the Old Creek,Teleport,1
-Student loan refund. Collect £20,ReceiveMoneyFromBank,20
-Bank error in your favour. Collect £200,ReceiveMoneyFromBank,200
-Pay bill for text books of £100,PayBank,100
-Mega late night taxi bill pay £50,PayBank,50
-Advance to go,Teleport,0
-From sale of Bitcoin you get £50,ReceiveMoneyFromBank,50
-Bitcoin assets fall - pay off Bitcoin short fall,PayBank,50
-Pay a £10 fine or take opportunity knocks,OppKnocksOption,10
-Pay insurance fee of £50,DepositToFreeParking,50
-Savings bond matures, collect £100",ReceiveMoneyFromBank,100
-Go to jail. Do not pass GO, do not collect £200,GoToJail,-1
-Received interest on shares of £25,ReceiveMoneyFromBank,25
-It's your birthday. Collect £10 from each player,ReceiveMoneyFromAll,10
-Get out of jail free,JailFreeCard,-1
+"""You inherit £200""",_ReceiveMoneyFromBank,200
+"""You have won 2nd prize in a beauty contest, collect £50""",_ReceiveMoneyFromBank,50
+"""You are up the creek with no paddle - go back to the Old Creek""",_Teleport,1
+"""Student loan refund. Collect £20""",_ReceiveMoneyFromBank,20
+"""Bank error in your favour. Collect £200""",_ReceiveMoneyFromBank,200
+"""Pay bill for text books of £100""",_PayBank,100
+"""Mega late night taxi bill pay £50""",_PayBank,50
+"""Advance to go""",_Teleport,0
+"""From sale of Bitcoin you get £50""",_ReceiveMoneyFromBank,50
+"""Bitcoin assets fall - pay off Bitcoin short fall""",_PayBank,50
+"""Pay a £10 fine or take opportunity knocks""",_OppKnocksOption,10
+"""Pay insurance fee of £50""",_DepositToFreeParking,50
+"""Savings bond matures, collect £100",_ReceiveMoneyFromBank,100
+"""Go to jail. Do not pass GO, do not collect £200""",_GoToJail,-1
+"""Received interest on shares of £25""",_ReceiveMoneyFromBank,25
+"""It's your birthday. Collect £10 from each player""",_ReceiveMoneyFromAll,10
+"""Get out of jail free""",_JailFreeCard,-1
 ,,
-Bank pays you divided of £50,ReceiveMoneyFromBank,50
-You have won a lip sync battle. Collect £100,ReceiveMoneyFromBank,100
-Advance to Turing Heights,Teleport,39
-Advance to Han Xin Gardens. If you pass GO, collect £200,CardMove,24
-Fined £15 for speeding,DepositToFreeParking,15
-Pay university fees of £150,PayBank,150
-Take a trip to Hove station. If you pass GO collect £200,CardMove,15
-Loan matures, collect £150,ReceiveMoneyFromBank,150
-You are assessed for repairs, £40/house, £115/hotel,Repairs,0
-Advance to GO,Teleport,0
-You are assessed for repairs, £25/house, £100/hotel,Repairs,1
-Go back 3 spaces,MoveForward,-3
-Advance to Skywalker Drive. If you pass GO collect £200,CardMove,11
-Go to jail. Do not pass GO, do not collect £200,GoToJail,-1
-Drunk in charge of a hoverboard. Fine £30,DepositToFreeParking,20
-Get out of jail free,JailFreeCard,-1
+"""Bank pays you divided of £50""",_ReceiveMoneyFromBank,50
+"""You have won a lip sync battle. Collect £100""",_ReceiveMoneyFromBank,100
+"""Advance to Turing Heights""",_Teleport,39
+"""Advance to Han Xin Gardens. If you pass GO, collect £200""",_CardMove,24
+"""Fined £15 for speeding""",_DepositToFreeParking,15
+"""Pay university fees of £150""",_PayBank,150
+"""Take a trip to Hove station. If you pass GO collect £200""",_CardMove,15
+"""Loan matures, collect £150""",_ReceiveMoneyFromBank,150
+"""You are assessed for repairs, £40/house, £115/hotel""",_Repairs,0
+"""Advance to GO""",_Teleport,0
+"""You are assessed for repairs, £25/house, £100/hotel""",_Repairs,1
+"""Go back 3 spaces""",_MoveForward,-3
+"""Advance to Skywalker Drive. If you pass GO collect £200""",_CardMove,11
+"""Go to jail. Do not pass GO, do not collect £200""",_GoToJail,-1
+"""Drunk in charge of a hoverboard. Fine £30""",_DepositToFreeParking,20
+"""Get out of jail free""",_JailFreeCard,-1
