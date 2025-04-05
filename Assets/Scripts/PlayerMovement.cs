@@ -38,10 +38,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject endButton;
     public GameObject propertyButton;
 
-    private bool bought = false;
-    private bool endedTurn = true;
-    private bool options = false;
-    private bool chose = false;
+
     // Default values
     public GameObject CurrentPlayer;
     public int playerTurn = -1;
@@ -229,7 +226,7 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log($"DiceRoll: {distance}");
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-        if (player.inJail == 3)
+        if (player.inJail == 2)
         {
             player.inJail = 0;
             return;
@@ -253,6 +250,13 @@ public class PlayerMovement : MonoBehaviour
             new_position = new_position - 40;
             //for the loop back to start of game (GO!)
         }
+
+        if (new_position < oldposition)
+        {
+            Debug.Log("You passed go!");
+            BankTrans(200);
+        }
+
         Debug.Log("newpos: " + new_position);
         CurrentPlayer.transform.position = boardPosition[new_position];
         player.pos = new_position;
@@ -307,17 +311,7 @@ public class PlayerMovement : MonoBehaviour
             if (location.Cost < player.balance)
             {
                 canBuyProperty(true);
-            }
-           
-            if (bought)
-            {
-                purchaseProperty(player, location);
-                bought = false;
-                chose = true;
-                Destroy(ButtonObject);
-            } 
-                
-            
+            }            
         }
         // Landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
@@ -383,11 +377,6 @@ public class PlayerMovement : MonoBehaviour
         {
             // should not need any logic if there is pass go logic implemented in move forward
             Debug.Log("Landed on GO");
-        }
-        //end turn functionff
-        if (endedTurn)
-        {
-            Destroy(ButtonObject);
         }
     }
 
@@ -536,13 +525,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("Options");
         }
 
-    }
-
-    public void EndedTurn()
-    {
-        endedTurn = true;
-    }
-
+    }   
  
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
     {

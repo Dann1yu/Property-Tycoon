@@ -12,6 +12,7 @@ public class Player_ : MonoBehaviour
     public int inJail; // -1 for not in jail and +1 each turn starting from 1 in jail
     private Bank_ bank;
     public int JailFreeCards;
+    public List<string> Sets;
 
     // Initializes the players variables
     public void Initialize(string name, int startBalance)
