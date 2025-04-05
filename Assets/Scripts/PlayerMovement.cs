@@ -228,7 +228,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (player.inJail == 2)
         {
-            player.inJail = 0;
+            player.inJail = -1;
             return;
         }
         else if (player.inJail > -1)
