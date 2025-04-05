@@ -36,17 +36,17 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         // RollDice();
     }
 
-    public int RollDice()
+    public (int, bool) RollDice()
     {
-        if (!isRolling)
-        {
-            int finalRoll = 0;
-            finalRoll = Random.Range(0, diceFaces.Length);
-            StartCoroutine(RollAnimation(finalRoll));
-            finalRoll += Random.Range(0, diceFaces.Length) + 2;
-            return finalRoll;
-        }
-        return 0;
+        int firstRoll = 0;
+        int secondRoll = 0;
+        firstRoll = Random.Range(0, diceFaces.Length);
+        secondRoll = Random.Range(0, diceFaces.Length);
+        StartCoroutine(RollAnimation(firstRoll));
+
+        var roll = firstRoll + secondRoll + 2;
+        var rolledDouble = (firstRoll == secondRoll);
+        return (roll, rolledDouble);
 
     }
 

@@ -2836,6 +2836,8 @@ MonoBehaviour:
   displayName2: {fileID: 0}
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
+  roll: -1
+  rolledDouble: 0
   displayName: {fileID: 1648605600}
 --- !u!114 &1648605600
 MonoBehaviour:
@@ -2948,7 +2950,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1754829404}
   - component: {fileID: 1754829403}
-  - component: {fileID: 1754829405}
   - component: {fileID: 1754829406}
   - component: {fileID: 1754829407}
   m_Layer: 0
@@ -2987,18 +2988,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1754829405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1754829402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21871533bc745584c8f908c7d260f458, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1754829406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3011,12 +3000,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c23bed64c496b440b655acaca2073c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerAmount: 2
+  playerAmount: 6
   PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
   displayName1: {fileID: 1648605600}
   displayName2: {fileID: 305263669}
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
+  roll: -1
+  rolledDouble: 0
 --- !u!114 &1754829407
 MonoBehaviour:
   m_ObjectHideFlags: 0

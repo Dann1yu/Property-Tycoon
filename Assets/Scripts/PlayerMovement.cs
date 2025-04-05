@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     // In unity objects / vars
-    [SerializeField] private int playerAmount = 2;
+    [SerializeField] private int playerAmount = 6;
     [SerializeField] private GameObject PlayerObject;
 
     public TextMeshProUGUI displayName1;
@@ -36,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
     Vector3[] boardPosition = new Vector3[40];
 
     private DiceRoller diceRoller;
+    public int roll = -1;
+    public int rolledDouble = 0;
 
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
@@ -62,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Emulation of two dice rolls (2x 1->6)
-    public int DiceRoll()
+    public (int, bool) DiceRoll()
     {
         return diceRoller.RollDice();
         //int dice1 = Random.Range(1, 7);
@@ -154,9 +156,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 return;
             }
-            
-            NextTurn();
-            moveForward(DiceRoll(), CurrentPlayer.transform.position);
+            if (rolledDouble == 0) NextTurn();
+
+            (int roll, bool boolDouble) = DiceRoll();
+            onRoll(roll, boolDouble);
 
             //BankTrans(100);
             //BankTrans(-150);
@@ -165,18 +168,42 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+
+    public void onRoll(int roll, bool boolDouble)
+    {
+        if (boolDouble)
+        {
+            rolledDouble += 1;
+            Debug.Log($"You rolled a double! {rolledDouble}");
+            if (rolledDouble == 3)
+            {
+                rolledDouble = 0;
+                _GoToJail(CurrentPlayer.GetComponent<Player_>());
+                return;
+            }
+        }        else rolledDouble = 0;
+
+        moveForward(roll, CurrentPlayer.transform.position);
+    }
+
     void moveForward(int distance, Vector3 currentpos)
     {
-        Player_ currentPlayerScript = CurrentPlayer.GetComponent<Player_>();
-        int oldposition=1;
-        for (int i = 0; i < boardPosition.Length; i++)
+        Debug.Log($"DiceRoll: {distance}");
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        if (player.inJail == 3)
         {
-            if (currentpos == boardPosition[i])
-            {
-                oldposition = i;
-                //finds the square that the current player is standing on
-            }
+            player.inJail = 0;
+            return;
         }
+        else if (player.inJail > -1)
+        {
+            player.inJail += 1;
+            Debug.Log($"YOU ARE IN JAIL LOSER NO GO FOR YOU {player.inJail}");
+            return;
+        }
+
+        int oldposition = player.pos;
 
         //github test
 
@@ -190,23 +217,23 @@ public class PlayerMovement : MonoBehaviour
         }
         Debug.Log("newpos: " + new_position);
         CurrentPlayer.transform.position = boardPosition[new_position];
-        currentPlayerScript.pos = new_position;
+        player.pos = new_position;
         //potential to add animation herre
 
-        positionHandling(currentPlayerScript);
+        positionHandling(player);
     }
 
     public void BankTrans(int amount)
     {
-        Player_ currentPlayerScript = CurrentPlayer.GetComponent<Player_>();
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
 
         if (amount > 0)
         {
-            currentPlayerScript.ReceiveMoneyFromBank(amount);
+            player.ReceiveMoneyFromBank(amount);
         }
         else
         {
-            currentPlayerScript.PayBank(-amount);
+            player.PayBank(-amount);
         }
         UpdateBalanceUI();
     }
@@ -281,8 +308,7 @@ public class PlayerMovement : MonoBehaviour
         if (position == 30)
         {
             Debug.Log("Go to jail");
-            player.inJail=1;
-            _Teleport(player, 10);
+           _GoToJail(player);
         }
 
         // Landed on super tax
@@ -386,24 +412,37 @@ public class PlayerMovement : MonoBehaviour
 
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
     {
-        Debug.Log("_ReceiveMoneyFromBank");
+        BankTrans(amount);
     }
     public void _PayBank(Player_ player, int amount)
     {
-        Debug.Log("_PayBank");
+        BankTrans(-amount);
     }
     public void _OppKnocksOption(Player_ player, int amount)
     {
-        Debug.Log("_OppKnocksOption");
+        Debug.Log("Pay a £10 fine or take opportunity knocks");
+
+        // TODO add ui for choice but for now is random
+        bool randomBool = Random.value > 0.5f;
+
+        if (randomBool)
+        {
+            _DepositToFreeParking(player, amount);
+        } else
+        {
+            oppKnock(player);
+        }
     }
     public void _DepositToFreeParking(Player_ player, int amount)
     {
         Debug.Log("_DepositToFreeParking");
         player.DepositToFreeParking(amount);
     }
-    public void _GoToJail(Player_ player, int amount)
+    public void _GoToJail(Player_ player, int amount = 0)
     {
         Debug.Log("_GoToJail");
+        _Teleport(player, 10);
+        player.inJail = 0;
     }
     public void _ReceiveMoneyFromAll(Player_ player, int amount)
     {
@@ -412,9 +451,19 @@ public class PlayerMovement : MonoBehaviour
     public void _JailFreeCard(Player_ player, int amount)
     {
         Debug.Log("_JailFreeCard");
+        player.JailFreeCards += 1;
     }
     public void _CardMove(Player_ player, int amount)
     {
+        var old_pos = player.pos;
+        var distance = amount - old_pos;
+
+        if (distance < 0)
+        {
+            distance += 40;
+        }
+
+        moveForward(distance, CurrentPlayer.transform.position);
         Debug.Log("_CardMove");
 
     }
@@ -424,6 +473,10 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    public void Jail(Player_ player)
+    {
+
+    }
 
 
 }

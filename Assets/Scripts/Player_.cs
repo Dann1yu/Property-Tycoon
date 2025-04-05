@@ -11,17 +11,18 @@ public class Player_ : MonoBehaviour
     public int pos;
     public int inJail; // -1 for not in jail and +1 each turn starting from 1 in jail
     private Bank_ bank;
-    private List<Card> JailFreeCards;
+    public int JailFreeCards;
 
     // Initializes the players variables
     public void Initialize(string name, int startBalance)
     {
         playerName = name;
         balance = startBalance;
-        pos = 1;
+        pos = 0;
         properties = new List<int>();
         inJail = -1;
         bank = FindFirstObjectByType<Bank_>();
+        JailFreeCards = 0;
     }
 
     // returns whether player has enough money for the payment
@@ -40,7 +41,7 @@ public class Player_ : MonoBehaviour
         balance += amount;
         bank.Balance -= amount;
         Debug.Log($"{playerName} received ${amount}. New balance: ${balance}");
-        Debug.Log($"!!{bank.Balance}");
+        Debug.Log($"{bank.Balance}");
     }
 
     // Receive money from the bank
