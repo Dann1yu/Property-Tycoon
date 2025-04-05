@@ -122,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
 
             // Attach and initialize the Player_ script
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
-            playerComponent.Initialize($"Player {i}", 1500);
+            playerComponent.Initialize($"Player {i}", 100000); //change to 1500
 
 
             // Add to player list for tracking
@@ -229,7 +229,6 @@ public class PlayerMovement : MonoBehaviour
         if (player.inJail == 2)
         {
             player.inJail = -1;
-            return;
         }
         else if (player.inJail > -1)
         {
@@ -383,7 +382,7 @@ public class PlayerMovement : MonoBehaviour
 
     void purchaseProperty(Player_ player, Property location)
     {
-        player.addProperty(player.pos);
+        player.addProperty(location);
         BankTrans(-location.Cost);
         location.Owner = player;
         //Debug.Log($"{player.properties}");

@@ -11,6 +11,7 @@ public class Bank_ : MonoBehaviour
     public List<Card> OKCards { get; private set; } = new List<Card>();
     public List<int> BankOwnedProperties = new List<int>();
     public int FreeParkingBalance = 0;
+    public Dictionary<string, int> PropertiesPerSet = new Dictionary<string, int>();
 
     private static System.Random rng = new System.Random();
 
@@ -43,6 +44,15 @@ public class Bank_ : MonoBehaviour
                 if (canBeBought)
                 {
                     BankOwnedProperties.Add(position);
+                }
+
+                if (PropertiesPerSet.ContainsKey(group))
+                {
+                    PropertiesPerSet[group]++;
+                }
+                else
+                {
+                    PropertiesPerSet[group] = 1;
                 }
 
                 Property property = new Property

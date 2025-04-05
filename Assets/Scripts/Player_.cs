@@ -12,7 +12,8 @@ public class Player_ : MonoBehaviour
     public int inJail; // -1 for not in jail and +1 each turn starting from 1 in jail
     private Bank_ bank;
     public int JailFreeCards;
-    public List<string> Sets;
+    public Dictionary<string, int> Sets = new Dictionary<string, int>();
+    public List<string> OwnedSets = new List<string>();
 
     // Initializes the players variables
     public void Initialize(string name, int startBalance)
@@ -78,10 +79,29 @@ public class Player_ : MonoBehaviour
         return false;
     }
 
-    public void addProperty(int idx)
+    public void addProperty(Property property)
     {
+        var idx = property.Position;
+        var group = property.Group;
+
         properties.Add(idx);
         bank.BankOwnedProperties.Remove(idx);
+
+        // check if all properties of that group are owned by player
+        if (Sets.ContainsKey(group))
+        {
+            Sets[group]++;
+        }
+        else
+        {
+            Sets[group] = 1;
+        }
+
+        if (Sets[group] == bank.PropertiesPerSet[group])
+        {
+            OwnedSets.Add(group);
+        }
+
     }
 
     public void DepositToFreeParking(int amount)
