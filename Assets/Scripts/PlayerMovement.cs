@@ -83,10 +83,15 @@ public class PlayerMovement : MonoBehaviour
 
         CurrentPlayer = playerlist[playerTurn].gameObject; // Get GameObject of current player
 
+        UpdateBalanceUI();
+    }
+
+    public void UpdateBalanceUI()
+    {
         string current = playerlist[playerTurn].ToString();
         current = current.Remove(current.Length - 9);
         displayName1.text = current;
-        displayName2.text = "Balance: $" +playerlist[playerTurn].balance.ToString();
+        displayName2.text = "Balance: $" + playerlist[playerTurn].balance.ToString();
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
@@ -203,11 +208,13 @@ public class PlayerMovement : MonoBehaviour
         {
             currentPlayerScript.PayBank(-amount);
         }
+        UpdateBalanceUI();
     }
 
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
         sender.PayPlayer(receiver, amount);
+        UpdateBalanceUI();
     }
 
     void positionHandling(Player_ player)
@@ -257,7 +264,7 @@ public class PlayerMovement : MonoBehaviour
         if (position == 4)
         {
             Debug.Log("Landed on Income Tax and charged $200");
-            player.DepositToFreeParking(200);
+            _DepositToFreeParking(player, 200);
             Debug.Log($"New balance: {player.balance}");
         }
 
@@ -283,7 +290,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("Landed on Super Tax and charged $100");
             Debug.Log(player.balance);
-            player.DepositToFreeParking(100);
+            _DepositToFreeParking(player, 100);
             Debug.Log($"New balance: {player.balance}");
         }
 
@@ -304,6 +311,7 @@ public class PlayerMovement : MonoBehaviour
         location.Owner = player;
         //Debug.Log($"{player.properties}");
         //Debug.Log($"{bank.BankOwnedProperties}");
+        UpdateBalanceUI();
     }
 
     void payRent(Player_ player, Property location)
@@ -326,6 +334,7 @@ public class PlayerMovement : MonoBehaviour
         {
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
+        UpdateBalanceUI();
     }
     
     // works but only for pay (not go to jail)
@@ -390,6 +399,7 @@ public class PlayerMovement : MonoBehaviour
     public void _DepositToFreeParking(Player_ player, int amount)
     {
         Debug.Log("_DepositToFreeParking");
+        player.DepositToFreeParking(amount);
     }
     public void _GoToJail(Player_ player, int amount)
     {
