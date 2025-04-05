@@ -3,25 +3,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.OnScreen;
 using UnityEngine.UI;
-public class UI : PlayerMovement
+public class UI : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public Button PropertyBtn;
-    void Start()
-    {
-      
-    }
+    public PlayerMovement playerMovement;
 
-    // Update is called once per frame
-    void Update()
+    public void OnMyButtonClick()
     {
-        
-    }
-
-    public void propertyBtnOff()
-    {
-        
-        DecidedToClick(this.name);
-        Debug.Log("button off");
+        GameObject button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        var playerMovement = GameObject.Find("GameController").GetComponent<PlayerMovement>();
+        playerMovement.DecidedToClick(button);
     }
 }

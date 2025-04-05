@@ -124,7 +124,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4405538820509763878}
         m_TargetAssemblyTypeName: UI, Assembly-CSharp
-        m_MethodName: propertyBtnOff
+        m_MethodName: OnMyButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 680c05060ef322847bfe3deea74dfee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PropertyBtn: {fileID: 7942545570972825488}
+  playerMovement: {fileID: 0}
 --- !u!1001 &5521771275188583130
 PrefabInstance:
   m_ObjectHideFlags: 0

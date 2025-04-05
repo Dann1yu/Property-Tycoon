@@ -34,7 +34,9 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI txt;
     public Transform WhereYouWantButtonsParented;
 
-
+    public GameObject optionsButton;
+    public GameObject endButton;
+    public GameObject propertyButton;
 
     private bool bought = false;
     private bool endedTurn = true;
@@ -148,6 +150,14 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("started");
         CreateBoard();
+
+        optionsButton = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
+        endButton = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
+        propertyButton = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
+
+        initiateEndTurn();
+        initiateBuyProperty();
+        initiateHaveOptions();
 
         bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
 
@@ -282,8 +292,8 @@ public class PlayerMovement : MonoBehaviour
         // handling
         var position = player.pos;
         var location = bank.Properties[position];
-        canEndTurn();
-        canHaveOptions();
+        canEndTurn(true);
+        canHaveOptions(true);
         // bank.info(position);
 
         //Debug.Log($"{position}");
@@ -296,7 +306,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("Property for sale");
             if (location.Cost < player.balance)
             {
-                canBuyProperty();
+                canBuyProperty(true);
             }
            
             if (bought)
@@ -465,50 +475,65 @@ public class PlayerMovement : MonoBehaviour
     //ui section tried to make a script for it didnt work
 
 
-    public void canBuyProperty()
+    public void initiateBuyProperty()
     {
 
-        var spawnedButtonP = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
-        spawnedButtonP.name = "propertyBtn";
-        spawnedButtonP.transform.position = new Vector3(Screen.width - 380, Screen.height - 50, 0);
-        Debug.Log("ui worked");
-        
+        propertyButton.name = "propertyBtn";
+        propertyButton.transform.position = new Vector3(Screen.width - 380, Screen.height - 50, 0);
+        propertyButton.SetActive(false);
+
     }
 
-    public void canEndTurn()
+    public void initiateEndTurn()
     {
-        var spawnedButtonE = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
-        spawnedButtonE.name = "EndBtn";
+        endButton.name = "EndBtn";
         GameObject.Find("EndBtn").GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
-        spawnedButtonE.transform.position = new Vector3(Screen.width -60, Screen.height - 50, 0);
+        endButton.transform.position = new Vector3(Screen.width -60, Screen.height - 50, 0);
+        endButton.SetActive(false);
     }
 
-    public void canHaveOptions()
+    public void initiateHaveOptions()
     {
-        var spawnedButtonO = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
-        spawnedButtonO.name = "optionsBtn";
+        optionsButton.name = "optionsBtn";
         GameObject.Find("optionsBtn").GetComponentInChildren<TextMeshProUGUI>().text = "Options";
-        spawnedButtonO.transform.position = new Vector3(Screen.width - 220, Screen.height - 50, 0);
+        optionsButton.transform.position = new Vector3(Screen.width - 220, Screen.height - 50, 0);
+        optionsButton.SetActive(false);
     }
 
-    public void DecidedToClick(string buttonName)
+    public void canBuyProperty(bool boolean)
     {
+        propertyButton.SetActive(boolean);
+    }
+    public void canEndTurn(bool boolean)
+    {
+        endButton.SetActive(boolean);
+    }
+    public void canHaveOptions(bool boolean)
+    {
+        optionsButton.SetActive(boolean);
+    }
+
+    public void DecidedToClick(GameObject button)
+    {
+        string buttonName = button.name;
+
         Debug.Log("button name " + buttonName);
         if (buttonName == "propertyBtn")
         {
-           
-            bought = true;
-            chose = true;
+            Debug.Log($"{playerTurn}");
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+            canBuyProperty(false);
+            purchaseProperty(player, bank.Properties[player.pos]);
+
         }
         if (buttonName == "EndBtn")
         {
-            endedTurn = true;
-            chose = true;
+            Debug.Log("EndTurn");
         }
         if (buttonName == "optionsBtn")
         {
-            options = true;
-            chose = true;
+            Debug.Log("Options");
         }
 
     }
