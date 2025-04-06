@@ -55,6 +55,9 @@ public class PlayerMovement : MonoBehaviour
     public int roll = -1;
     public int rolledDouble = 0;
 
+    public bool next = true;
+    public bool showing = true;
+
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
     {
@@ -83,10 +86,6 @@ public class PlayerMovement : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         return diceRoller.RollDice();
-        //int dice1 = Random.Range(1, 7);
-        //int dice2 = Random.Range(1, 7);
-        //Debug.Log("you rolled a: " + (dice1 + dice2));
-        //return (dice1 + dice2);
     }
 
     // Ends current term and starts next player's go
@@ -168,17 +167,26 @@ public class PlayerMovement : MonoBehaviour
     // Updates on next players turn
     public void Update()
     {
-  
+        if (!diceRoller.isRolling && next && !showing)
+        {
+            canRoll(next);
+        }
+
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-           
+            if (next && rolledDouble == 0) {
+                next = false;
+                NextTurn();
+            } else if (!next) {
+                return;
+            }
             //for now to test movement up arrow presses in order to simulate players turn
             // if the dice is rolling do nothing
             if (diceRoller.isRolling)
             {
                 return;
             }
-            if (rolledDouble == 0) NextTurn();
+            //if (rolledDouble == 0) NextTurn();
 
             (int roll, bool boolDouble) = DiceRoll();
             onRoll(roll, boolDouble);
@@ -291,8 +299,7 @@ public class PlayerMovement : MonoBehaviour
         // handling
         var position = player.pos;
         var location = bank.Properties[position];
-        canEndTurn(true);
-        canStartAuction(true);
+        canEndTurn(false);
         // bank.info(position);
 
         //Debug.Log($"{position}");
@@ -308,6 +315,7 @@ public class PlayerMovement : MonoBehaviour
                 canBuyProperty(true);
             }
             canStartAuction(true);
+            return;
         }
         // Landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
@@ -319,10 +327,10 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Property owned by another player");
                 payRent(player, location);
             }
-        }
+        } 
 
         // Landed on oppurtunity knocks 8, 37
-        if (position == 7 | position==22 | position == 36)
+        if (position == 7 | position == 22 | position == 36)
         {
             Debug.Log("Landed on oppurtunity knocks");
             oppKnock(player);
@@ -373,6 +381,18 @@ public class PlayerMovement : MonoBehaviour
         {
             // should not need any logic if there is pass go logic implemented in move forward
             Debug.Log("Landed on GO");
+        }
+
+        // if no actions are available, next turn
+        if (location.Group == "" && rolledDouble > 0 | (location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && rolledDouble > 0))
+        {
+            Debug.Log("SPECIAL");
+            canRoll(true);
+        }
+        else next = false;
+        if (rolledDouble == 0)
+        {
+            canEndTurn(true);
         }
     }
 
@@ -481,6 +501,11 @@ public class PlayerMovement : MonoBehaviour
 
     public void DecidedToClick(GameObject button)
     {
+        if (diceRoller.isRolling)
+        {
+            return;
+        }
+
         string buttonName = button.name;
 
         Debug.Log("button name " + buttonName);
@@ -492,17 +517,34 @@ public class PlayerMovement : MonoBehaviour
             canBuyProperty(false);
             canStartAuction(false);
             purchaseProperty(player, bank.Properties[player.pos]);
+            if (rolledDouble == 0)
+            {
+                canRoll(false);
+                canEndTurn(true);
+            }
+            else canRoll(true);
 
         }
         if (buttonName == "endTurnButton")
         {
             Debug.Log("EndTurn");
+            canRoll(true);
+            canEndTurn(false);
         }
         if (buttonName == "startAuctionButton")
         {
             canBuyProperty(false);
             canStartAuction(false);
             Debug.Log("Start auction");
+            if (rolledDouble == 0)
+            {
+                canRoll(false);
+                canEndTurn(true);
+            }
+            else
+            {
+                canRoll(true);
+            }
         }
 
     }   
@@ -566,8 +608,8 @@ public class PlayerMovement : MonoBehaviour
         {
             distance += 40;
         }
-
         moveForward(distance, CurrentPlayer.transform.position);
+        canEndTurn(false);
         Debug.Log("_CardMove");
 
     }
@@ -575,5 +617,11 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("_Repairs");
 
+    }
+
+    public void canRoll(bool canRoll)
+    {
+        next = canRoll;
+        showing = diceRoller.ShowDice(canRoll);
     }
 }

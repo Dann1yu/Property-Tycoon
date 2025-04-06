@@ -13,6 +13,11 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public Sprite rollDiceSprite2;
     public bool isRolling = false;
 
+    public GameObject dice1ImagesParent;
+    public GameObject dice2ImagesParent;
+
+    [SerializeField] private CanvasGroup diceCanvasGroup;
+
     public Texture2D handCursor; // Assign a hand cursor texture in the Inspector
     private Texture2D defaultCursor;
 
@@ -66,10 +71,25 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         diceImage1.sprite = diceFaces1[firstRoll];
         diceImage2.sprite = diceFaces2[secondRoll];
-        yield return new WaitForSeconds(2f);
-
+        yield return new WaitForSeconds(1f);
+        ShowDice(false);
         diceImage1.sprite = rollDiceSprite1;
         diceImage2.sprite = rollDiceSprite2;
         isRolling = false;
+    }
+
+    public bool ShowDice(bool show)
+    {
+        foreach (Transform child in dice1ImagesParent.transform)
+        {
+            child.gameObject.SetActive(show);
+        }
+
+        foreach (Transform child in dice2ImagesParent.transform)
+        {
+            child.gameObject.SetActive(show);
+        }
+
+        return show;
     }
 }
