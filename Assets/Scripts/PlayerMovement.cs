@@ -38,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
     public GameObject endButton;
     public GameObject propertyButton;
 
+    public GameObject playerBidPanel;
+    public TextMeshProUGUI playerNameText;
+    public TMP_InputField bidInputField;
 
     // Default values
     public GameObject CurrentPlayer;
@@ -57,6 +60,11 @@ public class PlayerMovement : MonoBehaviour
 
     public bool next = true;
     public bool showing = true;
+
+    public List<Player_> bidders = new List<Player_>();
+    public int nextBidder = 0;
+    public int highestBid = 0;
+    public Player_ highestBidder;
 
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
@@ -153,6 +161,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("started");
         CreateBoard();
+        playerBidPanel.SetActive(false);
 
         canBuyProperty(false);
         canEndTurn(false);
@@ -275,9 +284,12 @@ public class PlayerMovement : MonoBehaviour
         positionHandling(player);
     }
 
-    public void BankTrans(int amount)
+    public void BankTrans(int amount, Player_ player = null)
     {
-        Player_ player = CurrentPlayer.GetComponent<Player_>();
+        if (player == null)
+        {
+            player = CurrentPlayer.GetComponent<Player_>();
+        }
 
         if (amount > 0)
         {
@@ -404,10 +416,14 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    void purchaseProperty(Player_ player, Property location)
+    void purchaseProperty(Player_ player, Property location, int amount = -1)
     {
+        if (amount != -1)
+        {
+            amount = location.Cost;
+        }
         player.addProperty(location);
-        BankTrans(-location.Cost);
+        BankTrans(-amount, player);
         location.Owner = player;
         //Debug.Log($"{player.properties}");
         //Debug.Log($"{bank.BankOwnedProperties}");
@@ -564,14 +580,23 @@ public class PlayerMovement : MonoBehaviour
             canBuyProperty(false);
             canStartAuction(false);
             Debug.Log("Start auction");
-            if (rolledDouble == 0)
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+            startAuction(player);
+        }
+
+        if (buttonName == "bidButton")
+        {
+            string input = bidInputField.text;
+
+            if (int.TryParse(input, out int bid))
             {
-                canRoll(false);
-                canEndTurn(true);
+                Debug.Log("Bid entered: " + bid);
+                nextBid(bid);
             }
             else
             {
-                canRoll(true);
+                Debug.LogWarning("Invalid bid value.");
             }
         }
 
@@ -652,4 +677,56 @@ public class PlayerMovement : MonoBehaviour
         next = canRoll;
         showing = diceRoller.ShowDice(canRoll);
     }
+    public void startAuction(Player_ player)
+    {
+        bidders.Clear();
+        nextBidder = 0;
+        foreach (var item in playerlist)
+        {
+            if (item != player)
+            {
+                bidders.Add(item);
+            }
+        }
+        playerBidPanel.SetActive(true);
+
+        playerNameText.text = $"{bidders[0].playerName}, please enter your bid or skip";
+    }
+
+    public void nextBid(int bid)
+    {
+
+        Player_ bidder = bidders[nextBidder];
+        if (bid > highestBid)
+        {
+            highestBid = bid;
+            highestBidder = bidder;
+        }
+        if (nextBidder == bidders.Count-1)
+        {
+            endAuction();
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
+        } else
+        {
+            nextBidder++;
+            playerNameText.text = $"{bidders[nextBidder].playerName}, please enter your bid or skip";
+        }   
+    }
+    public void endAuction()
+    {
+        if (rolledDouble == 0)
+        {
+            canRoll(false);
+            canEndTurn(true);
+        }
+        else
+        {
+            canRoll(true);
+        }
+        playerBidPanel.SetActive(false);
+    }
+
 }
