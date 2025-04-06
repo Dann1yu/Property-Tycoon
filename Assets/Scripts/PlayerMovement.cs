@@ -418,7 +418,8 @@ public class PlayerMovement : MonoBehaviour
 
     void purchaseProperty(Player_ player, Property location, int amount = -1)
     {
-        if (amount != -1)
+        Debug.Log($"{amount}");
+        if (amount == -1)
         {
             amount = location.Cost;
         }
@@ -600,6 +601,11 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        if (buttonName == "skipButton")
+        {
+            nextBid(-1);
+        }
+
     }   
  
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
@@ -707,8 +713,7 @@ public class PlayerMovement : MonoBehaviour
             endAuction();
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
-
-            purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
+            if (highestBid != 0) purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
         } else
         {
             nextBidder++;
