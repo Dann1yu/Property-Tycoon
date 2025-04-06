@@ -89,6 +89,13 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Ends current term and starts next player's go
+
+    public void PlayerStartedTheGame(int AmountOfPlayers, int AmountOfAI, int gamemode)
+    {
+        playerAmount = AmountOfPlayers;
+        //add the other stuff here
+        Debug.Log("tests: " + AmountOfPlayers +" "+ AmountOfAI +" "+ gamemode);
+    }
     public void NextTurn()
     {
         playerTurn++;
