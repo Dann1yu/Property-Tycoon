@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI txt;
     public Transform WhereYouWantButtonsParented;
 
-    public GameObject optionsButton;
+    public GameObject auctionButton;
     public GameObject endButton;
     public GameObject propertyButton;
 
@@ -148,13 +148,9 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("started");
         CreateBoard();
 
-        optionsButton = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
-        endButton = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
-        propertyButton = Instantiate<GameObject>(ButtonObject.gameObject, WhereYouWantButtonsParented);
-
-        initiateEndTurn();
-        initiateBuyProperty();
-        initiateHaveOptions();
+        canBuyProperty(false);
+        canEndTurn(false);
+        canStartAuction(false);
 
         bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
 
@@ -296,7 +292,7 @@ public class PlayerMovement : MonoBehaviour
         var position = player.pos;
         var location = bank.Properties[position];
         canEndTurn(true);
-        canHaveOptions(true);
+        canStartAuction(true);
         // bank.info(position);
 
         //Debug.Log($"{position}");
@@ -310,7 +306,8 @@ public class PlayerMovement : MonoBehaviour
             if (location.Cost < player.balance)
             {
                 canBuyProperty(true);
-            }            
+            }
+            canStartAuction(true);
         }
         // Landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
@@ -332,7 +329,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on pot luck
-        if (position == 17 | position == 33)
+        if (position == 2 | position == 17 | position == 33)
         {
             Debug.Log("Landed on pot luck");
             potLuck(player);
@@ -469,32 +466,6 @@ public class PlayerMovement : MonoBehaviour
 
     //ui section tried to make a script for it didnt work
 
-
-    public void initiateBuyProperty()
-    {
-
-        propertyButton.name = "propertyBtn";
-        propertyButton.transform.position = new Vector3(Screen.width - 380, Screen.height - 50, 0);
-        propertyButton.SetActive(false);
-
-    }
-
-    public void initiateEndTurn()
-    {
-        endButton.name = "EndBtn";
-        GameObject.Find("EndBtn").GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
-        endButton.transform.position = new Vector3(Screen.width -60, Screen.height - 50, 0);
-        endButton.SetActive(false);
-    }
-
-    public void initiateHaveOptions()
-    {
-        optionsButton.name = "optionsBtn";
-        GameObject.Find("optionsBtn").GetComponentInChildren<TextMeshProUGUI>().text = "Options";
-        optionsButton.transform.position = new Vector3(Screen.width - 220, Screen.height - 50, 0);
-        optionsButton.SetActive(false);
-    }
-
     public void canBuyProperty(bool boolean)
     {
         propertyButton.SetActive(boolean);
@@ -503,9 +474,9 @@ public class PlayerMovement : MonoBehaviour
     {
         endButton.SetActive(boolean);
     }
-    public void canHaveOptions(bool boolean)
+    public void canStartAuction(bool boolean)
     {
-        optionsButton.SetActive(boolean);
+        auctionButton.SetActive(boolean);
     }
 
     public void DecidedToClick(GameObject button)
@@ -513,22 +484,25 @@ public class PlayerMovement : MonoBehaviour
         string buttonName = button.name;
 
         Debug.Log("button name " + buttonName);
-        if (buttonName == "propertyBtn")
+        if (buttonName == "buyPropertyButton")
         {
             Debug.Log($"{playerTurn}");
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
             canBuyProperty(false);
+            canStartAuction(false);
             purchaseProperty(player, bank.Properties[player.pos]);
 
         }
-        if (buttonName == "EndBtn")
+        if (buttonName == "endTurnButton")
         {
             Debug.Log("EndTurn");
         }
-        if (buttonName == "optionsBtn")
+        if (buttonName == "startAuctionButton")
         {
-            Debug.Log("Options");
+            canBuyProperty(false);
+            canStartAuction(false);
+            Debug.Log("Start auction");
         }
 
     }   
