@@ -5,9 +5,12 @@ using UnityEngine.EventSystems; // Required for pointer events
 
 public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public Image diceImage;
-    public Sprite[] diceFaces;
-    public Sprite rollDiceSprite;
+    public Image diceImage1;
+    public Sprite[] diceFaces1;
+    public Sprite rollDiceSprite1;
+    public Image diceImage2;
+    public Sprite[] diceFaces2;
+    public Sprite rollDiceSprite2;
     public bool isRolling = false;
 
     public Texture2D handCursor; // Assign a hand cursor texture in the Inspector
@@ -40,9 +43,9 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         int firstRoll = 0;
         int secondRoll = 0;
-        firstRoll = Random.Range(0, diceFaces.Length);
-        secondRoll = Random.Range(0, diceFaces.Length);
-        StartCoroutine(RollAnimation(firstRoll));
+        firstRoll = Random.Range(0, diceFaces1.Length);
+        secondRoll = Random.Range(0, diceFaces2.Length);
+        StartCoroutine(RollAnimation(firstRoll, secondRoll));
 
         var roll = firstRoll + secondRoll + 2;
         var rolledDouble = (firstRoll == secondRoll);
@@ -50,20 +53,23 @@ public class DiceRoller : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     }
 
-    private IEnumerator RollAnimation(int finalRoll)
+    private IEnumerator RollAnimation(int firstRoll, int secondRoll)
     {
         isRolling = true;
 
         for (int i = 0; i < 10; i++)
         {
-            diceImage.sprite = diceFaces[Random.Range(0, diceFaces.Length)];
+            diceImage1.sprite = diceFaces1[Random.Range(0, diceFaces1.Length)];
+            diceImage2.sprite = diceFaces2[Random.Range(0, diceFaces2.Length)];
             yield return new WaitForSeconds(0.1f);
         }
 
-        diceImage.sprite = diceFaces[finalRoll];
+        diceImage1.sprite = diceFaces1[firstRoll];
+        diceImage2.sprite = diceFaces2[secondRoll];
         yield return new WaitForSeconds(2f);
 
-        diceImage.sprite = rollDiceSprite;
+        diceImage1.sprite = rollDiceSprite1;
+        diceImage2.sprite = rollDiceSprite2;
         isRolling = false;
     }
 }
