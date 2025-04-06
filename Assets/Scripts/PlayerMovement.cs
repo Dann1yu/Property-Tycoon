@@ -407,6 +407,27 @@ public class PlayerMovement : MonoBehaviour
         UpdateBalanceUI();
     }
 
+    void mortgageProperty(Player_ player, Property location)
+    {
+        BankTrans(location.Cost / 2);
+        location.mortgaged = false;
+        UpdateBalanceUI();
+
+    }
+
+    void sellProperty(Player_ player, Property location)
+    {
+        player.removeProperty(location);
+        if (location.mortgaged)
+        {
+            BankTrans(location.Cost / 2);
+        } else BankTrans(location.Cost);
+
+        location.Owner = null;
+        bank.BankOwnedProperties.Add(player.pos);
+        UpdateBalanceUI();
+    }
+
     void payRent(Player_ player, Property location)
     {
         if (location.NumberOfHouses == 0) {

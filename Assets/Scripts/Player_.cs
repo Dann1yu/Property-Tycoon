@@ -104,6 +104,19 @@ public class Player_ : MonoBehaviour
 
     }
 
+    public void removeProperty(Property property)
+    {
+        var idx = property.Position;
+        var group = property.Group;
+
+        properties.Remove(idx);
+        bank.BankOwnedProperties.Add(idx);
+
+        if (OwnedSets.Contains(group)) OwnedSets.Remove(group);
+        
+        Sets[group]--;
+    }
+
     public void DepositToFreeParking(int amount)
     {
         balance -= amount;

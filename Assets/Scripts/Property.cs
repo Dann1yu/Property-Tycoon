@@ -14,4 +14,5 @@ public class Property
     public int RentHotel { get; set; }
     public Player_ Owner { get; set; }
     public int NumberOfHouses { get; set; }
+    public bool mortgaged { get; set; }
 }
