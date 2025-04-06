@@ -433,7 +433,7 @@ RectTransform:
   m_GameObject: {fileID: 182305955}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.92928, z: 0.92928}
+  m_LocalScale: {x: 0.98999995, y: 1.1499839, z: 1.1499839}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1177279078}
@@ -441,7 +441,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 271, y: 173}
+  m_AnchoredPosition: {x: 838, y: 518.01}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &182305957
@@ -1203,6 +1203,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 79056da9808eeec42886610ab6cbf885, type: 3}
   rollDiceSprite2: {fileID: 21300000, guid: 52042bd1af11b064fa6b0ee82383941b, type: 3}
   isRolling: 0
+  dice1ImagesParent: {fileID: 196529112}
+  dice2ImagesParent: {fileID: 1018915893}
+  diceCanvasGroup: {fileID: 0}
   handCursor: {fileID: 2800000, guid: 62655358e6a19b04f8e2cc8e82685031, type: 3}
 --- !u!224 &442983806
 RectTransform:
@@ -2026,7 +2029,7 @@ RectTransform:
   m_GameObject: {fileID: 840946863}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.92928, z: 0.92928}
+  m_LocalScale: {x: 0.98999995, y: 1.1499839, z: 1.1499839}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 85394744}
@@ -2034,7 +2037,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 271, y: 114}
+  m_AnchoredPosition: {x: 838, y: 444.99}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &840946865
@@ -3978,7 +3981,7 @@ MonoBehaviour:
   ButtonObject: {fileID: 0}
   txt: {fileID: 0}
   WhereYouWantButtonsParented: {fileID: 0}
-  optionsButton: {fileID: 0}
+  auctionButton: {fileID: 0}
   endButton: {fileID: 0}
   propertyButton: {fileID: 0}
   CurrentPlayer: {fileID: 0}
@@ -3986,6 +3989,8 @@ MonoBehaviour:
   PlayerInControl: {fileID: 0}
   roll: -1
   rolledDouble: 0
+  next: 1
+  showing: 1
   displayName: {fileID: 1648605600}
 --- !u!114 &1648605600
 MonoBehaviour:
@@ -4228,14 +4233,16 @@ MonoBehaviour:
   ButtonObject: {fileID: 2853928270198758366, guid: fd51c29e21ccace45944603475fb427e, type: 3}
   txt: {fileID: 4274969771931378966, guid: 33bd0f508de18fa4191369823ba926bf, type: 3}
   WhereYouWantButtonsParented: {fileID: 1419143180}
-  optionsButton: {fileID: 2074625690}
+  auctionButton: {fileID: 840946863}
   endButton: {fileID: 182305955}
-  propertyButton: {fileID: 840946863}
+  propertyButton: {fileID: 2074625690}
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
   PlayerInControl: {fileID: 0}
   roll: -1
   rolledDouble: 0
+  next: 1
+  showing: 1
 --- !u!114 &1754829407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4756,7 +4763,7 @@ RectTransform:
   m_GameObject: {fileID: 2074625690}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.92928, z: 0.92928}
+  m_LocalScale: {x: 0.98999995, y: 1.1499839, z: 1.1499839}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1564508603}
@@ -4764,7 +4771,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 271, y: 143}
+  m_AnchoredPosition: {x: 838, y: 480.88}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2074625692
