@@ -95,6 +95,7 @@ public class Bank_ : MonoBehaviour
                     Debug.Log($"HERE: {count}");
                     oppKnocks = true;
                     count = 0;
+                    continue;
                 }
                 
 
@@ -127,11 +128,11 @@ public class Bank_ : MonoBehaviour
                 }
             }
 
-            foreach (Card card in OKCards)
+            foreach (Card card in PLCards)
             {
                 Debug.Log($"{card.Id}");
             }
-            foreach (Card card in PLCards)
+            foreach (Card card in OKCards)
             {
                 Debug.Log($"{card.Id}");
             }
@@ -144,11 +145,11 @@ public class Bank_ : MonoBehaviour
 
             foreach (Card card in OKCards)
             {
-                Debug.Log($"{card.Id}");
+                Debug.Log($"{card.Description}");
             }
             foreach (Card card in PLCards)
             {
-                Debug.Log($"{card.Id}");
+                Debug.Log($"{card.Description}");
             }
         }
         catch (Exception ex)

@@ -27,7 +27,7 @@ Loan matures / collect £150,_ReceiveMoneyFromBank,150
 You are assessed for repairs / £40/house / £115/hotel,_Repairs,0
 Advance to GO,_Teleport,0
 You are assessed for repairs, £25/house, £100/hotel,_Repairs,1
-Go back 3 spaces,_MoveForward,-3
+Go back 3 spaces,_CardMove,-3
 Advance to Skywalker Drive. If you pass GO collect £200,_CardMove,11
 Go to jail. Do not pass GO / do not collect £200,_GoToJail,-1
 Drunk in charge of a hoverboard. Fine £30,_DepositToFreeParking,20

@@ -122,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
 
             // Attach and initialize the Player_ script
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
-            playerComponent.Initialize($"Player {i}", 100000); //change to 1500
+            playerComponent.Initialize($"Player {i}", 1500); 
 
 
             // Add to player list for tracking
@@ -250,7 +250,7 @@ public class PlayerMovement : MonoBehaviour
             //for the loop back to start of game (GO!)
         }
 
-        if (new_position < oldposition)
+        if (new_position < oldposition && distance > 0)
         {
             Debug.Log("You passed go!");
             BankTrans(200);
@@ -458,6 +458,13 @@ public class PlayerMovement : MonoBehaviour
     {
         player.pos = newPosition;
         CurrentPlayer.transform.position = boardPosition[newPosition];
+        positionHandling(player);
+
+        if (newPosition == 0)
+        {
+            BankTrans(200);
+        }
+
     }
 
     //ui section tried to make a script for it didnt work
@@ -563,6 +570,13 @@ public class PlayerMovement : MonoBehaviour
     public void _ReceiveMoneyFromAll(Player_ player, int amount)
     {
         Debug.Log("_ReceiveMoneyFromAll");
+        foreach (var sender in playerlist)
+        {
+            if (sender != player)
+            {
+                PlayerTrans(sender, player, amount);
+            }
+        }
     }
     public void _JailFreeCard(Player_ player, int amount)
     {
@@ -588,11 +602,4 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("_Repairs");
 
     }
-
-    public void Jail(Player_ player)
-    {
-
-    }
-
-
 }
