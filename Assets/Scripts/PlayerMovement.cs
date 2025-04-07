@@ -38,10 +38,18 @@ public class PlayerMovement : MonoBehaviour
     public GameObject auctionButton;
     public GameObject endButton;
     public GameObject propertyButton;
+    public GameObject manageButton;
 
     public GameObject playerBidPanel;
     public TextMeshProUGUI playerNameText;
     public TMP_InputField bidInputField;
+
+    public GameObject managePanel;
+    public GameObject setsPanel;
+    public GameObject propertiesPanel;
+    public TMP_Dropdown propertiesDropdown;
+    public TMP_Dropdown setsDropdown;
+
 
     // Default values
     public GameObject CurrentPlayer;
@@ -94,6 +102,7 @@ public class PlayerMovement : MonoBehaviour
     // Emulation of two dice rolls (2x 1->6)
     public (int, bool) DiceRoll()
     {
+        showing = false;
         return diceRoller.RollDice();
     }
 
@@ -163,6 +172,9 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("started");
         CreateBoard();
         playerBidPanel.SetActive(false);
+        managePanel.SetActive(false);
+        setsPanel.SetActive(false);
+        propertiesPanel.SetActive(false);
 
         //calling the info from the loading scene
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
@@ -192,7 +204,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!diceRoller.isRolling && next && !showing)
         {
-            canRoll(next);
+            diceRoller.ShowDice(true);
+            canRoll(true);
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -235,6 +248,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (boolDouble)
         {
+            showing = true;
             rolledDouble += 1;
             Debug.Log($"You rolled a double! {rolledDouble}");
             if (rolledDouble == 3)
@@ -261,6 +275,7 @@ public class PlayerMovement : MonoBehaviour
         {
             player.inJail += 1;
             Debug.Log($"YOU ARE IN JAIL LOSER NO GO FOR YOU {player.inJail}");
+            canEndTurn(true);
             return;
         }
 
@@ -545,6 +560,22 @@ public class PlayerMovement : MonoBehaviour
     public void canEndTurn(bool boolean)
     {
         endButton.SetActive(boolean);
+
+        if (!boolean)
+        {
+            manageButton.SetActive(boolean);
+            return;
+        }
+
+        next = false;
+
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        if (player.properties.Count() > 0)
+        {
+            manageButton.SetActive(boolean);
+        }
     }
     public void canStartAuction(bool boolean)
     {
@@ -611,6 +642,31 @@ public class PlayerMovement : MonoBehaviour
         if (buttonName == "skipButton")
         {
             nextBid(-1);
+        }
+
+        if (buttonName == "manageButton")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            canEndTurn(false);
+            if (player.OwnedSets.Count() > 0)
+            {
+                managePanel.SetActive(true);
+            }
+            else manageProperty(true);
+        }
+
+        if (buttonName == "setsButton")
+        {
+            managePanel.SetActive(false);
+            manageSets(true);
+        }
+
+        if (buttonName == "propertiesButton")
+        {
+            managePanel.SetActive(false);
+            manageProperty(true);
         }
 
     }   
@@ -688,7 +744,8 @@ public class PlayerMovement : MonoBehaviour
     public void canRoll(bool canRoll)
     {
         next = canRoll;
-        showing = diceRoller.ShowDice(canRoll);
+        showing = !canRoll;
+        // showing = diceRoller.ShowDice(canRoll);
     }
     public void startAuction(Player_ player)
     {
@@ -739,6 +796,52 @@ public class PlayerMovement : MonoBehaviour
             canRoll(true);
         }
         playerBidPanel.SetActive(false);
+    }
+
+    public void manageProperty(bool boolean)
+    {
+        if (boolean)
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            List<string> showProps = new List<string>();
+
+            foreach (int loc in player.properties)
+            {
+                Debug.Log($"{loc}");
+                showProps.Add(bank.Properties[loc].Name);
+            }
+
+            propertiesDropdown.ClearOptions();
+            propertiesDropdown.AddOptions(showProps);
+        }
+        propertiesPanel.SetActive(boolean);
+    }
+
+    public void manageSets(bool boolean)
+    {
+        if (boolean)
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            List<string> showProps = new List<string>();
+
+            foreach (int loc in player.properties)
+            {
+                if (player.OwnedSets.Contains(bank.Properties[loc].Group))
+                {
+                    Debug.Log($"{loc}");
+                    showProps.Add(bank.Properties[loc].Name);
+                }
+            }
+
+            setsDropdown.ClearOptions();
+            setsDropdown.AddOptions(showProps);
+        }
+
+        setsPanel.SetActive(boolean);
     }
 
 }
