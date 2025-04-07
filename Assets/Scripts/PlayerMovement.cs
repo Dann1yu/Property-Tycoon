@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
 
     public TextMeshProUGUI displayName1;
     public TextMeshProUGUI displayName2;
+    public TextMeshProUGUI displayName3;
+    public TextMeshProUGUI displaydouble;
 
     public GameObject ButtonObject;
     public TextMeshProUGUI txt;
@@ -251,6 +253,8 @@ public class PlayerMovement : MonoBehaviour
             showing = true;
             rolledDouble += 1;
             Debug.Log($"You rolled a double! {rolledDouble}");
+            displaydouble.text = ($"You rolled a double!");
+
             if (rolledDouble == 3)
             {
                 rolledDouble = 0;
@@ -265,6 +269,7 @@ public class PlayerMovement : MonoBehaviour
     void moveForward(int distance, Vector3 currentpos)
     {
         Debug.Log($"DiceRoll: {distance}");
+        displayName3.text = ($"DiceRoll: {distance}");
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
         if (player.inJail == 2)
@@ -275,6 +280,7 @@ public class PlayerMovement : MonoBehaviour
         {
             player.inJail += 1;
             Debug.Log($"YOU ARE IN JAIL LOSER NO GO FOR YOU {player.inJail}");
+            displayName3.text = ($"YOU ARE IN JAIL NO GO FOR YOU! {player.inJail}");
             canEndTurn(true);
             return;
         }
@@ -295,6 +301,7 @@ public class PlayerMovement : MonoBehaviour
         if (new_position < oldposition && distance > 0)
         {
             Debug.Log("You passed go!");
+            displayName3.text = ("You passed go!");
             BankTrans(200);
         }
 
@@ -351,6 +358,7 @@ public class PlayerMovement : MonoBehaviour
         {
             
             Debug.Log("Property for sale");
+            displayName3.text = ("The Property is for sale!");
             if (location.Cost < player.balance)
             {
                 canBuyProperty(true);
@@ -363,9 +371,11 @@ public class PlayerMovement : MonoBehaviour
         {
             if (player.properties.Contains(position)) {
                 Debug.Log("Property owned by the same player");
+                displayName3.text = ("Property owned by the same player");
             }
             else {
                 Debug.Log("Property owned by another player");
+                displayName3.text = ("Property owned by another player");
                 payRent(player, location);
             }
         } 
@@ -374,6 +384,7 @@ public class PlayerMovement : MonoBehaviour
         if (position == 7 | position == 22 | position == 36)
         {
             Debug.Log("Landed on oppurtunity knocks");
+            displayName3.text = ("Landed on oppurtunity knocks");
             oppKnock(player);
         }
 
@@ -381,6 +392,7 @@ public class PlayerMovement : MonoBehaviour
         if (position == 2 | position == 17 | position == 33)
         {
             Debug.Log("Landed on pot luck");
+            displayName3.text = ("Landed on pot luck");
             potLuck(player);
         }
 
@@ -388,6 +400,7 @@ public class PlayerMovement : MonoBehaviour
         if (position == 4)
         {
             Debug.Log("Landed on Income Tax and charged $200");
+            displayName3.text = ("Landed on Income Tax and charged $200");
             _DepositToFreeParking(player, 200);
             Debug.Log($"New balance: {player.balance}");
         }
@@ -396,6 +409,7 @@ public class PlayerMovement : MonoBehaviour
         if (position == 20)
         {
             Debug.Log($"Landed on free parking you have gained {bank.FreeParkingBalance}");
+            displayName3.text = ($"Landed on free parking you have gained {bank.FreeParkingBalance}");
             player.balance += bank.FreeParkingBalance;
             bank.FreeParkingBalance = 0;
             Debug.Log($"New balance: {player.balance}");
@@ -405,7 +419,8 @@ public class PlayerMovement : MonoBehaviour
         if (position == 30)
         {
             Debug.Log("Go to jail");
-           _GoToJail(player);
+            displayName3.text = ("Go to jail");
+            _GoToJail(player);
         }
 
         // Landed on super tax
@@ -422,12 +437,14 @@ public class PlayerMovement : MonoBehaviour
         {
             // should not need any logic if there is pass go logic implemented in move forward
             Debug.Log("Landed on GO");
+            displayName3.text = ("Landed on GO");
         }
 
         // if no actions are available, next turn
         if (location.Group == "" && rolledDouble > 0 | (location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && rolledDouble > 0))
         {
             Debug.Log("SPECIAL");
+            displaydouble.text = "you rolled a double!";
             canRoll(true);
         }
         else next = false;
@@ -517,6 +534,7 @@ public class PlayerMovement : MonoBehaviour
         bank.OKCards.RemoveAt(0);
 
         Debug.Log($"{card.Description}");
+        displayName3.text = ($"{card.Description}");
 
         var action = card.Action;
         var amount = card.Integer;
@@ -682,7 +700,7 @@ public class PlayerMovement : MonoBehaviour
     public void _OppKnocksOption(Player_ player, int amount)
     {
         Debug.Log("Pay a $10 fine or take opportunity knocks");
-
+        displayName3.text = ("Pay a $10 fine or take opportunity knocks");
         // TODO add ui for choice but for now is random
         bool randomBool = Random.value > 0.5f;
 
@@ -697,6 +715,7 @@ public class PlayerMovement : MonoBehaviour
     public void _DepositToFreeParking(Player_ player, int amount)
     {
         Debug.Log("_DepositToFreeParking");
+        displayName3.text = ($"Deposited: ${amount} to Free Parking");
         player.DepositToFreeParking(amount);
     }
     public void _GoToJail(Player_ player, int amount = 0)
@@ -719,6 +738,7 @@ public class PlayerMovement : MonoBehaviour
     public void _JailFreeCard(Player_ player, int amount)
     {
         Debug.Log("_JailFreeCard");
+        displayName3.text = "You got a Get out of Jail free card!";
         player.JailFreeCards += 1;
     }
     public void _CardMove(Player_ player, int amount)
