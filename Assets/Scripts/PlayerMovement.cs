@@ -5,11 +5,12 @@ using TMPro;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR;
+using UnityEngine.XR;   
 using static System.Net.Mime.MediaTypeNames;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using System.Reflection;
 using static UnityEngine.Rendering.DebugUI;
+
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -112,7 +113,7 @@ public class PlayerMovement : MonoBehaviour
 
     // Ends current term and starts next player's go
 
-    public void PlayerStartedTheGame(int AmountOfPlayers, int AmountOfAI, int gamemode)
+    public void PlayerStartedTheGame(int AmountOfPlayers=6, int AmountOfAI=0, int gamemode=0)
     {
         playerAmount = AmountOfPlayers;
         //add the other stuff here
@@ -185,7 +186,12 @@ public class PlayerMovement : MonoBehaviour
 
         //calling the info from the loading scene
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
+
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
+        if (playerAmount == 0)
+        {
+            playerAmount = 6;
+        }
         //also can call how much ai and the gamemode here ask dan how to do :)
 
 
