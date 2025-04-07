@@ -9,6 +9,7 @@ using UnityEngine.XR;
 using static System.Net.Mime.MediaTypeNames;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using System.Reflection;
+using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -162,6 +163,12 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("started");
         CreateBoard();
         playerBidPanel.SetActive(false);
+
+        //calling the info from the loading scene
+        var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
+        playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
+        //also can call how much ai and the gamemode here ask dan how to do :)
+
 
         canBuyProperty(false);
         canEndTurn(false);

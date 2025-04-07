@@ -8979,6 +8979,7 @@ GameObject:
   - component: {fileID: 1754829403}
   - component: {fileID: 1754829406}
   - component: {fileID: 1754829407}
+  - component: {fileID: 1754829408}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -9066,6 +9067,25 @@ MonoBehaviour:
   Balance: 0
   BankOwnedProperties: 
   FreeParkingBalance: 0
+--- !u!114 &1754829408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754829402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a18e417a0b4b2c8428fcea65fe55bb6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement: {fileID: 0}
+  DropdownPlayer: {fileID: 0}
+  DropdownAI: {fileID: 0}
+  DropdownGame: {fileID: 0}
+  Pvalue: 0
+  Avalue: 0
+  Gvalue: 0
 --- !u!1 &1789031963
 GameObject:
   m_ObjectHideFlags: 0
