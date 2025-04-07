@@ -11,34 +11,48 @@ public class LoadScene : MonoBehaviour
     public Dropdown DropdownPlayer;
     public Dropdown DropdownAI;
     public Dropdown DropdownGame;
+
+    public static int Pvalue;
+    public static int Avalue;
+    public static int Gvalue;
     void Start()
     {
 
-        
+
     }
 
     public void StartGamePressed()
     {
         int menuIndex = DropdownPlayer.GetComponent<Dropdown>().value;
         List<Dropdown.OptionData> menuOptions = DropdownPlayer.GetComponent<Dropdown>().options;
-        string Pvalue = menuOptions[menuIndex].text;
+        Pvalue = int.Parse(menuOptions[menuIndex].text);
         Debug.Log(Pvalue);
         int menuIndex2 = DropdownAI.GetComponent<Dropdown>().value;
         List<Dropdown.OptionData> menuOptions2 = DropdownAI.GetComponent<Dropdown>().options;
-        string Avalue = menuOptions2[menuIndex2].text;
+        Avalue = int.Parse(menuOptions2[menuIndex2].text);
         Debug.Log(Avalue);
-        int Gvalue = DropdownGame.GetComponent<Dropdown>().value;
+        Gvalue = DropdownGame.GetComponent<Dropdown>().value;
         Debug.Log(Gvalue);
 
         SceneManager.LoadScene("Property-Tycoon");
-        Debug.Log("SWITCH");
-        var playerMovement = GameObject.Find("GameController").GetComponent<PlayerMovement>();
-        playerMovement.PlayerStartedTheGame(int.Parse(Pvalue), int.Parse(Avalue), Gvalue);
+    }
+
+    public int UpdateGameSettingsPlayers()
+    {
+        return Pvalue;
+    }
+    public int UpdateGameSettingsAI()
+    {
+        return Avalue;
+    }
+    public int UpdateGameSettingsGame()
+    {
+        return Gvalue;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
