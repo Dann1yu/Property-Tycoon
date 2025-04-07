@@ -38,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject endButton;
     public GameObject propertyButton;
     public GameObject manageButton;
+    public GameObject closeButton;
 
     public GameObject playerBidPanel;
     public TextMeshProUGUI playerNameText;
@@ -48,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject propertiesPanel;
     public TMP_Dropdown propertiesDropdown;
     public TMP_Dropdown setsDropdown;
+    public TextMeshProUGUI mortgageText;
 
 
     // Default values
@@ -168,12 +170,15 @@ public class PlayerMovement : MonoBehaviour
     // Creates the board, spawns the player and sets current player to player 0
     void Start()
     {
+        diceRoller = FindFirstObjectByType<DiceRoller>();
+
         Debug.Log("started");
         CreateBoard();
         playerBidPanel.SetActive(false);
         managePanel.SetActive(false);
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
+        closeButton.SetActive(false);
 
         canBuyProperty(false);
         canEndTurn(false);
@@ -184,7 +189,6 @@ public class PlayerMovement : MonoBehaviour
 
         spawnPlayers(playerAmount);
 
-        diceRoller = FindFirstObjectByType<DiceRoller>();
 
         CurrentPlayer = GameObject.Find("Player 0");
         //Debug.Log("current" + CurrentPlayer);
@@ -433,7 +437,6 @@ public class PlayerMovement : MonoBehaviour
 
     void purchaseProperty(Player_ player, Property location, int amount = -1)
     {
-        Debug.Log($"{amount}");
         if (amount == -1)
         {
             amount = location.Cost;
@@ -449,6 +452,14 @@ public class PlayerMovement : MonoBehaviour
     void mortgageProperty(Player_ player, Property location)
     {
         BankTrans(location.Cost / 2);
+        location.mortgaged = true;
+        UpdateBalanceUI();
+
+    }
+
+    void unMortgageProperty(Player_ player, Property location)
+    {
+        BankTrans(-(location.Cost / 2));
         location.mortgaged = false;
         UpdateBalanceUI();
 
@@ -574,6 +585,10 @@ public class PlayerMovement : MonoBehaviour
     {
         auctionButton.SetActive(boolean);
     }
+    public void DecidedFromDropdown(string selectedText)
+    {
+
+    }
 
     public void DecidedToClick(GameObject button)
     {
@@ -646,6 +661,7 @@ public class PlayerMovement : MonoBehaviour
             if (player.OwnedSets.Count() > 0)
             {
                 managePanel.SetActive(true);
+                endButton.SetActive(true);
             }
             else manageProperty(true);
         }
@@ -662,8 +678,60 @@ public class PlayerMovement : MonoBehaviour
             manageProperty(true);
         }
 
-    }   
- 
+        if (buttonName == "closeButton")
+        {
+            closeOptions();
+        }
+
+        if (buttonName == "propertiesDropdown")
+        {
+            manageProperty(true);
+        }
+
+        if (buttonName == "sellPropertyButton")
+        {
+            var (loc, player) = returnPropertyOnShow();
+
+            sellProperty(player, loc);
+
+            if (player.properties.Count() == 0)
+            {
+                closeOptions();
+            }
+            else manageProperty(true);
+        }
+
+        if (buttonName == "mortgageButton")
+        {
+            var (loc, player) = returnPropertyOnShow();
+
+            if (loc.mortgaged)
+            {
+                unMortgageProperty(player, loc);
+            } else mortgageProperty(player, loc);
+
+            manageProperty(true);
+        }
+
+        if (buttonName == "sellHouseButton")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+        }
+
+        if (buttonName == "upgradeHouseButton")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+        }
+    }
+
+    public void dropdownChange()
+    {
+        editMortgageButton();
+    }
+
+
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
     {
         BankTrans(amount);
@@ -809,7 +877,11 @@ public class PlayerMovement : MonoBehaviour
             propertiesDropdown.ClearOptions();
             propertiesDropdown.AddOptions(showProps);
         }
+
         propertiesPanel.SetActive(boolean);
+        endButton.SetActive(boolean);
+        closeButton.SetActive(boolean);
+        editMortgageButton();
     }
 
     public void manageSets(bool boolean)
@@ -835,6 +907,47 @@ public class PlayerMovement : MonoBehaviour
         }
 
         setsPanel.SetActive(boolean);
+        endButton.SetActive(boolean);
+        closeButton.SetActive(boolean);
+        editMortgageButton();
+    }
+
+    public void closeOptions()
+    {
+        closeButton.SetActive(false);
+        setsPanel.SetActive(false);
+        propertiesPanel.SetActive(false);
+        manageButton.SetActive(true);
+    }
+
+    public (Property, Player_) returnPropertyOnShow()
+    {
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        var propertyName = propertiesDropdown.options[propertiesDropdown.value].text;
+
+        foreach (var locIdx in player.properties)
+        {
+            var loc = bank.Properties[locIdx];
+
+            if (loc.Name == propertyName)
+            {
+                return (loc, player);
+            }
+        }
+        return (null, null);
+    }
+
+    public void editMortgageButton()
+    {
+        var (loc, player) = returnPropertyOnShow();
+
+        if (loc.mortgaged)
+        {
+            mortgageText.text = "Unmortgage";
+        }
+        else mortgageText.text = "Mortgage";
     }
 
 }
