@@ -11989,6 +11989,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAmount: 6
   PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
+  abridgedGamemode: 1
   characterPrefabs:
   - {fileID: 5565982008113524239, guid: 610008dc6d8805240bd5cf800baf9c5f, type: 3}
   - {fileID: 7351789257260901266, guid: c3fab251821a0db4f91a6a4882f93b9c, type: 3}
@@ -12018,9 +12019,13 @@ MonoBehaviour:
   managePanel: {fileID: 422586695}
   setsPanel: {fileID: 883058626}
   propertiesPanel: {fileID: 983730888}
+  oppKnocksOption: {fileID: 506410797}
+  jailOption: {fileID: 1001762001}
   propertiesDropdown: {fileID: 498809550}
   setsDropdown: {fileID: 1169975961}
   mortgageText: {fileID: 321995804}
+  startTime: 0
+  endTime: 0
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
   PlayerInControl: {fileID: 0}

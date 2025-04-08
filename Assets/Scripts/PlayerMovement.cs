@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     // In unity objects / vars
     [SerializeField] private int playerAmount = 6;
     [SerializeField] private GameObject PlayerObject;
+    public bool abridgedGamemode = true;
 
     public List<GameObject> characterPrefabs = new List<GameObject>(); 
 
@@ -60,11 +61,15 @@ public class PlayerMovement : MonoBehaviour
     public GameObject managePanel;
     public GameObject setsPanel;
     public GameObject propertiesPanel;
+    public GameObject oppKnocksOption;
+    public GameObject jailOption;
     public TMP_Dropdown propertiesDropdown;
     public TMP_Dropdown setsDropdown;
     public TextMeshProUGUI mortgageText;
 
     private bool admin;
+    public float startTime;
+    public float endTime;
 
 
     // Default values
@@ -186,6 +191,8 @@ public class PlayerMovement : MonoBehaviour
     // Creates the board, spawns the player and sets current player to player 0
     void Start()
     {
+        startTime = Time.time;
+        Debug.Log($"Time: {startTime}");
         diceRoller = FindFirstObjectByType<DiceRoller>();
 
         Debug.Log("started");
@@ -195,6 +202,8 @@ public class PlayerMovement : MonoBehaviour
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
         closeButton.SetActive(false);
+        oppKnocksOption.SetActive(false);
+        jailOption.SetActive(false);
 
         //calling the info from the loading scene
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
@@ -248,6 +257,8 @@ public class PlayerMovement : MonoBehaviour
 
                 if (admin)
                 {
+                    endTime = 1200f;
+
                     CurrentPlayer = playerlist[playerTurn].gameObject;
                     Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -274,7 +285,7 @@ public class PlayerMovement : MonoBehaviour
 
                     mortgageProperty(player, bank.Properties[15]);
 
-                    checkLiquidation(player, 1000);
+                    Debug.Log(checkLiquidation(player));
 
                     //_Repairs(player, 0);
                     //_Repairs(player, 1);
@@ -737,6 +748,15 @@ public class PlayerMovement : MonoBehaviour
         }
         if (buttonName == "endTurnButton")
         {
+            if (abridgedGamemode && (playerTurn == (playerlist.Count()-1)))
+            {
+                if ((Time.time - startTime) > endTime)
+                {
+                    endAbridgedGame();
+                }
+            }
+
+             
             Debug.Log("EndTurn");
             canRoll(true);
             canEndTurn(false);
@@ -1150,7 +1170,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    public bool checkLiquidation(Player_ player, int amount)
+    public int checkLiquidation(Player_ player)
     {
         int total = 0;
         foreach (var locIdx in player.properties)
@@ -1163,8 +1183,28 @@ public class PlayerMovement : MonoBehaviour
             } else total += loc.Cost;
         }
 
-        Debug.Log($"Liquidation value {total}");
-        return (total >= amount);
+      
 
+        total += player.balance;
+        Debug.Log($"Liquidation value {total}");
+
+        return total;
+
+    }
+
+    public void endAbridgedGame()
+    {
+        Player_ winner = null;
+        int winnerLiquid = 0;
+        foreach (var player in playerlist)
+        {
+            int playerLiquid = checkLiquidation(player);
+            if (winnerLiquid < playerLiquid)
+            {
+                winnerLiquid = playerLiquid;
+                winner = player;
+            }
+        }
+        Debug.Log($"Winner is {winner} with a liquid value of {winnerLiquid}");
     }
 }
