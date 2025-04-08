@@ -21,7 +21,14 @@ public class UI : MonoBehaviour
     {
         GameObject dropdown = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var playerMovement = GameObject.Find("GameController").GetComponent<PlayerMovement>();
-        playerMovement.dropdownChange();
+        playerMovement.propertyDropdownChange();
+    }
+
+    public void setDropdownChange()
+    {
+        GameObject dropdown = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        var playerMovement = GameObject.Find("GameController").GetComponent<PlayerMovement>();
+        playerMovement.setDropdownChange();
     }
 
 

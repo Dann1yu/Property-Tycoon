@@ -10,6 +10,7 @@ using static System.Net.Mime.MediaTypeNames;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using System.Reflection;
 using static UnityEngine.Rendering.DebugUI;
+using static System.Math;
 
 
 public class PlayerMovement : MonoBehaviour
@@ -29,6 +30,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private int playerAmount = 6;
     [SerializeField] private GameObject PlayerObject;
 
+    public int lowestHouses = 5;
+    public int highestHouses = 0;
+
     public TextMeshProUGUI displayName1;
     public TextMeshProUGUI displayName2;
     public TextMeshProUGUI displayName3;
@@ -44,6 +48,9 @@ public class PlayerMovement : MonoBehaviour
     public GameObject manageButton;
     public GameObject closeButton;
 
+    public GameObject sellHouseButton;
+    public GameObject upgradeHouseButton;
+
     public GameObject playerBidPanel;
     public TextMeshProUGUI playerNameText;
     public TMP_InputField bidInputField;
@@ -54,6 +61,8 @@ public class PlayerMovement : MonoBehaviour
     public TMP_Dropdown propertiesDropdown;
     public TMP_Dropdown setsDropdown;
     public TextMeshProUGUI mortgageText;
+
+    private bool admin;
 
 
     // Default values
@@ -188,9 +197,14 @@ public class PlayerMovement : MonoBehaviour
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
 
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
+
+        admin = false;
         if (playerAmount == 0)
         {
             playerAmount = 6;
+            admin = true;
+            Debug.Log("ADMIN MODE");
+
         }
         //also can call how much ai and the gamemode here ask dan how to do :)
 
@@ -206,6 +220,8 @@ public class PlayerMovement : MonoBehaviour
 
 
         CurrentPlayer = GameObject.Find("Player 0");
+
+
         //Debug.Log("current" + CurrentPlayer);
         //Player_ thisPlayer = CurrentPlayer.GetComponent<Player_>();
         //Debug.Log("name" + thisPlayer.playerName);
@@ -225,6 +241,25 @@ public class PlayerMovement : MonoBehaviour
             if (next && rolledDouble == 0) {
                 next = false;
                 NextTurn();
+
+
+                if (admin)
+                {
+                    CurrentPlayer = playerlist[playerTurn].gameObject;
+                    Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+                    purchaseProperty(player, bank.Properties[1]);
+                    purchaseProperty(player, bank.Properties[3]);
+
+                    purchaseProperty(player, bank.Properties[5]);
+                    purchaseProperty(player, bank.Properties[15]);
+
+                    purchaseProperty(player, bank.Properties[12]);
+                    purchaseProperty(player, bank.Properties[28]);
+                    admin = false;
+
+                }
+
             } else if (!next) {
                 return;
             }
@@ -256,8 +291,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void onRoll(int roll, bool boolDouble)
+    public void onRoll(int nextRoll, bool boolDouble)
     {
+        roll = nextRoll;
         if (boolDouble)
         {
             showing = true;
@@ -510,21 +546,54 @@ public class PlayerMovement : MonoBehaviour
 
     void payRent(Player_ player, Property location)
     {
-        if (location.NumberOfHouses == 0) {
+        Debug.Log($"{location.Name} {location.NumberOfHouses} {location.RentUnimproved} {location.Rent1House} {location.Rent2Houses} {location.Rent3Houses} {location.Rent4Houses} {location.RentHotel}");
+        
+        if (location.Group == "Station")
+        {
+            int amount = 25 * System.Convert.ToInt32(System.Math.Pow(2, (location.Owner.Sets["Station"] - 1)));
+            PlayerTrans(player, location.Owner, amount);
+            return;
+        }
+        else if (location.Group == "Utilities")
+        {
+            int amount;
+            if (location.Owner.Sets["Utilities"] == 2)
+            {
+                amount = 10;
+            }
+            else amount = 4;
+
+            amount = roll * amount;
+            PlayerTrans(player, location.Owner, amount);
+            return;
+        }
+
+        if (location.NumberOfHouses == 0)
+        {
+            if (location.Owner.OwnedSets.Contains(location.Group))
+            {
+                PlayerTrans(player, location.Owner, (location.RentUnimproved * 2));
+                return;
+            }
             PlayerTrans(player, location.Owner, location.RentUnimproved);
-        } else if (location.NumberOfHouses == 1)
+        }
+        else if (location.NumberOfHouses == 1)
         {
             PlayerTrans(player, location.Owner, location.Rent1House);
-        } else if (location.NumberOfHouses == 2)
+        }
+        else if (location.NumberOfHouses == 2)
         {
             PlayerTrans(player, location.Owner, location.Rent2Houses);
-        } else if (location.NumberOfHouses == 3)
+        }
+        else if (location.NumberOfHouses == 3)
         {
             PlayerTrans(player, location.Owner, location.Rent3Houses);
-        } else if (location.NumberOfHouses == 4)
+        }
+        else if (location.NumberOfHouses == 4)
         {
             PlayerTrans(player, location.Owner, location.Rent4Houses);
-        } else if (location.NumberOfHouses == 5)
+        }
+        else if (location.NumberOfHouses == 5)
         {
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
@@ -616,10 +685,6 @@ public class PlayerMovement : MonoBehaviour
     {
         auctionButton.SetActive(boolean);
     }
-    public void DecidedFromDropdown(string selectedText)
-    {
-
-    }
 
     public void DecidedToClick(GameObject button)
     {
@@ -701,6 +766,7 @@ public class PlayerMovement : MonoBehaviour
         {
             managePanel.SetActive(false);
             manageSets(true);
+            setDropdownChange();    
         }
 
         if (buttonName == "propertiesButton")
@@ -746,22 +812,68 @@ public class PlayerMovement : MonoBehaviour
 
         if (buttonName == "sellHouseButton")
         {
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
+            var (loc, player) = returnPropertyOnShow();
+
+            player.sellHouse(player, loc);
+
+            
+
+            setDropdownChange();
         }
 
         if (buttonName == "upgradeHouseButton")
         {
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
+            var (loc, player) = returnPropertyOnShow();
+
+
+            player.upgradeHouse(player, loc);
+            setDropdownChange();
         }
     }
 
-    public void dropdownChange()
+    public void propertyDropdownChange()
     {
         editMortgageButton();
     }
 
+    public void setDropdownChange()
+    {
+        var (loc, player) = returnPropertyOnShow();
+        Debug.Log($"Name: {loc.Name}");
+
+        lowestHouses = 5;
+        highestHouses = 0;
+        foreach (var index in player.properties)
+        {
+            Property location = bank.Properties[index];
+            if (location.Group == loc.Group)
+            {
+                Debug.Log(location.Name);
+                if (lowestHouses > location.NumberOfHouses)
+                {
+                    lowestHouses = location.NumberOfHouses;
+                }
+                if (highestHouses < location.NumberOfHouses)
+                {
+                    highestHouses = location.NumberOfHouses;
+                }
+            }
+        }
+        
+        if (loc.NumberOfHouses > 0 && loc.NumberOfHouses == highestHouses)
+        {
+            sellHouseButton.SetActive(true);
+        }
+        else sellHouseButton.SetActive(false);
+
+        if (loc.NumberOfHouses == 5 | ((loc.NumberOfHouses != lowestHouses) && (lowestHouses != highestHouses)))
+        {
+            upgradeHouseButton.SetActive(false);
+        }
+        else upgradeHouseButton.SetActive(true);
+
+
+    }
 
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
     {
@@ -914,6 +1026,7 @@ public class PlayerMovement : MonoBehaviour
         propertiesPanel.SetActive(boolean);
         endButton.SetActive(boolean);
         closeButton.SetActive(boolean);
+        canEndTurn(!boolean);
         editMortgageButton();
     }
 
@@ -951,6 +1064,7 @@ public class PlayerMovement : MonoBehaviour
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
         manageButton.SetActive(true);
+        canEndTurn(true);
     }
 
     public (Property, Player_) returnPropertyOnShow()
@@ -958,17 +1072,19 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-        var propertyName = propertiesDropdown.options[propertiesDropdown.value].text;
+        var propertyName = setsDropdown.options[setsDropdown.value].text;
 
         foreach (var locIdx in player.properties)
         {
             var loc = bank.Properties[locIdx];
-
+            Debug.Log(propertyName);
+            Debug.Log(loc.Name);    
             if (loc.Name == propertyName)
             {
                 return (loc, player);
             }
         }
+        Debug.Log("SENDING NULL");  
         return (null, null);
     }
 
@@ -982,5 +1098,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else mortgageText.text = "Mortgage";
     }
+
+
 
 }

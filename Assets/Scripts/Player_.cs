@@ -97,7 +97,7 @@ public class Player_ : MonoBehaviour
             Sets[group] = 1;
         }
 
-        if (Sets[group] == bank.PropertiesPerSet[group])
+        if ((Sets[group] == bank.PropertiesPerSet[group]) && (group != "Station") && (group != "Utilities"))
         {
             OwnedSets.Add(group);
         }
@@ -121,6 +121,52 @@ public class Player_ : MonoBehaviour
     {
         balance -= amount;
         bank.FreeParkingBalance += amount;
+    }
+
+    public void upgradeHouse(Player_ player, Property loc)
+    {
+        int amount;
+        if (loc.Group == "Brown" | loc.Group == "Blue")
+        {
+            amount = 50;
+        }
+        else if (loc.Group == "Purple" | loc.Group == "Orange")
+        {
+            amount = 100;
+        }
+        else if (loc.Group == "Red" | loc.Group == "Yellow")
+        {
+            amount = 150;
+        }
+        else
+        {
+            amount = 200;
+        }
+        PayBank(amount);
+        loc.NumberOfHouses++;
+    }
+
+    public void sellHouse(Player_ player, Property loc)
+    {
+        int amount;
+        if (loc.Group == "Brown" | loc.Group == "Blue")
+        {
+            amount = 50;
+        }
+        else if (loc.Group == "Purple" | loc.Group == "Orange")
+        {
+            amount = 100;
+        }
+        else if (loc.Group == "Red" | loc.Group == "Yellow")
+        {
+            amount = 150;
+        }
+        else
+        {
+            amount = 200;
+        }
+        ReceiveMoneyFromBank(amount);
+        loc.NumberOfHouses--;
     }
 
 }
