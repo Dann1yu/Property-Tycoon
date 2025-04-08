@@ -125,9 +125,9 @@ public class PlayerMovement : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         showing = false;
-        diceRoller.RollDice();
-        return (8, true);
-        //return diceRoller.RollDice();
+        //diceRoller.RollDice();
+        //return (7, false);
+        return diceRoller.RollDice();
     }
 
     // Ends current term and starts next player's go
@@ -245,7 +245,7 @@ public class PlayerMovement : MonoBehaviour
     // Updates on next players turn
     public void Update()
     {
-        if (!diceRoller.isRolling && next && !showing)
+        if (!diceRoller.isRolling && next && !showing && !propertyButton.activeSelf)
         {
             diceRoller.ShowDice(true);
             canRoll(true);
@@ -439,7 +439,7 @@ public class PlayerMovement : MonoBehaviour
         // Landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
         {
-            
+            canEndTurn(false);
             Debug.Log("Property for sale");
             displayName3.text = ("The Property is for sale!");
             if (location.Cost < player.balance)
@@ -538,9 +538,10 @@ public class PlayerMovement : MonoBehaviour
             canRoll(true);
         }
         else next = false;
-        if (rolledDouble == 0)
+        if ((rolledDouble == 0) && (!jailOption.activeSelf) && (!propertyButton.activeSelf))
         {
             canEndTurn(true);
+            Debug.Log($"544");
         }
     }
 
@@ -704,6 +705,7 @@ public class PlayerMovement : MonoBehaviour
     public void canBuyProperty(bool boolean)
     {
         propertyButton.SetActive(boolean);
+        canEndTurn(false);
     }
     public void canEndTurn(bool boolean)
     {
