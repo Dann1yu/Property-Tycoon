@@ -248,29 +248,33 @@ public class PlayerMovement : MonoBehaviour
 
                 if (admin)
                 {
-                    //CurrentPlayer = playerlist[playerTurn].gameObject;
-                    //Player_ player = CurrentPlayer.GetComponent<Player_>();
+                    CurrentPlayer = playerlist[playerTurn].gameObject;
+                    Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-                    //player.balance = 100000;
+                    player.balance = 100000;
 
-                    //purchaseProperty(player, bank.Properties[1]);
-                    //purchaseProperty(player, bank.Properties[3]);
+                    purchaseProperty(player, bank.Properties[1]);
+                    purchaseProperty(player, bank.Properties[3]);
 
-                    //purchaseProperty(player, bank.Properties[5]);
-                    //purchaseProperty(player, bank.Properties[15]);
+                    purchaseProperty(player, bank.Properties[5]);
+                    purchaseProperty(player, bank.Properties[15]);
 
-                    //purchaseProperty(player, bank.Properties[12]);
-                    //purchaseProperty(player, bank.Properties[28]);
+                    purchaseProperty(player, bank.Properties[12]);
+                    purchaseProperty(player, bank.Properties[28]);
 
-                    //player.upgradeHouse(player, bank.Properties[1]);
-                    //player.upgradeHouse(player, bank.Properties[1]);
-                    //player.upgradeHouse(player, bank.Properties[1]);
-                    //player.upgradeHouse(player, bank.Properties[1]);
-                    //player.upgradeHouse(player, bank.Properties[1]);
-                    //player.upgradeHouse(player, bank.Properties[3]);
-                    //player.upgradeHouse(player, bank.Properties[3]);
-                    //player.upgradeHouse(player, bank.Properties[3]);
-                    //player.upgradeHouse(player, bank.Properties[3]);
+                    player.upgradeHouse(player, bank.Properties[1]);
+                    player.upgradeHouse(player, bank.Properties[1]);
+                    player.upgradeHouse(player, bank.Properties[1]);
+                    player.upgradeHouse(player, bank.Properties[1]);
+                    player.upgradeHouse(player, bank.Properties[1]);
+                    player.upgradeHouse(player, bank.Properties[3]);
+                    player.upgradeHouse(player, bank.Properties[3]);
+                    player.upgradeHouse(player, bank.Properties[3]);
+                    player.upgradeHouse(player, bank.Properties[3]);
+
+                    mortgageProperty(player, bank.Properties[15]);
+
+                    checkLiquidation(player);
 
                     //_Repairs(player, 0);
                     //_Repairs(player, 1);
@@ -1146,5 +1150,21 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    public int checkLiquidation(Player_ player)
+    {
+        int total = 0;
+        foreach (var locIdx in player.properties)
+        {
+            var loc = bank.Properties[locIdx];
+            total += player.checkHousePrice(loc) * loc.NumberOfHouses;
+            if (loc.mortgaged)
+            {
+                total += loc.Cost/2;
+            } else total += loc.Cost;
+        }
 
+        Debug.Log($"Liquidation value {total}");
+        return total;
+
+    }
 }

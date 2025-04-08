@@ -125,28 +125,19 @@ public class Player_ : MonoBehaviour
 
     public void upgradeHouse(Player_ player, Property loc)
     {
-        int amount;
-        if (loc.Group == "Brown" | loc.Group == "Blue")
-        {
-            amount = 50;
-        }
-        else if (loc.Group == "Purple" | loc.Group == "Orange")
-        {
-            amount = 100;
-        }
-        else if (loc.Group == "Red" | loc.Group == "Yellow")
-        {
-            amount = 150;
-        }
-        else
-        {
-            amount = 200;
-        }
+        int amount = checkHousePrice(loc);
         PayBank(amount);
         loc.NumberOfHouses++;
     }
 
     public void sellHouse(Player_ player, Property loc)
+    {
+        int amount = checkHousePrice(loc);
+        ReceiveMoneyFromBank(amount);
+        loc.NumberOfHouses--;
+    }
+
+    public int checkHousePrice(Property loc)
     {
         int amount;
         if (loc.Group == "Brown" | loc.Group == "Blue")
@@ -165,8 +156,8 @@ public class Player_ : MonoBehaviour
         {
             amount = 200;
         }
-        ReceiveMoneyFromBank(amount);
-        loc.NumberOfHouses--;
+
+        return amount;
     }
 
 }
