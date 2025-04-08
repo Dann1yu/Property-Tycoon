@@ -274,7 +274,7 @@ public class PlayerMovement : MonoBehaviour
 
                     mortgageProperty(player, bank.Properties[15]);
 
-                    checkLiquidation(player);
+                    checkLiquidation(player, 1000);
 
                     //_Repairs(player, 0);
                     //_Repairs(player, 1);
@@ -1150,7 +1150,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    public int checkLiquidation(Player_ player)
+    public bool checkLiquidation(Player_ player, int amount)
     {
         int total = 0;
         foreach (var locIdx in player.properties)
@@ -1164,7 +1164,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         Debug.Log($"Liquidation value {total}");
-        return total;
+        return (total >= amount);
 
     }
 }
