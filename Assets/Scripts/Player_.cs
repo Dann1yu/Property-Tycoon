@@ -15,6 +15,7 @@ public class Player_ : MonoBehaviour
     public Dictionary<string, int> Sets = new Dictionary<string, int>();
     public List<string> OwnedSets = new List<string>();
     public bool passedGo = false;
+    public bool AI = false;
 
     // Initializes the players variables
     public void Initialize(string name, int startBalance)

@@ -27,8 +27,9 @@ public class PlayerMovement : MonoBehaviour
 
 
     // In unity objects / vars
-    [SerializeField] private int playerAmount = 6;
+    [SerializeField] private int playerAmount;
     [SerializeField] private GameObject PlayerObject;
+    public int AIplayerAmount;
     public bool abridgedGamemode = true;
 
     public List<GameObject> characterPrefabs = new List<GameObject>(); 
@@ -125,9 +126,9 @@ public class PlayerMovement : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         showing = false;
-        diceRoller.RollDice();
-        return (3, false);
-        //return diceRoller.RollDice();
+        //diceRoller.RollDice();
+        //return (3, false);
+        return diceRoller.RollDice();
     }
 
     // Ends current term and starts next player's go
@@ -161,8 +162,10 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
-    public void spawnPlayers(int amount)
+    public void spawnPlayers(int Human, int AI)
     {
+        var amount = Human + AI;
+
         for (int i = 0; i < amount; i++)
         {
             PlayerObject = characterPrefabs[i];
@@ -172,6 +175,11 @@ public class PlayerMovement : MonoBehaviour
             // Attach and initialize the Player_ script
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
             playerComponent.Initialize($"Player {i}", 1500); 
+
+            if (i >= Human)
+            {
+                playerComponent.AI = true;
+            }
 
 
             // Add to player list for tracking
@@ -212,11 +220,13 @@ public class PlayerMovement : MonoBehaviour
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
 
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
+        AIplayerAmount = PlayerAmounts.UpdateGameSettingsAI();
 
         admin = false;
         if (playerAmount == 0)
         {
-            playerAmount = 6;
+            playerAmount = 2;
+            AIplayerAmount = 1;
             admin = true;
             Debug.Log("ADMIN MODE");
 
@@ -231,7 +241,7 @@ public class PlayerMovement : MonoBehaviour
         bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
 
 
-        spawnPlayers(playerAmount);
+        spawnPlayers(playerAmount, AIplayerAmount);
 
 
         CurrentPlayer = GameObject.Find("Player 0");
@@ -288,16 +298,16 @@ public class PlayerMovement : MonoBehaviour
 
                     mortgageProperty(player, bank.Properties[15]);
 
-                    player = playerlist[1].gameObject.GetComponent<Player_>();
-                    player.balance = 10;
-                    player = playerlist[2].gameObject.GetComponent<Player_>();
-                    player.balance = 10;
-                    player = playerlist[3].gameObject.GetComponent<Player_>();
-                    player.balance = 10;
-                    player = playerlist[4].gameObject.GetComponent<Player_>();
-                    player.balance = 10;
-                    player = playerlist[5].gameObject.GetComponent<Player_>();
-                    player.balance = 10;
+                    //player = playerlist[1].gameObject.GetComponent<Player_>();
+                    //player.balance = 10;
+                    //player = playerlist[2].gameObject.GetComponent<Player_>();
+                    //player.balance = 10;
+                    //player = playerlist[3].gameObject.GetComponent<Player_>();
+                    //player.balance = 10;
+                    //player = playerlist[4].gameObject.GetComponent<Player_>();
+                    //player.balance = 10;
+                    //player = playerlist[5].gameObject.GetComponent<Player_>();
+                    //player.balance = 10;
 
                     Debug.Log(checkLiquidation(player));
 
