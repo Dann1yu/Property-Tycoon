@@ -966,6 +966,32 @@ public class PlayerMovement : MonoBehaviour
             canEndTurn(true);
             manageButton.SetActive(false);
         }
+
+        if (buttonName == "pay10")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            _DepositToFreeParking(player, 10);
+
+            if (rolledDouble > 0)
+            {
+                canRoll(true);
+            }
+            else
+            {
+                canEndTurn(true);
+            }
+
+                
+        }
+        if (buttonName == "oppKnock")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            oppKnock(player);
+        }
     }
 
     public void propertyDropdownChange()
@@ -1024,16 +1050,8 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("Pay a $10 fine or take opportunity knocks");
         displayName3.text = ("Pay a $10 fine or take opportunity knocks");
-        // TODO add ui for choice but for now is random
-        bool randomBool = Random.value > 0.5f;
 
-        if (randomBool)
-        {
-            _DepositToFreeParking(player, amount);
-        } else
-        {
-            oppKnock(player);
-        }
+        oppKnocksOption.SetActive(true);
     }
     public void _DepositToFreeParking(Player_ player, int amount)
     {
