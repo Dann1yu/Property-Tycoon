@@ -125,8 +125,9 @@ public class PlayerMovement : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         showing = false;
-        // return diceRoller.RollDice();
-        return (30, false);
+        diceRoller.RollDice();
+        return (8, true);
+        //return diceRoller.RollDice();
     }
 
     // Ends current term and starts next player's go
@@ -459,6 +460,12 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Property owned by another player");
                 displayName3.text = ("Property owned by another player");
                 payRent(player, location);
+                if (rolledDouble > 0)
+                {
+                    Debug.Log("CAN ROLL TRUE AND NEXT TRUE");
+                    canRoll(true);
+                    next = true;
+                }
             }
         } 
 
@@ -523,9 +530,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // if no actions are available, next turn
-        if (location.Group == "" && rolledDouble > 0 | (location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && rolledDouble > 0))
+        Debug.Log($"{location.CanBeBought}, {!bank.BankOwnedProperties.Contains(position)}, {rolledDouble}");    
+        if ((location.Group == "" && rolledDouble > 0) | ((location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && (rolledDouble > 0))))
         {
-            Debug.Log("SPECIAL");
+            Debug.Log("SPECIALX");
             displaydouble.text = "you rolled a double!";
             canRoll(true);
         }
