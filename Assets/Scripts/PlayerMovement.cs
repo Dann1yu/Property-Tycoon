@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private int playerAmount = 6;
     [SerializeField] private GameObject PlayerObject;
 
+    public List<GameObject> characterPrefabs = new List<GameObject>(); 
+
     public int lowestHouses = 5;
     public int highestHouses = 0;
 
@@ -155,6 +157,7 @@ public class PlayerMovement : MonoBehaviour
     {
         for (int i = 0; i < amount; i++)
         {
+            PlayerObject = characterPrefabs[i];
             var spawnedPlayer = Instantiate(PlayerObject, new Vector3(10, 0.5f, 0), Quaternion.identity);
             spawnedPlayer.name = $"Player {i}";
 
@@ -201,7 +204,7 @@ public class PlayerMovement : MonoBehaviour
         admin = false;
         if (playerAmount == 0)
         {
-            playerAmount = 1;
+            playerAmount = 6;
             admin = true;
             Debug.Log("ADMIN MODE");
 

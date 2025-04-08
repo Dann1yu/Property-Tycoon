@@ -6184,7 +6184,19 @@ MonoBehaviour:
       m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4405538820509763878, guid: fd51c29e21ccace45944603475fb427e, type: 3}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: setDropdownChange
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &1169975962
 MonoBehaviour:
@@ -9341,6 +9353,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAmount: 2
   PlayerObject: {fileID: 0}
+  lowestHouses: 5
+  highestHouses: 0
   displayName1: {fileID: 0}
   displayName2: {fileID: 0}
   displayName3: {fileID: 0}
@@ -9353,6 +9367,8 @@ MonoBehaviour:
   propertyButton: {fileID: 0}
   manageButton: {fileID: 0}
   closeButton: {fileID: 0}
+  sellHouseButton: {fileID: 0}
+  upgradeHouseButton: {fileID: 0}
   playerBidPanel: {fileID: 0}
   playerNameText: {fileID: 0}
   bidInputField: {fileID: 0}
@@ -9362,9 +9378,55 @@ MonoBehaviour:
   propertiesDropdown: {fileID: 0}
   setsDropdown: {fileID: 0}
   mortgageText: {fileID: 0}
+  admin: 0
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
+  bank: {fileID: 0}
   PlayerInControl: {fileID: 0}
+  UserInterface: {fileID: 0}
+  playerlist: []
+  boardPosition:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  diceRoller: {fileID: 0}
   roll: -1
   rolledDouble: 0
   next: 1
@@ -10280,6 +10342,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAmount: 6
   PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
+  characterPrefabs:
+  - {fileID: 5565982008113524239, guid: 610008dc6d8805240bd5cf800baf9c5f, type: 3}
+  - {fileID: 7351789257260901266, guid: c3fab251821a0db4f91a6a4882f93b9c, type: 3}
+  - {fileID: 4263920032023121601, guid: ee0abfb65f6bb7348a5300e26efe1ca2, type: 3}
+  - {fileID: 6130756977411752786, guid: 2e39bac90f5733c4ba663c97b4ef2b2d, type: 3}
+  - {fileID: 4679352489972109727, guid: e9efad721b2c57140a2e7b22a7819735, type: 3}
+  - {fileID: 4470610090606774282, guid: 7a32e7b38f4c26542a89ada5fdcbee51, type: 3}
+  lowestHouses: 5
+  highestHouses: 0
   displayName1: {fileID: 1648605600}
   displayName2: {fileID: 305263669}
   displayName3: {fileID: 1212798172}
@@ -10292,6 +10363,8 @@ MonoBehaviour:
   propertyButton: {fileID: 2074625690}
   manageButton: {fileID: 1562396607}
   closeButton: {fileID: 150469313}
+  sellHouseButton: {fileID: 1669074058}
+  upgradeHouseButton: {fileID: 1357375804}
   playerBidPanel: {fileID: 638406644}
   playerNameText: {fileID: 1405061454}
   bidInputField: {fileID: 415101478}
