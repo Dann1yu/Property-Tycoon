@@ -201,7 +201,7 @@ public class PlayerMovement : MonoBehaviour
         admin = false;
         if (playerAmount == 0)
         {
-            playerAmount = 6;
+            playerAmount = 1;
             admin = true;
             Debug.Log("ADMIN MODE");
 
@@ -245,17 +245,33 @@ public class PlayerMovement : MonoBehaviour
 
                 if (admin)
                 {
-                    CurrentPlayer = playerlist[playerTurn].gameObject;
-                    Player_ player = CurrentPlayer.GetComponent<Player_>();
+                    //CurrentPlayer = playerlist[playerTurn].gameObject;
+                    //Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-                    purchaseProperty(player, bank.Properties[1]);
-                    purchaseProperty(player, bank.Properties[3]);
+                    //player.balance = 100000;
 
-                    purchaseProperty(player, bank.Properties[5]);
-                    purchaseProperty(player, bank.Properties[15]);
+                    //purchaseProperty(player, bank.Properties[1]);
+                    //purchaseProperty(player, bank.Properties[3]);
 
-                    purchaseProperty(player, bank.Properties[12]);
-                    purchaseProperty(player, bank.Properties[28]);
+                    //purchaseProperty(player, bank.Properties[5]);
+                    //purchaseProperty(player, bank.Properties[15]);
+
+                    //purchaseProperty(player, bank.Properties[12]);
+                    //purchaseProperty(player, bank.Properties[28]);
+
+                    //player.upgradeHouse(player, bank.Properties[1]);
+                    //player.upgradeHouse(player, bank.Properties[1]);
+                    //player.upgradeHouse(player, bank.Properties[1]);
+                    //player.upgradeHouse(player, bank.Properties[1]);
+                    //player.upgradeHouse(player, bank.Properties[1]);
+                    //player.upgradeHouse(player, bank.Properties[3]);
+                    //player.upgradeHouse(player, bank.Properties[3]);
+                    //player.upgradeHouse(player, bank.Properties[3]);
+                    //player.upgradeHouse(player, bank.Properties[3]);
+
+                    //_Repairs(player, 0);
+                    //_Repairs(player, 1);
+
                     admin = false;
 
                 }
@@ -941,9 +957,36 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("_CardMove");
 
     }
-    public void _Repairs(Player_ player, int amount)
+    public void _Repairs(Player_ player, int version)
     {
-        Debug.Log("_Repairs");
+        int noHouses = 0;
+        int noHotels = 0;
+
+        int amount = 0;
+
+        foreach (var location in player.properties)
+        {
+            var temp = bank.Properties[location].NumberOfHouses;
+
+            Debug.Log($"Houses {temp}");
+
+            if (temp == 5)
+            {
+                noHotels++;
+            }
+            else noHouses += temp;
+        }
+
+        if (version == 0)
+        {
+            amount += 115 * noHotels;
+            amount += 40 * noHouses;
+        } else
+        {
+            amount += 100 * noHotels;
+            amount += 25 * noHouses;
+        }
+        BankTrans(-amount);
 
     }
 
