@@ -754,6 +754,10 @@ public class PlayerMovement : MonoBehaviour
                 {
                     endAbridgedGame();
                 }
+                else if (playerlist.Count() == 1)
+                {
+                    endLongGame();
+                }
             }
 
              
@@ -1206,5 +1210,17 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         Debug.Log($"Winner is {winner} with a liquid value of {winnerLiquid}");
+        endGame();
+    }
+
+    public void endLongGame()
+    {
+        Debug.Log($"Winner: {playerlist[0]}");
+        endGame();
+    }
+
+    public void endGame()
+    {
+        // logic to end the game
     }
 }
