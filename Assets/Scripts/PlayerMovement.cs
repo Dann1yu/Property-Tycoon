@@ -50,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject propertyButton;
     public GameObject manageButton;
     public GameObject closeButton;
+    public GameObject jailButton;
 
     public GameObject sellHouseButton;
     public GameObject upgradeHouseButton;
@@ -124,7 +125,8 @@ public class PlayerMovement : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         showing = false;
-        return diceRoller.RollDice();
+        // return diceRoller.RollDice();
+        return (30, false);
     }
 
     // Ends current term and starts next player's go
@@ -699,7 +701,7 @@ public class PlayerMovement : MonoBehaviour
     {
         endButton.SetActive(boolean);
 
-        if (!boolean)
+        if (!boolean) // IDK what this does
         {
             manageButton.SetActive(boolean);
             return;
@@ -713,6 +715,11 @@ public class PlayerMovement : MonoBehaviour
         if (player.properties.Count() > 0)
         {
             manageButton.SetActive(boolean);
+        }
+
+        if (player.inJail > -1)
+        {
+            manageButton.SetActive(false);
         }
     }
     public void canStartAuction(bool boolean)
@@ -876,6 +883,38 @@ public class PlayerMovement : MonoBehaviour
             player.upgradeHouse(player, loc);
             setDropdownChange();
         }
+
+        if (buttonName == "pay50")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            BankTrans(-50, player);
+            player.inJail = -1;
+            jailOption.SetActive(false);
+            canEndTurn(true);
+            manageButton.SetActive(false);
+
+        }
+
+        if (buttonName == "jailFree")
+        {
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+            player.JailFreeCards--;
+            player.inJail = -1;
+            jailOption.SetActive(false);
+            canEndTurn(true);
+            manageButton.SetActive(false);
+        }
+
+        if (buttonName == "stayInJail")
+        {
+            jailOption.SetActive(false);
+            canEndTurn(true);
+            manageButton.SetActive(false);
+        }
     }
 
     public void propertyDropdownChange()
@@ -956,6 +995,9 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("_GoToJail");
         _Teleport(player, 10);
         player.inJail = 0;
+        manageButton.SetActive(false);
+        canEndTurn(false);
+        jailOptions(player);
     }
     public void _ReceiveMoneyFromAll(Player_ player, int amount)
     {
@@ -1222,5 +1264,15 @@ public class PlayerMovement : MonoBehaviour
     public void endGame()
     {
         // logic to end the game
+    }
+
+    public void jailOptions(Player_ player)
+    {
+        jailOption.SetActive(true);
+        if (player.JailFreeCards == 0)
+        {
+            jailButton.SetActive(false);
+        }
+        else jailButton.SetActive(true);
     }
 }

@@ -2480,7 +2480,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 374630904}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4405538820509763878, guid: fd51c29e21ccace45944603475fb427e, type: 3}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: OnMyButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &374630904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3900,7 +3912,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 547029331}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4405538820509763878, guid: fd51c29e21ccace45944603475fb427e, type: 3}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: OnMyButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &547029331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8656,7 +8680,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1386310235}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4405538820509763878, guid: fd51c29e21ccace45944603475fb427e, type: 3}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: OnMyButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1386310235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12011,6 +12047,7 @@ MonoBehaviour:
   propertyButton: {fileID: 2074625690}
   manageButton: {fileID: 1562396607}
   closeButton: {fileID: 150469313}
+  jailButton: {fileID: 547029328}
   sellHouseButton: {fileID: 1669074058}
   upgradeHouseButton: {fileID: 1357375804}
   playerBidPanel: {fileID: 638406644}
