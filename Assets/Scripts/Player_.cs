@@ -14,6 +14,7 @@ public class Player_ : MonoBehaviour
     public int JailFreeCards;
     public Dictionary<string, int> Sets = new Dictionary<string, int>();
     public List<string> OwnedSets = new List<string>();
+    public bool passedGo = false;
 
     // Initializes the players variables
     public void Initialize(string name, int startBalance)

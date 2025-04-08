@@ -125,9 +125,9 @@ public class PlayerMovement : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         showing = false;
-        //diceRoller.RollDice();
-        //return (7, false);
-        return diceRoller.RollDice();
+        diceRoller.RollDice();
+        return (3, false);
+        //return diceRoller.RollDice();
     }
 
     // Ends current term and starts next player's go
@@ -288,6 +288,17 @@ public class PlayerMovement : MonoBehaviour
 
                     mortgageProperty(player, bank.Properties[15]);
 
+                    player = playerlist[1].gameObject.GetComponent<Player_>();
+                    player.balance = 10;
+                    player = playerlist[2].gameObject.GetComponent<Player_>();
+                    player.balance = 10;
+                    player = playerlist[3].gameObject.GetComponent<Player_>();
+                    player.balance = 10;
+                    player = playerlist[4].gameObject.GetComponent<Player_>();
+                    player.balance = 10;
+                    player = playerlist[5].gameObject.GetComponent<Player_>();
+                    player.balance = 10;
+
                     Debug.Log(checkLiquidation(player));
 
                     //_Repairs(player, 0);
@@ -386,6 +397,11 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("You passed go!");
             displayName3.text = ("You passed go!");
             BankTrans(200);
+
+            if (!player.passedGo)
+            {
+                player.passedGo = true;
+            }
         }
 
         Debug.Log("newpos: " + new_position);
@@ -409,7 +425,10 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            player.PayBank(-amount);
+            if (!checkBankruptcy(player, amount))
+            {
+                player.PayBank(-amount);
+            }
         }
         UpdateBalanceUI();
     }
@@ -421,7 +440,10 @@ public class PlayerMovement : MonoBehaviour
 
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
-        sender.PayPlayer(receiver, amount);
+        if (!checkBankruptcy(sender, amount))
+        {
+            sender.PayPlayer(receiver, amount);
+        }
         UpdateBalanceUI();
     }
 
@@ -442,6 +464,11 @@ public class PlayerMovement : MonoBehaviour
             canEndTurn(false);
             Debug.Log("Property for sale");
             displayName3.text = ("The Property is for sale!");
+            if (!player.passedGo)
+            {
+                canEndTurn(true);
+                return;
+            }
             if (location.Cost < player.balance)
             {
                 canBuyProperty(true);
@@ -459,7 +486,11 @@ public class PlayerMovement : MonoBehaviour
             else {
                 Debug.Log("Property owned by another player");
                 displayName3.text = ("Property owned by another player");
-                payRent(player, location);
+                if (!location.mortgaged && (location.Owner.inJail == -1))
+                {
+                    payRent(player, location);
+                }
+
                 if (rolledDouble > 0)
                 {
                     Debug.Log("CAN ROLL TRUE AND NEXT TRUE");
@@ -570,6 +601,10 @@ public class PlayerMovement : MonoBehaviour
 
     void unMortgageProperty(Player_ player, Property location)
     {
+        if (player.balance < (location.Cost / 2))
+        {
+            return;
+        }
         BankTrans(-(location.Cost / 2));
         location.mortgaged = false;
         UpdateBalanceUI();
@@ -770,10 +805,6 @@ public class PlayerMovement : MonoBehaviour
                 if ((Time.time - startTime) > endTime)
                 {
                     endAbridgedGame();
-                }
-                else if (playerlist.Count() == 1)
-                {
-                    endLongGame();
                 }
             }
 
@@ -1246,6 +1277,31 @@ public class PlayerMovement : MonoBehaviour
 
         return total;
 
+    }
+
+    public bool checkBankruptcy(Player_ player, int amount)
+    {
+        if (checkLiquidation(player) < amount)
+        {
+            // implement bankrupcy code here
+
+            playerlist[playerTurn].gameObject.SetActive(false);
+            
+            playerlist.Remove(playerlist[playerTurn]);
+            playerTurn--;
+            playerTurn--;
+
+            
+
+            if (playerlist.Count == 1)
+            {
+                endLongGame();
+                return true;
+            }
+
+            NextTurn();
+            return true;
+        } return false;
     }
 
     public void endAbridgedGame()
