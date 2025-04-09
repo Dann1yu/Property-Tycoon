@@ -11,6 +11,8 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 using System.Reflection;
 using static UnityEngine.Rendering.DebugUI;
 using static System.Math;
+using System.Threading;
+using System.Collections;
 
 
 public class PlayerMovement : MonoBehaviour
@@ -105,6 +107,8 @@ public class PlayerMovement : MonoBehaviour
     private bool auc = true;
     private bool rol = false;
 
+    private bool running = false;
+
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
     {
@@ -156,8 +160,6 @@ public class PlayerMovement : MonoBehaviour
         {
             playerTurn = 0;
         }
-
-        CurrentPlayer = playerlist[playerTurn].gameObject; // Get GameObject of current player
 
         UpdateBalanceUI();
     }
@@ -252,22 +254,22 @@ public class PlayerMovement : MonoBehaviour
         {
             diceRoller.ShowDice(true);
             canRoll(true);
-        }
+        } 
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) | (playerlist[playerTurn].AI && !running))
         {
-            if (next && rolledDouble == 0) {
+            if (next && rolledDouble == 0)
+            {
                 canRoll(false);
-                //next = false;
-                // NextTurn();
 
                 if (admin)
                 {
                     test();
                     admin = false;
                 }
-
-            } else if (!next) {
+            }
+            else if (!next)
+            {
                 return;
             }
 
@@ -277,17 +279,32 @@ public class PlayerMovement : MonoBehaviour
                 return;
             }
 
-            (int roll, bool boolDouble) = DiceRoll();
-            onRoll(roll, boolDouble);
-
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
-
-            if (player.AI) {
-                Debug.Log("CPU LOGIC");
-                CPULogic(player);
-            }
+            
+            running = true;
+            StartCoroutine(diceRollRoutine(player));
         }
+    }
+
+    IEnumerator diceRollRoutine(Player_ player)
+    {
+        if (player.AI)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        (int roll, bool boolDouble) = DiceRoll();
+        yield return new WaitForSeconds(1.5f);
+
+        onRoll(roll, boolDouble);
+        
+        if (player.AI) {
+            Debug.Log("CPU LOGIC");
+            CPULogic(player); 
+        }
+
+        running = false;
     }
 
     public void test()
@@ -459,8 +476,12 @@ public class PlayerMovement : MonoBehaviour
             displayName3.text = ("The Property is for sale!");
             if (!player.passedGo)
             {
-                canEndTurn(true);
-                Debug.Log("not passed go yet!");
+                if (rolledDouble == 0)
+                {
+                    canEndTurn(true);
+                } else canRoll(true);
+
+                    Debug.Log("not passed go yet!");
                 return;
             }
             if (location.Cost < player.balance)
@@ -748,6 +769,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void canEndTurn(bool boolean)
     {
+        Debug.Log($"Now {boolean}");
         // CPU LOGIC
         if (end == boolean)
         {
@@ -756,7 +778,6 @@ public class PlayerMovement : MonoBehaviour
         else end = boolean;
 
         CPUPush($"canEndTurn {boolean}");
-
         endButton.SetActive(boolean);
 
         if (!boolean) // IDK what this does
@@ -824,6 +845,8 @@ public class PlayerMovement : MonoBehaviour
         }
         if (buttonName == "endTurnButton")
         {
+            Debug.Log("HERE 2");
+            canEndTurn(false);
             if (abridgedGamemode && (playerTurn == (playerlist.Count()-1)))
             {
                 if ((Time.time - startTime) > endTime)
@@ -831,13 +854,11 @@ public class PlayerMovement : MonoBehaviour
                     endAbridgedGame();
                 }
             }
-
-             
+ 
             Debug.Log("EndTurn");
             NextTurn();
             UpdateBalanceUI();
-            canRoll(true);
-            canEndTurn(false);
+            canRoll(true);  
         }
         if (buttonName == "startAuctionButton")
         {
@@ -1392,6 +1413,12 @@ public class PlayerMovement : MonoBehaviour
         }
         else jailButton.SetActive(true);
     }
+   
+    public (string, bool) stackSplit(string input)
+    {
+        string[] parts = input.Split(' ');
+        return (parts[0], bool.Parse(parts[1]));
+    }
 
     public void CPUPush(string action)
     {
@@ -1411,5 +1438,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log(str);
         }
+
+
     }
 }
