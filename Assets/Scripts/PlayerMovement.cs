@@ -1147,8 +1147,8 @@ public class PlayerMovement : MonoBehaviour
         nextBidder = 0;
         foreach (var item in playerlist)
         {
-            if (item != player && item.passedGo && item.inJail != -1) //checks to make sure players that have passed go added
-            {
+            if (item != player && item.passedGo) //checks to make sure players that have passed go added
+            {//&& item.inJail != -1)
                 bidders.Add(item);
             }
         }
