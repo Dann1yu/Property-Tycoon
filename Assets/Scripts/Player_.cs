@@ -143,20 +143,26 @@ public class Player_ : MonoBehaviour
     // Returns the price to upgrade the property
     public int checkHousePrice(Property loc)
     {
-        if (loc.Group == "Brown" | loc.Group == "Blue")
+        return checkColourPrice(loc.Group);
+    }
+
+    public int checkColourPrice(string colour)
+    {
+        if (colour == "Brown" | colour == "Blue")
         {
             return 50;
         }
-        else if (loc.Group == "Purple" | loc.Group == "Orange")
+        else if (colour == "Purple" | colour == "Orange")
         {
             return 100;
         }
-        else if (loc.Group == "Red" | loc.Group == "Yellow")
+        else if (colour == "Red" | colour == "Yellow")
         {
             return 150;
         }
         else return 200;
     }
+
 
     // Returns the value of the player (Houses/Hotels, Properties and Balance)
     public int checkLiquidation()

@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     public int AIplayerAmount;
     public bool abridgedGamemode = true;
 
-    public List<GameObject> characterPrefabs = new List<GameObject>(); 
+    public List<GameObject> characterPrefabs = new List<GameObject>();
 
     public int lowestHouses = 5;
     public int highestHouses = 0;
@@ -114,7 +114,7 @@ public class PlayerMovement : MonoBehaviour
     {
         for (int i = 0; i < 11; i++)
         {
-            boardPosition[i] = new Vector3(10 - i, 0.5f, 0); 
+            boardPosition[i] = new Vector3(10 - i, 0.5f, 0);
         }
 
         for (int i = 11; i < 21; i++)
@@ -124,12 +124,12 @@ public class PlayerMovement : MonoBehaviour
 
         for (int i = 21; i < 31; i++)
         {
-            boardPosition[i] = new Vector3(i - 20, 0.5f, 10); 
+            boardPosition[i] = new Vector3(i - 20, 0.5f, 10);
         }
 
         for (int i = 31; i < 40; i++)
         {
-            boardPosition[i] = new Vector3(10, 0.5f, 40 - i); 
+            boardPosition[i] = new Vector3(10, 0.5f, 40 - i);
         }
     }
 
@@ -145,11 +145,11 @@ public class PlayerMovement : MonoBehaviour
 
     // Ends current term and starts next player's go
 
-    public void PlayerStartedTheGame(int AmountOfPlayers=6, int AmountOfAI=0, int gamemode=0)
+    public void PlayerStartedTheGame(int AmountOfPlayers = 6, int AmountOfAI = 0, int gamemode = 0)
     {
         playerAmount = AmountOfPlayers;
         //add the other stuff here
-        Debug.Log("tests: " + AmountOfPlayers +" "+ AmountOfAI +" "+ gamemode);
+        Debug.Log("tests: " + AmountOfPlayers + " " + AmountOfAI + " " + gamemode);
     }
     public void NextTurn()
     {
@@ -187,16 +187,16 @@ public class PlayerMovement : MonoBehaviour
 
             // Attach and initialize the Player_ script
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
-            playerComponent.Initialize($"Player {i}", 1500); 
+            playerComponent.Initialize($"Player {i}", 1500);
 
             // CPU LOGIC
             if (i >= Human)
             {
                 playerComponent.AI = true;
+                playerComponent.passedGo = true;
             }
 
             playerlist.Add(playerComponent);
-            Debug.Log("player count" + playerlist.Count);
         }
     }
 
@@ -227,8 +227,8 @@ public class PlayerMovement : MonoBehaviour
         admin = false;
         if (playerAmount == 0)
         {
-            playerAmount = 1;
-            AIplayerAmount = 2;
+            playerAmount = 0;
+            AIplayerAmount = 3;
             admin = true;
             Debug.Log("ADMIN MODE");
 
@@ -254,7 +254,7 @@ public class PlayerMovement : MonoBehaviour
         {
             diceRoller.ShowDice(true);
             canRoll(true);
-        } 
+        }
 
         if (Input.GetKeyDown(KeyCode.UpArrow) | (playerlist[playerTurn].AI && !running))
         {
@@ -281,7 +281,7 @@ public class PlayerMovement : MonoBehaviour
 
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
-            
+
             running = true;
             StartCoroutine(diceRollRoutine(player));
         }
@@ -298,13 +298,12 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
 
         onRoll(roll, boolDouble);
-        
+
         if (player.AI) {
             Debug.Log("CPU LOGIC");
-            CPULogic(player); 
-        }
+            StartCoroutine(CPULogic(player));
+        }  
 
-        running = false;
     }
 
     public void test()
@@ -325,17 +324,19 @@ public class PlayerMovement : MonoBehaviour
         purchaseProperty(player, bank.Properties[12]);
         purchaseProperty(player, bank.Properties[28]);
 
-        player.upgradeHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[3]);
-        player.upgradeHouse(bank.Properties[3]);
-        player.upgradeHouse(bank.Properties[3]);
-        player.upgradeHouse(bank.Properties[3]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[3]);
+        //player.upgradeHouse(bank.Properties[3]);
+        //player.upgradeHouse(bank.Properties[3]);
+        //player.upgradeHouse(bank.Properties[3]);
 
         mortgageProperty(player, bank.Properties[15]);
+
+        player.balance = 1000;
 
         //player = playerlist[1].gameObject.GetComponent<Player_>();
         //player.balance = 10;
@@ -348,7 +349,7 @@ public class PlayerMovement : MonoBehaviour
         //player = playerlist[5].gameObject.GetComponent<Player_>();
         //player.balance = 10;
 
-        Debug.Log(player.checkLiquidation());
+        //Debug.Log(player.checkLiquidation());
 
         //_Repairs(player, 0);
         //_Repairs(player, 1);
@@ -371,7 +372,7 @@ public class PlayerMovement : MonoBehaviour
                 _GoToJail(CurrentPlayer.GetComponent<Player_>());
                 return;
             }
-        }        else rolledDouble = 0;
+        } else rolledDouble = 0;
 
         moveForward(roll, CurrentPlayer.transform.position);
     }
@@ -399,7 +400,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         int oldposition = player.pos;
-        int new_position =  distance + oldposition;
+        int new_position = distance + oldposition;
 
         if (new_position >= 40)
         {
@@ -449,7 +450,7 @@ public class PlayerMovement : MonoBehaviour
         }
         UpdateBalanceUI();
     }
-    
+
     // Transaction from player to player
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
@@ -481,7 +482,7 @@ public class PlayerMovement : MonoBehaviour
                     canEndTurn(true);
                 } else canRoll(true);
 
-                    Debug.Log("not passed go yet!");
+                Debug.Log("not passed go yet!");
                 return;
             }
             if (location.Cost < player.balance)
@@ -508,12 +509,10 @@ public class PlayerMovement : MonoBehaviour
 
                 if (rolledDouble > 0)
                 {
-                    Debug.Log("CAN ROLL TRUE AND NEXT TRUE");
                     canRoll(true);
-                    //next = true;
                 }
             }
-        } 
+        }
 
         // Landed on oppurtunity knocks 8, 37
         else if (position == 7 | position == 22 | position == 36)
@@ -587,7 +586,6 @@ public class PlayerMovement : MonoBehaviour
         if ((rolledDouble == 0) && (!jailOption.activeSelf) && (!propertyButton.activeSelf))
         {
             canEndTurn(true);
-            Debug.Log($"544");
         }
     }
 
@@ -601,8 +599,6 @@ public class PlayerMovement : MonoBehaviour
         player.addProperty(location);
         BankTrans(-amount, player);
         location.Owner = player;
-        //Debug.Log($"{player.properties}");
-        //Debug.Log($"{bank.BankOwnedProperties}");
         UpdateBalanceUI();
     }
 
@@ -642,7 +638,7 @@ public class PlayerMovement : MonoBehaviour
     void payRent(Player_ player, Property location)
     {
         Debug.Log($"{location.Name} {location.NumberOfHouses} {location.RentUnimproved} {location.Rent1House} {location.Rent2Houses} {location.Rent3Houses} {location.Rent4Houses} {location.RentHotel}");
-        
+
         if (location.Group == "Station")
         {
             int amount = 25 * System.Convert.ToInt32(System.Math.Pow(2, (location.Owner.Sets["Station"] - 1)));
@@ -694,14 +690,14 @@ public class PlayerMovement : MonoBehaviour
         }
         UpdateBalanceUI();
     }
-    
+
     // works but only for pay (not go to jail)
     public void potLuck(Player_ player) {
         Card card = bank.PLCards[0];
         bank.PLCards.RemoveAt(0);
 
         Debug.Log($"{card.Description}");
-        
+
         var action = card.Action;
         var amount = card.Integer;
 
@@ -769,7 +765,6 @@ public class PlayerMovement : MonoBehaviour
     }
     public void canEndTurn(bool boolean)
     {
-        Debug.Log($"Now {boolean}");
         // CPU LOGIC
         if (end == boolean)
         {
@@ -780,9 +775,9 @@ public class PlayerMovement : MonoBehaviour
         CPUPush($"canEndTurn {boolean}");
         endButton.SetActive(boolean);
 
-        if (!boolean) // IDK what this does
+        if (!boolean) // if false disable manage button
         {
-            manageButton.SetActive(boolean);
+            canManage(boolean);
             return;
         }
 
@@ -794,15 +789,15 @@ public class PlayerMovement : MonoBehaviour
 
         if (player.properties.Count() > 0)
         {
-            manageButton.SetActive(boolean);
+            canManage(boolean);
         }
 
         if (player.inJail > -1)
         {
-            manageButton.SetActive(false);
+            canManage(false);
         }
 
-        
+
     }
     public void canStartAuction(bool boolean)
     {
@@ -811,8 +806,8 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         else auc = boolean;
-            // CPU LOGIC
-            CPUPush($"canStartAuction {boolean}");
+        // CPU LOGIC
+        CPUPush($"canStartAuction {boolean}");
 
         auctionButton.SetActive(boolean);
     }
@@ -829,45 +824,15 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("button name " + buttonName);
         if (buttonName == "buyPropertyButton")
         {
-            Debug.Log($"{playerTurn}");
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
-            canBuyProperty(false);
-            canStartAuction(false);
-            purchaseProperty(player, bank.Properties[player.pos]);
-            if (rolledDouble == 0)
-            {
-                canRoll(false);
-                canEndTurn(true);
-            }
-            else canRoll(true);
-
+            buyProperty();
         }
         if (buttonName == "endTurnButton")
         {
-            Debug.Log("HERE 2");
-            canEndTurn(false);
-            if (abridgedGamemode && (playerTurn == (playerlist.Count()-1)))
-            {
-                if ((Time.time - startTime) > endTime)
-                {
-                    endAbridgedGame();
-                }
-            }
- 
-            Debug.Log("EndTurn");
-            NextTurn();
-            UpdateBalanceUI();
-            canRoll(true);  
+            endTurn();
         }
         if (buttonName == "startAuctionButton")
         {
-            canBuyProperty(false);
-            canStartAuction(false);
-            Debug.Log("Start auction");
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
-            startAuction(player);
+            startAuction();
         }
 
         if (buttonName == "bidButton")
@@ -908,7 +873,7 @@ public class PlayerMovement : MonoBehaviour
         {
             managePanel.SetActive(false);
             manageSets(true);
-            setDropdownChange();    
+            setDropdownChange();
         }
 
         if (buttonName == "propertiesButton")
@@ -958,7 +923,7 @@ public class PlayerMovement : MonoBehaviour
 
             player.sellHouse(loc);
 
-            
+
 
             setDropdownChange();
         }
@@ -974,38 +939,24 @@ public class PlayerMovement : MonoBehaviour
 
         if (buttonName == "pay50")
         {
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
-
-            BankTrans(-50, player);
-            player.inJail = -1;
-            jailOption.SetActive(false);
-            canEndTurn(true);
-            manageButton.SetActive(false);
-
+            pay50();
         }
 
         if (buttonName == "jailFree")
         {
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
-
-            player.JailFreeCards--;
-            player.inJail = -1;
-            jailOption.SetActive(false);
-            canEndTurn(true);
-            manageButton.SetActive(false);
+            usedJailFree();
         }
 
         if (buttonName == "stayInJail")
         {
             jailOption.SetActive(false);
             canEndTurn(true);
-            manageButton.SetActive(false);
+            canManage(false);
         }
 
         if (buttonName == "pay10")
         {
+            oppKnocksOption.SetActive(false);
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -1020,16 +971,76 @@ public class PlayerMovement : MonoBehaviour
                 canEndTurn(true);
             }
 
-                
         }
         if (buttonName == "oppKnock")
         {
+            oppKnocksOption.SetActive(false);
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
 
             oppKnock(player);
         }
     }
+
+    public void usedJailFree()
+    {
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        player.JailFreeCards--;
+        player.inJail = -1;
+        jailOption.SetActive(false);
+        canEndTurn(true);
+        canManage(false);
+    }
+
+    public void buyProperty()
+    {
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        canBuyProperty(false);
+        canStartAuction(false);
+        purchaseProperty(player, bank.Properties[player.pos]);
+
+        if (rolledDouble == 0)
+        {
+            canRoll(false);
+            canEndTurn(true);
+        }
+        else canRoll(true);
+    }
+
+    public void endTurn()
+    {
+        canEndTurn(false);
+        if (abridgedGamemode && (playerTurn == (playerlist.Count() - 1)))
+        {
+            if ((Time.time - startTime) > endTime)
+            {
+                endAbridgedGame();
+            }
+        }
+
+        running = false;
+        NextTurn();
+        UpdateBalanceUI();
+        canRoll(true);
+        Debug.Log("ended turn");
+    }
+
+    public void pay50()
+    {
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        BankTrans(-50, player);
+        player.inJail = -1;
+        jailOption.SetActive(false);
+        canEndTurn(true);
+        canManage(false);
+    }
+
 
     public void propertyDropdownChange()
     {
@@ -1038,17 +1049,47 @@ public class PlayerMovement : MonoBehaviour
 
     public void setDropdownChange()
     {
-        var (loc, player) = returnPropertyOnShow("Sets");
+        Property loc;
+        Player_ player;
+
+        (loc, player) = returnPropertyOnShow("Sets");
         Debug.Log($"Name: {loc.Name}");
 
+        housesInGroup(player, loc.Group);
+
+        var (buy, sell) = canChangeHouses(loc);
+
+        upgradeHouseButton.SetActive(buy);
+        sellHouseButton.SetActive(sell);
+    }
+
+    public (bool, bool) canChangeHouses(Property loc) {
+        bool sell;
+        bool buy;
+        if (loc.NumberOfHouses > 0 && loc.NumberOfHouses == highestHouses)
+        {
+            sell = true;
+        }
+        else sell = false;
+
+        if (loc.NumberOfHouses == 5 | ((loc.NumberOfHouses != lowestHouses) && (lowestHouses != highestHouses)))
+        {
+            buy = false;
+        }
+        else buy = true;
+
+        return (buy, sell);
+    }
+
+    public void housesInGroup(Player_ player, string group)
+    {
         lowestHouses = 5;
         highestHouses = 0;
         foreach (var index in player.properties)
         {
             Property location = bank.Properties[index];
-            if (location.Group == loc.Group)
+            if (location.Group == group)
             {
-                Debug.Log(location.Name);
                 if (lowestHouses > location.NumberOfHouses)
                 {
                     lowestHouses = location.NumberOfHouses;
@@ -1059,20 +1100,6 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
-        
-        if (loc.NumberOfHouses > 0 && loc.NumberOfHouses == highestHouses)
-        {
-            sellHouseButton.SetActive(true);
-        }
-        else sellHouseButton.SetActive(false);
-
-        if (loc.NumberOfHouses == 5 | ((loc.NumberOfHouses != lowestHouses) && (lowestHouses != highestHouses)))
-        {
-            upgradeHouseButton.SetActive(false);
-        }
-        else upgradeHouseButton.SetActive(true);
-
-
     }
 
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
@@ -1085,11 +1112,22 @@ public class PlayerMovement : MonoBehaviour
     }
     public void _OppKnocksOption(Player_ player, int amount)
     {
-        // CPU LOGIC
-        CPUPush("_OppKnocksOption");
-
         Debug.Log("Pay a $10 fine or take opportunity knocks");
         displayName3.text = ("Pay a $10 fine or take opportunity knocks");
+
+        // CPU LOGIC
+        if (player.AI)
+        {
+            if (player.balance >= 10)
+            {
+                _DepositToFreeParking(10);
+            } else
+            {
+                oppKnock(player);
+            }
+
+            return;
+        }
 
         oppKnocksOption.SetActive(true);
     }
@@ -1101,13 +1139,10 @@ public class PlayerMovement : MonoBehaviour
     }
     public void _GoToJail(Player_ player, int amount = 0)
     {
-        // CPU LOGIC
-        CPUPush("_GoToJail");
-
         Debug.Log("_GoToJail");
         _Teleport(player, 10);
         player.inJail = 0;
-        manageButton.SetActive(false);
+        canManage(false);
         canEndTurn(false);
         jailOptions(player);
     }
@@ -1182,14 +1217,26 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         else rol = canRoll;
-            // CPU LOGIC
-            CPUPush($"canRoll {canRoll}");
+        // CPU LOGIC
+        CPUPush($"canRoll {canRoll}");
 
         next = canRoll;
         showing = !canRoll;
     }
-    public void startAuction(Player_ player)
+
+    public void canManage(bool boolean)
     {
+        CPUPush($"canManage {boolean}");
+        manageButton.SetActive(boolean);
+    }
+
+    public void startAuction()
+    {
+        canBuyProperty(false);
+        canStartAuction(false);
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
         bidders.Clear();
         nextBidder = 0;
         foreach (var item in playerlist)
@@ -1212,7 +1259,7 @@ public class PlayerMovement : MonoBehaviour
             highestBid = bid;
             highestBidder = bidder;
         }
-        if (nextBidder == bidders.Count-1)
+        if (nextBidder == bidders.Count - 1)
         {
             endAuction();
             CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1224,7 +1271,7 @@ public class PlayerMovement : MonoBehaviour
 
             nextBidder++;
             playerNameText.text = $"{bidders[nextBidder].playerName}, please enter your bid or skip";
-        }   
+        }
     }
     public void endAuction()
     {
@@ -1299,7 +1346,7 @@ public class PlayerMovement : MonoBehaviour
         closeButton.SetActive(false);
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
-        manageButton.SetActive(true);
+        canManage(true);
         canEndTurn(true);
     }
 
@@ -1331,10 +1378,10 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        Debug.Log("SENDING NULL");  
+        Debug.Log("SENDING NULL");
         return (null, null);
     }
-    
+
     // When called it checks whether the location is mortgaged and changes the button text
     public void editMortgageButton()
     {
@@ -1354,7 +1401,7 @@ public class PlayerMovement : MonoBehaviour
         if (player.checkLiquidation() < amount)
         {
             playerlist[playerTurn].gameObject.SetActive(false);
-            
+
             playerlist.Remove(playerlist[playerTurn]);
             playerTurn--;
             playerTurn--;
@@ -1369,7 +1416,7 @@ public class PlayerMovement : MonoBehaviour
             return true;
         } return false;
     }
-   
+
     // When the time limit is reached, calculate every player's worth and crown the winner
     // End the game
     public void endAbridgedGame()
@@ -1406,6 +1453,27 @@ public class PlayerMovement : MonoBehaviour
     // Code for which buttons appear when a player first enters jail
     public void jailOptions(Player_ player)
     {
+        // CPU LOGIC
+        if (player.AI)
+        {
+            if (player.JailFreeCards > 0)
+            {
+                Debug.Log("Used Jail Free Card");
+                usedJailFree();
+            } else if (player.balance > 50)
+            {
+                Debug.Log("Paid 50");
+                pay50();
+            } else
+            {
+                Debug.Log("Stayed in jail");
+                jailOption.SetActive(false);
+                canEndTurn(true);
+                canManage(false);
+            }
+            return;
+        }
+
         jailOption.SetActive(true);
         if (player.JailFreeCards == 0)
         {
@@ -1413,7 +1481,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else jailButton.SetActive(true);
     }
-   
+
     public (string, bool) stackSplit(string input)
     {
         string[] parts = input.Split(' ');
@@ -1431,14 +1499,121 @@ public class PlayerMovement : MonoBehaviour
         } else cpuStack.Add(action);
     }
 
-    public void CPULogic(Player_ player)
+    IEnumerator CPULogic(Player_ player)
     {
         // CPU LOGIC
-        foreach (string str in cpuStack)
+        // Rolling works
+        // Buying property works
+        // Jail works
+        // Purchasing hotels works
+        // Opp knock option works
+
+        int stackIndex = cpuStack.Count() - 1;
+        string tempAction;
+        bool tempBool;
+
+        Property location = bank.Properties[player.pos];
+
+        Dictionary<string, bool> actions = new Dictionary<string, bool>{
+            { "canEndTurn", false },
+            { "canBuyProperty", false },
+            { "canStartAuction", false },
+            { "canRoll", false },
+            { "canManage", false }
+        };
+
+        for (int i = 0; i < cpuStack.Count; i++)
         {
-            Debug.Log(str);
+            (tempAction, tempBool) = stackSplit(cpuStack[i]);
+
+            actions[tempAction] = tempBool;
         }
 
+        Debug.Log("--------------------");
+        foreach (KeyValuePair<string, bool> pair in actions)
+        {
+            Debug.Log($"Key: {pair.Key}, Value: {pair.Value}");
+        }
+        Debug.Log("--------------------");
 
+        if (actions["canBuyProperty"])
+        {
+            if (location.Cost <= player.balance) // Logic whether to purchase
+            {
+                yield return new WaitForSeconds(1f);
+                buyProperty();
+                Debug.Log("BOT PURCHASED");
+            }
+            else if (actions["canStartAuction"])
+            {
+                yield return new WaitForSeconds(1f);
+                startAuction();
+                Debug.Log("STARTED AUCTION");
+            }
+
+            StartCoroutine(CPULogic(player));
+        }
+
+        else if (actions["canRoll"])
+        {
+            running = false;
+        }
+
+        else if (actions["canEndTurn"] && actions["canManage"])
+        {   
+            // if player owns sets check if they are upgradeable
+            if (player.OwnedSets.Count() > 0)
+            {
+                List<Property> upgradeableProperties = new List<Property>();
+
+                foreach (string set in player.OwnedSets)
+                {
+                    // check whether upgrade is possible and decide
+                    housesInGroup(player, set);
+
+                    if (player.balance > (player.checkColourPrice(set) + 400))
+                    {
+                        foreach (int position in player.properties)
+                        {
+                            Property property = bank.Properties[position];
+
+                            if ((property.Group == set))
+                            {
+                                var (buy, sell) = canChangeHouses(location);
+
+                                if (buy)
+                                {
+                                    upgradeableProperties.Add(property);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // sort upgradeablePositions by property.position
+                upgradeableProperties = upgradeableProperties
+                    .OrderByDescending(p => p.Position)
+                    .ToList();
+
+                Debug.Log("here");
+                foreach (Property loc in upgradeableProperties)
+                {
+                    if (player.balance > (player.checkColourPrice(loc.Group) + 400))
+                    {
+                        player.upgradeHouse(loc);
+                    }
+                }
+
+                if (player.balance < 1000)
+                {
+                    canManage(false);
+                } 
+
+                StartCoroutine(CPULogic(player));
+            }
+
+            
+
+        }
     }
 }
