@@ -159,6 +159,8 @@ public class PlayerMovement : MonoBehaviour
         current = current.Remove(current.Length - 9);
         displayName1.text = current;
         displayName2.text = "Balance: $" + playerlist[playerTurn].balance.ToString();
+        displaydouble.text = "";
+        displayName3.text = "";
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
@@ -266,6 +268,7 @@ public class PlayerMovement : MonoBehaviour
             if (next && rolledDouble == 0) {
                 next = false;
                 NextTurn();
+                
 
 
                 if (admin)
@@ -574,7 +577,7 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log($"{location.CanBeBought}, {!bank.BankOwnedProperties.Contains(position)}, {rolledDouble}");    
         if ((location.Group == "" && rolledDouble > 0) | ((location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && (rolledDouble > 0))))
         {
-            Debug.Log("SPECIALX");
+            Debug.Log("SPECIALX");  
             displaydouble.text = "you rolled a double!";
             canRoll(true);
         }
@@ -1144,7 +1147,7 @@ public class PlayerMovement : MonoBehaviour
         nextBidder = 0;
         foreach (var item in playerlist)
         {
-            if (item != player && item.passedGo) //checks to make sure players that have passed go added
+            if (item != player && item.passedGo && item.inJail != -1) //checks to make sure players that have passed go added
             {
                 bidders.Add(item);
             }
