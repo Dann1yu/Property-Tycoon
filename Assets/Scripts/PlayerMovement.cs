@@ -183,33 +183,19 @@ public class PlayerMovement : MonoBehaviour
                 playerComponent.AI = true;
             }
 
-
-            // Add to player list for tracking
             playerlist.Add(playerComponent);
             Debug.Log("player count" + playerlist.Count);
         }
-    }
-
-    public string findPlayerName()
-    {
-        if (playerTurn >= playerlist.Count) // Loops back to first player
-        {
-            playerTurn = 0;
-        }
-
-        //Debug.Log("ttest" + playerlist[0]);
-        return playerlist[1].ToString();
     }
 
     // Creates the board, spawns the player and sets current player to player 0
     void Start()
     {
         startTime = Time.time;
-        Debug.Log($"Time: {startTime}");
         diceRoller = FindFirstObjectByType<DiceRoller>();
-
-        Debug.Log("started");
         CreateBoard();
+
+        // Sets all panels to invisible
         playerBidPanel.SetActive(false);
         managePanel.SetActive(false);
         setsPanel.SetActive(false);
@@ -218,7 +204,7 @@ public class PlayerMovement : MonoBehaviour
         oppKnocksOption.SetActive(false);
         jailOption.SetActive(false);
 
-        //calling the info from the loading scene
+        // Calling the info from the loading scene
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
 
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
@@ -233,8 +219,6 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("ADMIN MODE");
 
         }
-        //also can call how much ai and the gamemode here ask dan how to do :)
-
 
         canBuyProperty(false);
         canEndTurn(false);
@@ -242,21 +226,14 @@ public class PlayerMovement : MonoBehaviour
 
         bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
 
-
         spawnPlayers(playerAmount, AIplayerAmount);
-
-
         CurrentPlayer = GameObject.Find("Player 0");
-
-
-        //Debug.Log("current" + CurrentPlayer);
-        //Player_ thisPlayer = CurrentPlayer.GetComponent<Player_>();
-        //Debug.Log("name" + thisPlayer.playerName);
     }
 
-    // Updates on next players turn
+    // Checks every few frames
     public void Update()
     {
+        // Checks if player can roll the dice and if it isn't showing
         if (!diceRoller.isRolling && next && !showing && !propertyButton.activeSelf)
         {
             diceRoller.ShowDice(true);
@@ -268,90 +245,76 @@ public class PlayerMovement : MonoBehaviour
             if (next && rolledDouble == 0) {
                 next = false;
                 NextTurn();
-                
-
 
                 if (admin)
                 {
-                    endTime = 1200f;
-
-                    CurrentPlayer = playerlist[playerTurn].gameObject;
-                    Player_ player = CurrentPlayer.GetComponent<Player_>();
-
-                    player.balance = 100000;
-
-                    purchaseProperty(player, bank.Properties[1]);
-                    purchaseProperty(player, bank.Properties[3]);
-
-                    purchaseProperty(player, bank.Properties[5]);
-                    purchaseProperty(player, bank.Properties[15]);
-
-                    purchaseProperty(player, bank.Properties[12]);
-                    purchaseProperty(player, bank.Properties[28]);
-
-                    player.upgradeHouse(bank.Properties[1]);
-                    player.upgradeHouse(bank.Properties[1]);
-                    player.upgradeHouse(bank.Properties[1]);
-                    player.upgradeHouse(bank.Properties[1]);
-                    player.upgradeHouse(bank.Properties[1]);
-                    player.upgradeHouse(bank.Properties[3]);
-                    player.upgradeHouse(bank.Properties[3]);
-                    player.upgradeHouse(bank.Properties[3]);
-                    player.upgradeHouse(bank.Properties[3]);
-
-                    mortgageProperty(player, bank.Properties[15]);
-
-                    //player = playerlist[1].gameObject.GetComponent<Player_>();
-                    //player.balance = 10;
-                    //player = playerlist[2].gameObject.GetComponent<Player_>();
-                    //player.balance = 10;
-                    //player = playerlist[3].gameObject.GetComponent<Player_>();
-                    //player.balance = 10;
-                    //player = playerlist[4].gameObject.GetComponent<Player_>();
-                    //player.balance = 10;
-                    //player = playerlist[5].gameObject.GetComponent<Player_>();
-                    //player.balance = 10;
-
-                    Debug.Log(player.checkLiquidation());
-
-                    //_Repairs(player, 0);
-                    //_Repairs(player, 1);
-
+                    test();
                     admin = false;
-
                 }
 
             } else if (!next) {
                 return;
             }
-            //for now to test movement up arrow presses in order to simulate players turn
+
             // if the dice is rolling do nothing
             if (diceRoller.isRolling)
             {
                 return;
             }
-            //if (rolledDouble == 0) NextTurn();
 
             (int roll, bool boolDouble) = DiceRoll();
             onRoll(roll, boolDouble);
-
-            bool firstroll = true;
-            if (firstroll)
-            {
-                
-                firstroll = false;
-            }
-
-            //all decision making after roll:
-
-            //BankTrans(100);
-            //BankTrans(-150);
-            //PlayerTrans(0, 1, 10);
-            //PlayerTrans(1, 0, 15);
-
         }
     }
 
+    public void test()
+    {
+        endTime = 1200f;
+
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        player.balance = 100000;
+
+        purchaseProperty(player, bank.Properties[1]);
+        purchaseProperty(player, bank.Properties[3]);
+
+        purchaseProperty(player, bank.Properties[5]);
+        purchaseProperty(player, bank.Properties[15]);
+
+        purchaseProperty(player, bank.Properties[12]);
+        purchaseProperty(player, bank.Properties[28]);
+
+        player.upgradeHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[3]);
+        player.upgradeHouse(bank.Properties[3]);
+        player.upgradeHouse(bank.Properties[3]);
+        player.upgradeHouse(bank.Properties[3]);
+
+        mortgageProperty(player, bank.Properties[15]);
+
+        //player = playerlist[1].gameObject.GetComponent<Player_>();
+        //player.balance = 10;
+        //player = playerlist[2].gameObject.GetComponent<Player_>();
+        //player.balance = 10;
+        //player = playerlist[3].gameObject.GetComponent<Player_>();
+        //player.balance = 10;
+        //player = playerlist[4].gameObject.GetComponent<Player_>();
+        //player.balance = 10;
+        //player = playerlist[5].gameObject.GetComponent<Player_>();
+        //player.balance = 10;
+
+        Debug.Log(player.checkLiquidation());
+
+        //_Repairs(player, 0);
+        //_Repairs(player, 1);
+    }
+
+    // Logic for just after dice has been rolled
     public void onRoll(int nextRoll, bool boolDouble)
     {
         roll = nextRoll;
@@ -373,16 +336,19 @@ public class PlayerMovement : MonoBehaviour
         moveForward(roll, CurrentPlayer.transform.position);
     }
 
+    // move x spaces forward (if x is -ve then |x| backwards)
     void moveForward(int distance, Vector3 currentpos)
     {
         Debug.Log($"DiceRoll: {distance}");
         displayName3.text = ($"DiceRoll: {distance}");
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
+        // if player has been in jail for 2 rounds then let free
         if (player.inJail == 2)
         {
             player.inJail = -1;
         }
+        // else if player is in jail but not for 2 rounds stay in jail
         else if (player.inJail > -1)
         {
             player.inJail += 1;
@@ -393,18 +359,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         int oldposition = player.pos;
-
-        //github test
-
-
         int new_position =  distance + oldposition;
 
         if (new_position >= 40)
         {
             new_position = new_position - 40;
-            //for the loop back to start of game (GO!)
         }
 
+        // if player is on or has passed go reward with $200
         if (new_position < oldposition && distance > 0)
         {
             Debug.Log("You passed go!");
@@ -420,11 +382,13 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("newpos: " + new_position);
         CurrentPlayer.transform.position = boardPosition[new_position];
         player.pos = new_position;
-        //potential to add animation herre
+        //potential to add animation here
 
         positionHandling(player);
     }
 
+    // Transaction to or from bank 
+    // +ve amount is from the bank, -ve amount is to the bank
     public void BankTrans(int amount, Player_ player = null)
     {
         if (player == null)
@@ -445,12 +409,8 @@ public class PlayerMovement : MonoBehaviour
         }
         UpdateBalanceUI();
     }
-
-    public bool waitForDecision()
-    {
-        return true;
-    }
-
+    
+    // Transaction from player to player
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
         if (!checkBankruptcy(sender, amount))
@@ -460,16 +420,13 @@ public class PlayerMovement : MonoBehaviour
         UpdateBalanceUI();
     }
 
+    // Checks where the player landed and performs the correct action
     void positionHandling(Player_ player)
     {
         // handling
         var position = player.pos;
         var location = bank.Properties[position];
         canEndTurn(false);
-        // bank.info(position);
-
-        //Debug.Log($"{position}");
-        //Debug.Log($"{location.Position}");
 
         // Landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
@@ -514,7 +471,7 @@ public class PlayerMovement : MonoBehaviour
         } 
 
         // Landed on oppurtunity knocks 8, 37
-        if (position == 7 | position == 22 | position == 36)
+        else if (position == 7 | position == 22 | position == 36)
         {
             Debug.Log("Landed on oppurtunity knocks");
             displayName3.text = ("Landed on oppurtunity knocks");
@@ -522,7 +479,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on pot luck
-        if (position == 2 | position == 17 | position == 33)
+        else if (position == 2 | position == 17 | position == 33)
         {
             Debug.Log("Landed on pot luck");
             displayName3.text = ("Landed on pot luck");
@@ -530,7 +487,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on income tax
-        if (position == 4)
+        else if (position == 4)
         {
             Debug.Log("Landed on Income Tax and charged $200");
             displayName3.text = ("Landed on Income Tax and charged $200");
@@ -539,7 +496,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on free parking
-        if (position == 20)
+        else if (position == 20)
         {
             Debug.Log($"Landed on free parking you have gained {bank.FreeParkingBalance}");
             displayName3.text = ($"Landed on free parking you have gained {bank.FreeParkingBalance}");
@@ -549,7 +506,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on go to jail
-        if (position == 30)
+        else if (position == 30)
         {
             Debug.Log("Go to jail");
             displayName3.text = ("Go to jail");
@@ -557,7 +514,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on super tax
-        if (position == 38)
+        else if (position == 38)
         {
             Debug.Log("Landed on Super Tax and charged $100");
             Debug.Log(player.balance);
@@ -566,7 +523,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Landed on go
-        if (position == 0)
+        else if (position == 0)
         {
             // should not need any logic if there is pass go logic implemented in move forward
             Debug.Log("Landed on GO");
