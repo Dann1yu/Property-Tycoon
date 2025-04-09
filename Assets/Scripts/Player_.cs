@@ -158,6 +158,7 @@ public class Player_ : MonoBehaviour
         else return 200;
     }
 
+    // Returns the value of the player (Houses/Hotels, Properties and Balance)
     public int checkLiquidation()
     {
         int total = 0;
