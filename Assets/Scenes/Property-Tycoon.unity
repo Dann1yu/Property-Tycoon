@@ -7918,7 +7918,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1261107821}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4405538820509763878, guid: fd51c29e21ccace45944603475fb427e, type: 3}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: OnMyButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1261107821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10044,7 +10056,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1496536288}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4405538820509763878, guid: fd51c29e21ccace45944603475fb427e, type: 3}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: OnMyButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1496536288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12025,6 +12049,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAmount: 6
   PlayerObject: {fileID: 7257972868504290906, guid: c3c4a1a71bab86847857e02340e484be, type: 3}
+  AIplayerAmount: 0
   abridgedGamemode: 1
   characterPrefabs:
   - {fileID: 5565982008113524239, guid: 610008dc6d8805240bd5cf800baf9c5f, type: 3}

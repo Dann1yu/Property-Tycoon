@@ -7,11 +7,11 @@ public class Player_ : MonoBehaviour
 {
     public string playerName;
     public int balance;
-    public List<int> properties;
-    public int pos;
-    public int inJail; // -1 for not in jail and +1 each turn starting from 1 in jail
+    public List<int> properties = new List<int>();
+    public int pos = 0;
+    public int inJail = -1; // -1 for not in jail and +1 each turn starting from 0 in jail
     private Bank_ bank;
-    public int JailFreeCards;
+    public int JailFreeCards = 0;
     public Dictionary<string, int> Sets = new Dictionary<string, int>();
     public List<string> OwnedSets = new List<string>();
     public bool passedGo = false;
@@ -22,11 +22,7 @@ public class Player_ : MonoBehaviour
     {
         playerName = name;
         balance = startBalance;
-        pos = 0;
-        properties = new List<int>();
-        inJail = -1;
         bank = FindFirstObjectByType<Bank_>();
-        JailFreeCards = 0;
     }
 
     // returns whether player has enough money for the payment
@@ -81,6 +77,7 @@ public class Player_ : MonoBehaviour
         return false;
     }
 
+    // Adds property to player aswell as removing from bank and appending to sets / ownedsets
     public void addProperty(Property property)
     {
         var idx = property.Position;
@@ -106,6 +103,7 @@ public class Player_ : MonoBehaviour
 
     }
 
+    // Removes property from player aswell as adding to the bank and ammending sets / ownedsets
     public void removeProperty(Property property)
     {
         var idx = property.Position;
@@ -119,26 +117,30 @@ public class Player_ : MonoBehaviour
         Sets[group]--;
     }
 
+    // Deposits amount to free parking
     public void DepositToFreeParking(int amount)
     {
         balance -= amount;
         bank.FreeParkingBalance += amount;
     }
-
-    public void upgradeHouse(Player_ player, Property loc)
+     
+    // Increases the number of houses of the property for the given price
+    public void upgradeHouse(Property loc)
     {
         int amount = checkHousePrice(loc);
         PayBank(amount);
         loc.NumberOfHouses++;
     }
 
-    public void sellHouse(Player_ player, Property loc)
+    // Decreases the number of houses of the property and gain the given price
+    public void sellHouse(Property loc)
     {
         int amount = checkHousePrice(loc);
         ReceiveMoneyFromBank(amount);
         loc.NumberOfHouses--;
     }
 
+    // Returns the price to upgrade the property
     public int checkHousePrice(Property loc)
     {
         int amount;

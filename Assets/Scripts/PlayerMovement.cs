@@ -289,15 +289,15 @@ public class PlayerMovement : MonoBehaviour
                     purchaseProperty(player, bank.Properties[12]);
                     purchaseProperty(player, bank.Properties[28]);
 
-                    player.upgradeHouse(player, bank.Properties[1]);
-                    player.upgradeHouse(player, bank.Properties[1]);
-                    player.upgradeHouse(player, bank.Properties[1]);
-                    player.upgradeHouse(player, bank.Properties[1]);
-                    player.upgradeHouse(player, bank.Properties[1]);
-                    player.upgradeHouse(player, bank.Properties[3]);
-                    player.upgradeHouse(player, bank.Properties[3]);
-                    player.upgradeHouse(player, bank.Properties[3]);
-                    player.upgradeHouse(player, bank.Properties[3]);
+                    player.upgradeHouse(bank.Properties[1]);
+                    player.upgradeHouse(bank.Properties[1]);
+                    player.upgradeHouse(bank.Properties[1]);
+                    player.upgradeHouse(bank.Properties[1]);
+                    player.upgradeHouse(bank.Properties[1]);
+                    player.upgradeHouse(bank.Properties[3]);
+                    player.upgradeHouse(bank.Properties[3]);
+                    player.upgradeHouse(bank.Properties[3]);
+                    player.upgradeHouse(bank.Properties[3]);
 
                     mortgageProperty(player, bank.Properties[15]);
 
@@ -922,7 +922,7 @@ public class PlayerMovement : MonoBehaviour
         {
             var (loc, player) = returnPropertyOnShow();
 
-            player.sellHouse(player, loc);
+            player.sellHouse(loc);
 
             
 
@@ -934,7 +934,7 @@ public class PlayerMovement : MonoBehaviour
             var (loc, player) = returnPropertyOnShow();
 
 
-            player.upgradeHouse(player, loc);
+            player.upgradeHouse(loc);
             setDropdownChange();
         }
 
@@ -1147,8 +1147,8 @@ public class PlayerMovement : MonoBehaviour
         nextBidder = 0;
         foreach (var item in playerlist)
         {
-            if (item != player && item.passedGo) //checks to make sure players that have passed go added
-            {//&& item.inJail != -1)
+            if (item != player && item.passedGo && item.inJail == -1) //checks to make sure players that have passed go added
+            {
                 bidders.Add(item);
             }
         }
