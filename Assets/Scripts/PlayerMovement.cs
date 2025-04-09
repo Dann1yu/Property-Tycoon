@@ -797,7 +797,7 @@ public class PlayerMovement : MonoBehaviour
         {
             string input = bidInputField.text;
 
-            if (int.TryParse(input, out int bid))
+            if (int.TryParse(input, out int bid)) // && (amount <= player.balance))
             {
                 Debug.Log("Bid entered: " + bid);
                 nextBid(bid);
@@ -1104,7 +1104,7 @@ public class PlayerMovement : MonoBehaviour
         nextBidder = 0;
         foreach (var item in playerlist)
         {
-            if (item != player && item.passedGo && item.inJail == -1) //checks to make sure players that have passed go added
+            if (item != player && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
             {
                 bidders.Add(item);
             }
@@ -1295,20 +1295,21 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         Debug.Log($"Winner is {winner} with a liquid value of {winnerLiquid}");
-        endGame();
+        endGame(winner);
     }
 
     // If player is the last remaning player this should be called to end the game
     public void endLongGame()
     {
         Debug.Log($"Winner: {playerlist[0]}");
-        endGame();
+        endGame(playerlist[0]);
     }
 
     // Logic to end the game
-    public void endGame()
+    public void endGame(Player_ winner)
     {
-        // logic to end the game
+        // new scene with player wins and there value
+        // player.checkLiquidation();
     }
 
     // Code for which buttons appear when a player first enters jail
