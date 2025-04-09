@@ -143,25 +143,40 @@ public class Player_ : MonoBehaviour
     // Returns the price to upgrade the property
     public int checkHousePrice(Property loc)
     {
-        int amount;
         if (loc.Group == "Brown" | loc.Group == "Blue")
         {
-            amount = 50;
+            return 50;
         }
         else if (loc.Group == "Purple" | loc.Group == "Orange")
         {
-            amount = 100;
+            return 100;
         }
         else if (loc.Group == "Red" | loc.Group == "Yellow")
         {
-            amount = 150;
+            return 150;
         }
-        else
+        else return 200;
+    }
+
+    public int checkLiquidation()
+    {
+        int total = 0;
+
+        foreach (var locIdx in properties)
         {
-            amount = 200;
+            var loc = bank.Properties[locIdx];
+            total += checkHousePrice(loc) * loc.NumberOfHouses;
+            if (loc.mortgaged)
+            {
+                total += loc.Cost / 2;
+            }
+            else total += loc.Cost;
         }
 
-        return amount;
+        total += balance;
+        Debug.Log($"Liquidation value {total}");
+
+        return total;
     }
 
 }

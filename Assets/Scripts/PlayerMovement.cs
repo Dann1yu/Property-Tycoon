@@ -312,7 +312,7 @@ public class PlayerMovement : MonoBehaviour
                     //player = playerlist[5].gameObject.GetComponent<Player_>();
                     //player.balance = 10;
 
-                    Debug.Log(checkLiquidation(player));
+                    Debug.Log(player.checkLiquidation());
 
                     //_Repairs(player, 0);
                     //_Repairs(player, 1);
@@ -895,7 +895,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (buttonName == "sellPropertyButton")
         {
-            var (loc, player) = returnPropertyOnShow();
+            var (loc, player) = returnPropertyOnShow("Properties");
 
             sellProperty(player, loc);
 
@@ -908,7 +908,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (buttonName == "mortgageButton")
         {
-            var (loc, player) = returnPropertyOnShow();
+            var (loc, player) = returnPropertyOnShow("Properties");
 
             if (loc.mortgaged)
             {
@@ -920,7 +920,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (buttonName == "sellHouseButton")
         {
-            var (loc, player) = returnPropertyOnShow();
+            var (loc, player) = returnPropertyOnShow("Sets");
 
             player.sellHouse(loc);
 
@@ -931,7 +931,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (buttonName == "upgradeHouseButton")
         {
-            var (loc, player) = returnPropertyOnShow();
+            var (loc, player) = returnPropertyOnShow("Sets");
 
 
             player.upgradeHouse(loc);
@@ -1004,7 +1004,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void setDropdownChange()
     {
-        var (loc, player) = returnPropertyOnShow();
+        var (loc, player) = returnPropertyOnShow("Sets");
         Debug.Log($"Name: {loc.Name}");
 
         lowestHouses = 5;
@@ -1255,30 +1255,42 @@ public class PlayerMovement : MonoBehaviour
         canEndTurn(true);
     }
 
-    public (Property, Player_) returnPropertyOnShow()
+    // Returns the property on show on either the "Sets" or "Properties" dropdown
+    public (Property, Player_) returnPropertyOnShow(string type)
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-        var propertyName = setsDropdown.options[setsDropdown.value].text;
+        string propertyName = "";
+
+        if (type == "Sets")
+        {
+            propertyName = setsDropdown.options[setsDropdown.value].text;
+        }
+        else if (type == "Properties")
+        {
+            propertyName = propertiesDropdown.options[propertiesDropdown.value].text; ;
+        }
 
         foreach (var locIdx in player.properties)
         {
             var loc = bank.Properties[locIdx];
             Debug.Log(propertyName);
-            Debug.Log(loc.Name);    
+            Debug.Log(loc.Name);
             if (loc.Name == propertyName)
             {
                 return (loc, player);
             }
         }
+
         Debug.Log("SENDING NULL");  
         return (null, null);
     }
-
+    
+    // When called it checks whether the location is mortgaged and changes the button text
     public void editMortgageButton()
     {
-        var (loc, player) = returnPropertyOnShow();
+        var (loc, player) = returnPropertyOnShow("Properties");
 
         if (loc.mortgaged)
         {
@@ -1287,42 +1299,17 @@ public class PlayerMovement : MonoBehaviour
         else mortgageText.text = "Mortgage";
     }
 
-
-    public int checkLiquidation(Player_ player)
-    {
-        int total = 0;
-        foreach (var locIdx in player.properties)
-        {
-            var loc = bank.Properties[locIdx];
-            total += player.checkHousePrice(loc) * loc.NumberOfHouses;
-            if (loc.mortgaged)
-            {
-                total += loc.Cost/2;
-            } else total += loc.Cost;
-        }
-
-      
-
-        total += player.balance;
-        Debug.Log($"Liquidation value {total}");
-
-        return total;
-
-    }
-
+    // If bankrupt, remove player and start next turn
+    // If not return false
     public bool checkBankruptcy(Player_ player, int amount)
     {
-        if (checkLiquidation(player) < amount)
+        if (player.checkLiquidation() < amount)
         {
-            // implement bankrupcy code here
-
             playerlist[playerTurn].gameObject.SetActive(false);
             
             playerlist.Remove(playerlist[playerTurn]);
             playerTurn--;
             playerTurn--;
-
-            
 
             if (playerlist.Count == 1)
             {
@@ -1334,14 +1321,16 @@ public class PlayerMovement : MonoBehaviour
             return true;
         } return false;
     }
-
+   
+    // When the time limit is reached, calculate every player's worth and crown the winner
+    // End the game
     public void endAbridgedGame()
     {
         Player_ winner = null;
         int winnerLiquid = 0;
         foreach (var player in playerlist)
         {
-            int playerLiquid = checkLiquidation(player);
+            int playerLiquid = player.checkLiquidation();
             if (winnerLiquid < playerLiquid)
             {
                 winnerLiquid = playerLiquid;
@@ -1352,17 +1341,20 @@ public class PlayerMovement : MonoBehaviour
         endGame();
     }
 
+    // If player is the last remaning player this should be called to end the game
     public void endLongGame()
     {
         Debug.Log($"Winner: {playerlist[0]}");
         endGame();
     }
 
+    // Logic to end the game
     public void endGame()
     {
         // logic to end the game
     }
 
+    // Code for which buttons appear when a player first enters jail
     public void jailOptions(Player_ player)
     {
         jailOption.SetActive(true);
