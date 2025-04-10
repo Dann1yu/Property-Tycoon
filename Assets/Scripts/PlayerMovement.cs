@@ -169,7 +169,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateBalanceUI()
     {
-        Player_ player = playerlist[playerTurn];
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
         string current = player.ToString();
         current = current.Remove(current.Length - 9);
         displayName1.text = current;
@@ -209,7 +211,7 @@ public class PlayerMovement : MonoBehaviour
             if (i >= Human)
             {
                 playerComponent.AI = true;
-                playerComponent.passedGo = true;
+                // playerComponent.passedGo = true;
             }
             Debug.Log("add player");
             playerlist.Add(playerComponent);
@@ -252,7 +254,8 @@ public class PlayerMovement : MonoBehaviour
         if (playerAmount == 0)
         {
             playerAmount = 0;
-            AIplayerAmount = 3;
+            AIplayerAmount = 6;
+            endTime = 120f;
             admin = true;
             Debug.Log("ADMIN MODE");
 
@@ -269,6 +272,12 @@ public class PlayerMovement : MonoBehaviour
         canStartAuction(false);
 
         gameStarted = true;
+
+        if (playerlist[0].AI)
+        {
+            canRoll(true);
+            CPULogic(playerlist[0]);
+        }
     }
 
     // Checks every few frames
@@ -293,7 +302,7 @@ public class PlayerMovement : MonoBehaviour
 
                 if (admin)
                 {
-                    test();
+                    //test();
                     admin = false;
                 }
             }
@@ -337,8 +346,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void test()
     {
-        endTime = 1200f;
-
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -371,8 +378,8 @@ public class PlayerMovement : MonoBehaviour
 
         player.balance = 2000;
 
-        purchaseProperty(playerlist[1], bank.Properties[37]);
-        purchaseProperty(playerlist[1], bank.Properties[39]);
+        //purchaseProperty(playerlist[1], bank.Properties[37]);
+        //purchaseProperty(playerlist[1], bank.Properties[39]);
         playerlist[1].balance = 10;
         playerlist[2].balance = 10;
 
@@ -840,11 +847,45 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
+
     public void canStartAuction(bool boolean)
     {
-        // CPU LOGIC
-        CPUPush($"canStartAuction {boolean}");
+        if (!boolean)
+        {
+            CPUPush("canStartAuction false");
+            auctionButton.SetActive(false);
 
+            if (rolledDouble > 0)
+            {
+                canRoll(true);
+                canEndTurn(false);
+            }
+            else
+            {
+                canRoll(false);
+            }
+            return;
+        }
+
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+
+        bidders.Clear();
+        foreach (var item in playerlist)
+        {
+            if ((item != player) && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
+            {
+                bidders.Add(item);
+            }
+        }
+
+        if (bidders.Count() <= 1)
+        {
+            canStartAuction(false);
+            return;
+        }
+
+        CPUPush("canStartAuction true");
         auctionButton.SetActive(boolean);
     }
 
@@ -1273,58 +1314,53 @@ public class PlayerMovement : MonoBehaviour
     {
         canBuyProperty(false);
         canStartAuction(false);
-        CurrentPlayer = playerlist[playerTurn].gameObject;
-        Player_ player = CurrentPlayer.GetComponent<Player_>();
 
         highestBid = 0;
         highestBidder = null;
 
-        bidders.Clear();
-        nextBidder = 0;
-        foreach (var item in playerlist)
-        {
-            if (item != player && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
-            {
-                bidders.Add(item);
-            }
-        }
         playerBidPanel.SetActive(true);
 
-        if (bidders.Count() < 2)
-        {
-            endAuction();
-            return;
-        }
-        else if (bidders[0].AI)
+        if (bidders[0].AI)
         {
             CPUAuction();
         }
 
+
         playerNameText.text = $"{bidders[0].playerName}, please enter your bid or skip";
+
+        CPUPush($"canStartAuction false");
     }
 
     public void nextBid(int bid)
     {
         Player_ bidder = bidders[nextBidder];
+        Debug.Log($"{bidder.playerName} bid {bid}");
+
         if (bid > highestBid)
         {
             highestBid = bid;
             highestBidder = bidder;
+            Debug.Log("Highest bidder");
         }
         else
         {
             //remove this bidder from the bidding
             bidders.Remove(bidder);
             nextBidder--;
+            Debug.Log($"Bidder removed, now only {bidders.Count()} people bidding");
         }
 
         if (bidders.Count() == 1)
         {
-            //if only one left to bid
+            if (highestBid != 0)
+            {
+                Player_ player = playerlist[playerTurn];
+
+                purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
+            }
+
             endAuction();
-            CurrentPlayer = playerlist[playerTurn].gameObject;
-            Player_ player = CurrentPlayer.GetComponent<Player_>();
-            if (highestBid != 0) purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
+            return;
         }
 
 
@@ -1369,6 +1405,12 @@ public class PlayerMovement : MonoBehaviour
             canRoll(true);
         }
         playerBidPanel.SetActive(false);
+
+        Player_ player = playerlist[playerTurn];
+        if (player.AI)
+        {
+            StartCoroutine(CPULogic(player));
+        }
     }
 
     public void manageProperty(bool boolean)
@@ -1431,7 +1473,8 @@ public class PlayerMovement : MonoBehaviour
         propertiesPanel.SetActive(false);
         canManage(true);
 
-        Player_ player = playerlist[playerTurn];
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
         if (player.balance >= 0)
         {
             canEndTurn(true);
@@ -1488,7 +1531,11 @@ public class PlayerMovement : MonoBehaviour
 
         playerlist.Remove(playerlist[playerTurn]);
         playerTurn--;
-        playerTurn--;
+
+        if (playerTurn == -1)
+        {
+            playerTurn = playerlist.Count();
+        }
 
         if (playerlist.Count == 1)
         {
@@ -1508,6 +1555,7 @@ public class PlayerMovement : MonoBehaviour
             player.removeProperty(property);
         }
 
+        Debug.Log($"Player turn: {playerTurn}");
         endTurn();
         return amount;
     }
@@ -1544,9 +1592,8 @@ public class PlayerMovement : MonoBehaviour
         // new scene with player wins and there value
         // player.checkLiquidation();
         winnerPanel.SetActive(true);
-        winningtext.text = $"{CurrentPlayer} !!!";
-        Player_ player = CurrentPlayer.GetComponent<Player_>();
-        winningbalance.text = $"End Balance: {player.checkLiquidation()}";
+        winningtext.text = $"You won {winner.playerName}!";
+        winningbalance.text = $"End NetWorth: {winner.checkLiquidation()}";
     }
 
     // Code for which buttons appear when a player first enters jail
@@ -1606,6 +1653,8 @@ public class PlayerMovement : MonoBehaviour
         // Jail works
         // Purchasing hotels works
         // Opp knock option works
+        UpdateBalanceUI();
+        yield return new WaitForSeconds(1f);
 
         int stackIndex = cpuStack.Count() - 1;
         string tempAction;
@@ -1704,8 +1753,17 @@ public class PlayerMovement : MonoBehaviour
                 if (player.balance < 1000)
                 {
                     canManage(false);
-                }
 
+                }
+                else
+                {
+                    canManage(true);
+                }
+                StartCoroutine(CPULogic(player));
+            }
+            else
+            {
+                canManage(false);
                 StartCoroutine(CPULogic(player));
             }
 
@@ -1798,9 +1856,10 @@ public class PlayerMovement : MonoBehaviour
 
         endOfNestedLoops:
             closeOptions();
+            StartCoroutine(CPULogic(player));
         }
 
-        if (pastActions["canEndTurn"])
+        else if (pastActions["canEndTurn"])
         {
             yield return new WaitForSeconds(1f);
             endTurn();

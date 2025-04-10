@@ -161,7 +161,7 @@ public class Bank_ : MonoBehaviour
 
     void Start()
     {
-        Balance = 15000;
+        Balance = 50000;
         string path = Application.dataPath + "/Resources/BoardData.csv"; // Ensure the file is inside 'Assets/Resources/'
         LoadProperties(path);
         path = Application.dataPath + "/Resources/CardData.csv";
