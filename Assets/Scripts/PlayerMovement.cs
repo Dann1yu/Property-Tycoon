@@ -1,4 +1,4 @@
-nexusing NUnit.Framework.Internal;
+using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -26,23 +26,24 @@ public class PlayerMovement : MonoBehaviour
     private bool abridgedGamemode;
     public float startTime;
     public float endTime;
-    private bool admin = false;
+    private bool testing = false;
 
     // all pointers used through out script
     private int lowestHouses = 5;
     private int highestHouses = 0;
     
     private int roll = -1;
-    private int rolledDouble = 0;
+    public int rolledDouble = 0;
 
-    private bool next = true;
-    private bool showing = true;
-    private bool running = false;
-    private bool gameStarted = false;
+    public bool next = true;
+    public bool showing = true;
+    public bool running = false;
+    public bool gameStarted = false;
 
     private Player_ highestBidder;
     private int nextBidder = 0;
     private int highestBid = 0;
+    private int totalpassed = 0;
 
     // player variables
     public GameObject CurrentPlayer;
@@ -131,12 +132,12 @@ public class PlayerMovement : MonoBehaviour
 
     /// <summary>
     /// Emulation of two dice rolls
+    /// </summary>
     /// <returns>
     /// (int, bool) 
     /// int: Value of the dice roll (2 to 12)
     /// bool: Boolean value representative of if a double is rolled
     /// </returns>
-    /// </summary>
     public (int, bool) DiceRoll()
     {
         canRoll(false);
@@ -180,6 +181,7 @@ public class PlayerMovement : MonoBehaviour
         displaydouble.text = "";
         displayName3.text = "";
 
+        // If action is required to go above negative balance
         if (pastActions["canManage"] && !pastActions["canEndTurn"] && (player.balance >= 0)) {
             canEndTurn(true);
             if (player.AI)
@@ -192,13 +194,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Spawns x players with attached scripts "Player_" to hold required variables
+    /// <summary>
+    /// Spawns players with attached scripts "Player_" to hold required variables
+    /// Aswell as if they are or are not AI players
+    /// </summary>
+    /// <param name="amount">Total number of players</param>
+    /// <param name="AI">Number of those players whcih will be AI players</param>
     public void spawnPlayers(int amount, int AI)
     {
-        Debug.Log("spawned players");
-
         for (int i = 0; i < amount; i++)
         {
+            // Create each unique player
             var PlayerObject = characterPrefabs[i];
             var spawnedPlayer = Instantiate(PlayerObject, new Vector3(10, 0.5f, 0), Quaternion.identity);
             spawnedPlayer.name = $"Player {i}";
@@ -206,26 +212,24 @@ public class PlayerMovement : MonoBehaviour
             // Attach and initialize the Player_ script
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
             playerComponent.Initialize($"Player {i}", 1500);
+            playerlist.Add(playerComponent);
 
             // CPU LOGIC
-            if (i >= (amount-AI))
-            {
-                playerComponent.AI = true;
-                // playerComponent.passedGo = true;
-            }
-            Debug.Log("add player");
-            playerlist.Add(playerComponent);
+            playerComponent.AI = (i >= (amount - AI));
+
+            Debug.Log($"{playerComponent.playerName} : AI={playerComponent.AI}");   
         }
     }
 
-    // Creates the board, spawns the player and sets current player to player 0
+    /// <summary>
+    /// Creates the board, spawns the players, sets current player to player 0,
+    /// Makes all unneeded UI components invisible
+    /// </summary>
     void Start()
     {
         startTime = Time.time;
         diceRoller = FindFirstObjectByType<DiceRoller>();
         CreateBoard();
-
-
 
         // Sets all panels to invisible
         playerBidPanel.SetActive(false);
@@ -245,26 +249,26 @@ public class PlayerMovement : MonoBehaviour
 
         // Calling the info from the loading scene
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
-
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
-        // CPU LOGIC
         AIplayerAmount = PlayerAmounts.UpdateGameSettingsAI();
 
+        // TODO get gamemode and therefore length of game
+
+        // Checks if script is ran from Property-Tycoon scene and puts into testing mode
         if (playerAmount == 0)
         {
-            playerAmount = 0;
-            AIplayerAmount = 6;
+            playerAmount = 3;
+            AIplayerAmount = 3;
             endTime = 120f;
             abridgedGamemode = true;
-            admin = true;
-            Debug.Log("ADMIN MODE");
+            testing = true;
+            Debug.Log("TESTING MODE");
 
         }
 
         bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
 
         spawnPlayers(playerAmount, AIplayerAmount);
-
         NextTurn();
 
         canBuyProperty(false);
@@ -273,37 +277,45 @@ public class PlayerMovement : MonoBehaviour
 
         gameStarted = true;
 
+        canRoll(true);
+
+        // If first player is an AI start the CPU Logic
         if (playerlist[0].AI)
         {
-            canRoll(true);
             CPULogic(playerlist[0]);
         }
     }
 
-    // Checks every few frames
+    /// <summary>
+    /// Checks every frame for specified requirements
+    /// </summary>
     public void Update()
     {
+        // If start() hasn't finished do not check update
         if (!gameStarted)
         {
             return;
         }
-        // Checks if player can roll the dice and if it isn't showing
+
+        // If player can roll the dice and if it isn't showing
         if (!diceRoller.isRolling && next && !showing && !propertyButton.activeSelf)
         {
             diceRoller.ShowDice(true);
             canRoll(true);
         }
 
+        // If UpArrow pressed OR player is an AI and logic isn't running
         if (Input.GetKeyDown(KeyCode.UpArrow) | (playerlist[playerTurn].AI && !running))
         {
+            // If first roll of the go
             if (next && rolledDouble == 0)
             {
                 canRoll(false);
 
-                if (admin)
+                if (testing)
                 {
-                    //test();
-                    admin = false;
+                    test();
+                    testing = false;
                 }
             }
             else if (!next)
@@ -311,12 +323,13 @@ public class PlayerMovement : MonoBehaviour
                 return;
             }
 
-            // if the dice is rolling do nothing
+            // If the dice is rolling do nothing
             if (diceRoller.isRolling)
             {
                 return;
             }
 
+            // Else starts dice roll
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -325,25 +338,38 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Starts dice roll with time waits for animations to complete.
+    /// Runs onRoll(roll, boolDouble) after dice roll.
+    /// If player is a cpu run their logic.
+    /// </summary>
+    /// <param name="player">Player that is rolling the dice</param>
+    /// <returns></returns>
     IEnumerator diceRollRoutine(Player_ player)
     {
+        // If player is AI wait a second to mimic a human
         if (player.AI)
         {
             yield return new WaitForSeconds(1f);
         }
 
+        // Roll the dice and wait 1.5s for it to finish
         (int roll, bool boolDouble) = DiceRoll();
         yield return new WaitForSeconds(1.5f);
 
+        // Run roll logic
         onRoll(roll, boolDouble);
 
+        // If player is AI run cpu logic
         if (player.AI) {
             Debug.Log("CPU LOGIC");
             StartCoroutine(CPULogic(player));
         }
-
     }
 
+    /// <summary>
+    /// Function for testing code, only runs if script ran from Property-Tycoon scene
+    /// </summary>
     public void test()
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -400,17 +426,23 @@ public class PlayerMovement : MonoBehaviour
         //_Repairs(player, 1);
     }
 
-    // Logic for just after dice has been rolled
-    public void onRoll(int nextRoll, bool boolDouble)
+    /// <summary>
+    /// Logic for dealing with post dice roll
+    /// </summary>
+    /// <param name="rollValue">Value of the double dice roll</param>
+    /// <param name="boolDouble">Boolean for whether player rolled a double</param>
+    public void onRoll(int rollValue, bool boolDouble)
     {
-        roll = nextRoll;
+        roll = rollValue;
+
+        // If rolled a double increase rolledDouble
         if (boolDouble)
         {
-            //showing = true;
             rolledDouble += 1;
             Debug.Log($"You rolled a double! {rolledDouble}");
             displaydouble.text = ($"You rolled a double!");
 
+            // If player has rolled 3 doubles go to jail and stop logic
             if (rolledDouble == 3)
             {
                 rolledDouble = 0;
@@ -419,22 +451,29 @@ public class PlayerMovement : MonoBehaviour
             }
         } else rolledDouble = 0;
 
+        // Move forward roll
         moveForward(roll, CurrentPlayer.transform.position);
     }
 
-    // move x spaces forward (if x is -ve then |x| backwards)
+    /// <summary>
+    /// Move distance spaces forward (if distance is -ve then |x| backwards)
+    /// Then run positionHandling(player)
+    /// </summary>
+    /// <param name="distance">Number of spaces to be moved</param>
+    /// <param name="currentpos">Current position (vector3) of player</param>
     void moveForward(int distance, Vector3 currentpos)
     {
         Debug.Log($"DiceRoll: {distance}");
         displayName3.text = ($"DiceRoll: {distance}");
+
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-        // if player has been in jail for 2 rounds then let free
+        // If player has been in jail for 2 rounds then let free
         if (player.inJail == 2)
         {
             player.inJail = -1;
         }
-        // else if player is in jail but not for 2 rounds stay in jail
+        // Else if player is in jail but not for 2 rounds stay in jail, can end turn and stop logic
         else if (player.inJail > -1)
         {
             player.inJail += 1;
@@ -444,17 +483,20 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // Calculate new distance, if larger than possible positions player has wrapped board and is treated accordingly
         int oldposition = player.pos;
         int new_position = distance + oldposition;
-
-        if (new_position >= 40)
+        
+        // If position is negative, make positive
+        if (new_position < 0)
+        {
+            new_position = new_position + 40;
+        }
+        // Else if position is larger than 39, mod back down and pass GO
+        else if (new_position >= 40)
         {
             new_position = new_position - 40;
-        }
 
-        // if player is on or has passed go reward with $200
-        if (new_position < oldposition && distance > 0)
-        {
             Debug.Log("You passed go!");
             displayName3.text = ("You passed go!");
             BankTrans(200);
@@ -462,58 +504,79 @@ public class PlayerMovement : MonoBehaviour
             if (!player.passedGo)
             {
                 player.passedGo = true;
+                totalpassed++;
             }
         }
 
+        // Move the player to new position
+        // TODO add animation here
         Debug.Log("newpos: " + new_position);
         CurrentPlayer.transform.position = boardPosition[new_position];
         player.pos = new_position;
-        //potential to add animation here
 
+        // Handle new position of player
         positionHandling(player);
     }
 
-    // Transaction to or from bank 
-    // +ve amount is from the bank, -ve amount is to the bank
+    /// <summary>
+    /// Transaction to or from bank 
+    /// +ve amount is from the bank, -ve amount is to the bank
+    /// </summary>
+    /// <param name="amount">Amount to receive or send (+ve : receive, -ve : send)</param>
+    /// <param name="player">Player receiving or sending</param>
     public void BankTrans(int amount, Player_ player = null)
     {
+        // If player is null, find player
         if (player == null)
         {
             player = CurrentPlayer.GetComponent<Player_>();
         }
 
+        // If amount is positive, bank sends money to the player
         if (amount > 0)
         {
             player.ReceiveMoneyFromBank(amount);
         }
+        // Else paybank amount
         else
         {
             player.PayBank(checkBalance(player, -amount));
         }
+        // Update UI
         UpdateBalanceUI();
     }
 
-    // Transaction from player to player
+    /// <summary>
+    /// Transaction from sender to receiver of amount
+    /// </summary>
+    /// <param name="sender">Player_ that is sending the amount</param>
+    /// <param name="receiver">Player_ that is receiving the amount</param>
+    /// <param name="amount">Amount that is being sent / received</param>
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
         sender.PayPlayer(receiver, checkBalance(sender, amount));
         UpdateBalanceUI();
     }
 
-    // Checks where the player landed and performs the correct action
+    /// <summary>
+    /// Checks where the player landed and performs the correct action
+    /// </summary>
+    /// <param name="player">Player_ who's position is being handled</param>
     void positionHandling(Player_ player)
     {
-        // handling
+        // Basic values and UI changes
         var position = player.pos;
         var location = bank.Properties[position];
-        canEndTurn(false);
+        canEndTurn(false)
 
-        // Landed on property that can be purchased
+        // If landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
         {
             canEndTurn(false);
             Debug.Log("Property for sale");
             displayName3.text = ("The Property is for sale!");
+
+            // If player has not passed go no action is to occur
             if (!player.passedGo)
             {
                 if (rolledDouble == 0)
@@ -524,33 +587,33 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("not passed go yet!");
                 return;
             }
+
+            // If player has the balance to purchase give them the option
             if (location.Cost < player.balance)
             {
                 canBuyProperty(true);
             }
 
-            int totalpassed = 0;
-            for (int i = 0; i < playerlist.Count; i++)
-            {
-                if (playerlist[i].passedGo && (playerlist[i] != player))
-                {
-                    totalpassed++;
-                    Debug.Log($"Player passed: {playerlist[i].playerName} Total passed: {totalpassed}");
-                }
-            }
-            
-            if (totalpassed > 1)
+            // If total number of people passed go that aren't player is 2 or more auction can start
+            if ((totalpassed - (player.passedGo ? 1 : 0)) >= 2)
             {
                 canStartAuction(true); //checks to make sure at least 2 can auction before auctioning
-            } else canEndTurn(true);
+            }
+            // Else if not enough players can join the auction, allow end turn
+            else 
+            { 
+                canEndTurn(true); 
+            }
         }
-        // Landed on property that is owned by a player
+        // Else if landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
         {
+            // If player owns the property do nothing
             if (player.properties.Contains(position)) {
                 Debug.Log("Property owned by the same player");
                 displayName3.text = ("Property owned by the same player");
             }
+            // Else payrent
             else {
                 Debug.Log("Property owned by another player");
                 displayName3.text = ("Property owned by another player");
@@ -559,6 +622,7 @@ public class PlayerMovement : MonoBehaviour
                     payRent(player, location);
                 }
 
+                // If rolled a double give chance to roll again
                 if (rolledDouble > 0)
                 {
                     canRoll(true);
@@ -566,7 +630,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // Landed on oppurtunity knocks 8, 37
+        // Landed on oppurtunity knocks 7, 22, 36
         else if (position == 7 | position == 22 | position == 36)
         {
             Debug.Log("Landed on oppurtunity knocks");
@@ -574,7 +638,7 @@ public class PlayerMovement : MonoBehaviour
             oppKnock(player);
         }
 
-        // Landed on pot luck
+        // Landed on pot luck 2, 17, 33
         else if (position == 2 | position == 17 | position == 33)
         {
             Debug.Log("Landed on pot luck");
@@ -582,7 +646,7 @@ public class PlayerMovement : MonoBehaviour
             potLuck(player);
         }
 
-        // Landed on income tax
+        // Landed on income tax 4
         else if (position == 4)
         {
             Debug.Log("Landed on Income Tax and charged $200");
@@ -591,7 +655,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log($"New balance: {player.balance}");
         }
 
-        // Landed on free parking
+        // Landed on free parking 20
         else if (position == 20)
         {
             Debug.Log($"Landed on free parking you have gained {bank.FreeParkingBalance}");
@@ -601,7 +665,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log($"New balance: {player.balance}");
         }
 
-        // Landed on go to jail
+        // Landed on go to jail 30
         else if (position == 30)
         {
             Debug.Log("Go to jail");
@@ -609,7 +673,7 @@ public class PlayerMovement : MonoBehaviour
             _GoToJail(player);
         }
 
-        // Landed on super tax
+        // Landed on super tax 38
         else if (position == 38)
         {
             Debug.Log("Landed on Super Tax and charged $100");
@@ -618,15 +682,15 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log($"New balance: {player.balance}");
         }
 
-        // Landed on go
+        // Landed on go 0
         else if (position == 0)
         {
-            // should not need any logic if there is pass go logic implemented in move forward
+            // Doesn't need any logic because pass go logic implemented in moveForward()
             Debug.Log("Landed on GO");
             displayName3.text = ("Landed on GO");
         }
 
-        // if no actions are available, next turn
+        // If no actions are available and rolled double, next roll
         Debug.Log($"{location.CanBeBought}, {!bank.BankOwnedProperties.Contains(position)}, {rolledDouble}");
         if ((location.Group == "" && rolledDouble > 0) | ((location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && (rolledDouble > 0))))
         {
@@ -634,26 +698,41 @@ public class PlayerMovement : MonoBehaviour
             displaydouble.text = "you rolled a double!";
             canRoll(true);
         }
-        else canRoll(false);//next = false;
+        // Else can not roll
+        else canRoll(false);
+
+        // If nothing for player to do, allow end turn
         if ((rolledDouble == 0) && (!jailOption.activeSelf) && (!propertyButton.activeSelf))
         {
             canEndTurn(true);
         }
     }
 
-
+    /// <summary>
+    /// Purchase property logic
+    /// </summary>
+    /// <param name="player">Player_ purchasing</param>
+    /// <param name="location">Property being purchased</param>
+    /// <param name="amount">How much the property is for, if no amount set will default to a -ve value to flag</param>
     void purchaseProperty(Player_ player, Property location, int amount = -1)
     {
+        // If amount not set, amount is location default cost
         if (amount == -1)
         {
             amount = location.Cost;
         }
+
         player.addProperty(location);
         BankTrans(-amount, player);
         location.Owner = player;
         UpdateBalanceUI();
     }
 
+    /// <summary>
+    /// Mortgage property logic
+    /// </summary>
+    /// <param name="player">Player mortgaging the property</param>
+    /// <param name="location">Location being mortgaged</param>
     void mortgageProperty(Player_ player, Property location)
     {
         BankTrans(location.Cost / 2);
@@ -662,26 +741,38 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Unmortgage property logic
+    /// </summary>
+    /// <param name="player">Player unmortgaging the property</param>
+    /// <param name="location">Location being unmortgaged</param>
     void unMortgageProperty(Player_ player, Property location)
     {
+        // If player can't afford return
         if (player.balance < (location.Cost / 2))
         {
             return;
         }
+
         BankTrans(-(location.Cost / 2));
         location.mortgaged = false;
         UpdateBalanceUI();
-
     }
-
+    
+    /// <summary>
+    /// Sell property logic
+    /// </summary>
+    /// <param name="player">Player selling the property</param>
+    /// <param name="location">Property being sold</param>
     void sellProperty(Player_ player, Property location)
     {
-        player.removeProperty(location);
+        // If location is mortgaged only reward 1/2 the price
         if (location.mortgaged)
         {
             BankTrans(location.Cost / 2);
         } else BankTrans(location.Cost);
 
+        player.removeProperty(location);
         location.Owner = null;
         bank.BankOwnedProperties.Add(player.pos);
         UpdateBalanceUI();
@@ -1014,7 +1105,6 @@ public class PlayerMovement : MonoBehaviour
         if (buttonName == "upgradeHouseButton")
         {
             var (loc, player) = returnPropertyOnShow("Sets");
-
 
             player.upgradeHouse(loc);
             setDropdownChange();
