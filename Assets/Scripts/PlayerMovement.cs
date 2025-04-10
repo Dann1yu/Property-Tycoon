@@ -941,7 +941,7 @@ public class PlayerMovement : MonoBehaviour
     public void canBuyProperty(bool boolean)
     {
         // CPU Logic
-        CPUPush($"canBuyProperty {boolean}");
+        pastActions["canBuyProperty"] = boolean;
 
         auctionButton.SetActive(boolean);
         propertyButton.SetActive(boolean);
@@ -965,7 +965,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // CPU Logic
-        CPUPush($"canEndTurn {boolean}");
+        pastActions["canEndTurn"] = boolean;
 
         endButton.SetActive(boolean);
 
@@ -1004,7 +1004,7 @@ public class PlayerMovement : MonoBehaviour
         // If boolean is false disable auction button
         if (!boolean)
         {
-            CPUPush("canStartAuction false");
+            pastActions["canStartAuction"] = false;
             auctionButton.SetActive(false);
 
             if (rolledDouble > 0)
@@ -1040,7 +1040,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // CPU Logic
-        CPUPush("canStartAuction true");
+        pastActions["canStartAuction"] = true;
         auctionButton.SetActive(boolean);
     }
 
@@ -1558,7 +1558,7 @@ public class PlayerMovement : MonoBehaviour
     public void canRoll(bool canRoll)
     {
         // CPU LOGIC
-        CPUPush($"canRoll {canRoll}");
+        pastActions["canRoll"] = canRoll;
 
         next = canRoll;
         showing = !canRoll;
@@ -1570,7 +1570,7 @@ public class PlayerMovement : MonoBehaviour
     /// <param name="boolean">Boolean whether the player can manage properties or not</param>
     public void canManage(bool boolean)
     {
-        CPUPush($"canManage {boolean}");
+        pastActions["canManage"] = boolean;
         manageButton.SetActive(boolean);
     }
 
@@ -1597,9 +1597,9 @@ public class PlayerMovement : MonoBehaviour
 
 
         playerNameText.text = $"{bidders[0].playerName}, please enter your bid or skip";
-         
+
         // CPU Logic
-        CPUPush($"canStartAuction false");
+        pastActions["canStartAuction"] = false;
     }
 
     /// <summary>
@@ -1661,8 +1661,12 @@ public class PlayerMovement : MonoBehaviour
         playerNameText.text = $"{bidders[nextBidder].playerName}, please enter your bid or skip";
     }
 
+    /// <summary>
+    /// Ran when it is an AI player's turn to bid in an auction
+    /// </summary>
     public void CPUAuction()
     {
+        // TODO make more complex
         if (bidders[nextBidder].balance > 5)
         {
             nextBid(5);
@@ -1671,10 +1675,14 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// End auction by disabling all the relative UI and letting the player who's go it is continue
+    /// </summary>
     public void endAuction()
     {
         canStartAuction(false);
 
+        // If player did not roll a double let them end turn
         if (rolledDouble == 0)
         {
             canRoll(false);
@@ -1686,6 +1694,7 @@ public class PlayerMovement : MonoBehaviour
         }
         playerBidPanel.SetActive(false);
 
+        // CPU Logic
         Player_ player = playerlist[playerTurn];
         if (player.AI)
         {
@@ -1693,8 +1702,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// UI for managing property when button is clicked. Visibility depends on boolean
+    /// </summary>
+    /// <param name="boolean">Whether to make management visible or not</param>
     public void manageProperty(bool boolean)
     {
+        // If visibility to be set to true, show all properties owned by player in the dropdown
         if (boolean)
         {
             CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1718,8 +1732,13 @@ public class PlayerMovement : MonoBehaviour
         editMortgageButton();
     }
 
+    /// <summary>
+    /// UI for managing sets when button is clicked. Visibility depends on boolean
+    /// </summary>
+    /// <param name="boolean">Whether to make management of sets visible or not</param>
     public void manageSets(bool boolean)
     {
+        // If visibility to be set true, show all properties in owned sets by player in the dropdown
         if (boolean)
         {
             CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1746,6 +1765,9 @@ public class PlayerMovement : MonoBehaviour
         editMortgageButton();
     }
 
+    /// <summary>
+    /// On close button press make every option deactivated
+    /// </summary>
     public void closeOptions()
     {
         closeButton.SetActive(false);
@@ -1761,23 +1783,30 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Returns the property on show on either the "Sets" or "Properties" dropdown
+    /// <summary>
+    /// Returns the property on show on either the "Sets" or "Properties" dropdown
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns>Returns location and location owner selected in dropdown</returns>
     public (Property, Player_) returnPropertyOnShow(string type)
     {
+        // Set variables
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
-
         string propertyName = "";
 
+        // If sets on show then property = property on show in set dropdown
         if (type == "Sets")
         {
             propertyName = setsDropdown.options[setsDropdown.value].text;
         }
+        // Else if properties on show then property = property on show in properties dropdown
         else if (type == "Properties")
         {
             propertyName = propertiesDropdown.options[propertiesDropdown.value].text; ;
         }
 
+        // Searches owned properties and returns it's location and the player
         foreach (var locIdx in player.properties)
         {
             var loc = bank.Properties[locIdx];
@@ -1787,11 +1816,14 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        // If nothing return Null
         Debug.Log("SENDING NULL");
         return (null, null);
     }
 
-    // When called it checks whether the location is mortgaged and changes the button text
+    /// <summary>
+    /// When called it checks whether the location on show is mortgaged and changes the button text
+    /// </summary>
     public void editMortgageButton()
     {
         var (loc, player) = returnPropertyOnShow("Properties");
@@ -1803,8 +1835,12 @@ public class PlayerMovement : MonoBehaviour
         else mortgageText.text = "Mortgage";
     }
 
-    // If bankrupt, remove player and start next turn
-    // If not return false
+    /// <summary>
+    /// Ran when a player cannot afford to pay the full amount owed even when liquid
+    /// Returns the max amount they can pay and returns all property to the bank
+    /// </summary>
+    /// <param name="player">Player who is bankrupt</param>
+    /// <returns>Amount the can afford to pay</returns>
     public int bankrupt(Player_ player)
     {
         playerlist[playerTurn].gameObject.SetActive(false);
@@ -1840,8 +1876,10 @@ public class PlayerMovement : MonoBehaviour
         return amount;
     }
 
-    // When the time limit is reached, calculate every player's worth and crown the winner
-    // End the game
+    /// <summary>
+    /// When the time limit is reached, calculate every player's worth and crown the winner
+    /// End the game
+    /// </summary>
     public void endAbridgedGame()
     {
         Player_ winner = null;
@@ -1859,24 +1897,31 @@ public class PlayerMovement : MonoBehaviour
         endGame(winner);
     }
 
-    // If player is the last remaning player this should be called to end the game
+    /// <summary>
+    /// If long game ends, crown winner as the only remaining player
+    /// </summary>
     public void endLongGame()
     {
         Debug.Log($"Winner: {playerlist[0]}");
         endGame(playerlist[0]);
     }
 
-    // Logic to end the game
+    /// <summary>
+    /// Logic to end the game and show the winner and their networth
+    /// </summary>
+    /// <param name="winner">Player that won the game</param>
     public void endGame(Player_ winner)
     {
-        // new scene with player wins and there value
-        // player.checkLiquidation();
+        // TODO new scene with player wins and there value
         winnerPanel.SetActive(true);
         winningText.text = $"You won {winner.playerName}!";
         winningBalance.text = $"End NetWorth: {winner.checkLiquidation()}";
     }
 
-    // Code for which buttons appear when a player first enters jail
+    /// <summary>
+    /// Acivates the UI for which buttons appear when a player first enters jail
+    /// </summary>
+    /// <param name="player">Player being given the options</param>
     public void jailOptions(Player_ player)
     {
         // CPU LOGIC
@@ -1902,6 +1947,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // Human player UI show
         jailOption.SetActive(true);
         if (player.JailFreeCards == 0)
         {
@@ -1910,48 +1956,18 @@ public class PlayerMovement : MonoBehaviour
         else jailButton.SetActive(true);
     }
 
-    public (string, bool) stackSplit(string input)
-    {
-        string[] parts = input.Split(' ');
-        return (parts[0], bool.Parse(parts[1]));
-    }
-
-    public void CPUPush(string action)
-    {
-        if (cpuStack.Count() > 0)
-        {
-            if (cpuStack[cpuStack.Count() - 1] != action)
-            {
-                cpuStack.Add(action);
-            }
-        }
-        else cpuStack.Add(action);
-    }
-
+    /// <summary>
+    /// Coroutine for the cpu logic to run, looks at every possible thing a human player could do in it's position and makes decisions accordingly
+    /// </summary>
+    /// <param name="player">AI player needing decision making</param>
+    /// <returns>Yield returns timings to make the bot more lifelike</returns>
     IEnumerator CPULogic(Player_ player)
     {
-        // CPU LOGIC
-        // Rolling works
-        // Buying property works
-        // Jail works
-        // Purchasing hotels works
-        // Opp knock option works
         UpdateBalanceUI();
         yield return new WaitForSeconds(1f);
-
-        int stackIndex = cpuStack.Count() - 1;
-        string tempAction;
-        bool tempBool;
-
         Property location = bank.Properties[player.pos];
 
-        for (int i = 0; i < cpuStack.Count; i++)
-        {
-            (tempAction, tempBool) = stackSplit(cpuStack[i]);
-
-            pastActions[tempAction] = tempBool;
-        }
-
+        // Outputs all possible UI options to console
         Debug.Log("--------------------");
         foreach (KeyValuePair<string, bool> pair in pastActions)
         {
@@ -1959,25 +1975,26 @@ public class PlayerMovement : MonoBehaviour
         }
         Debug.Log("--------------------");
 
-        if (pastActions["canBuyProperty"]) // if can buy property
+        // If a possible action is buy property consider it's purchase
+        if (pastActions["canBuyProperty"])
         {
-            if (location.Cost <= player.balance) // Logic whether to purchase
+            if (location.Cost <= player.balance)
             {
                 yield return new WaitForSeconds(1f);
                 Debug.Log($"COST: {location.Cost}");
                 buyProperty();
                 Debug.Log("BOT PURCHASED");
             }
-            else if (pastActions["canStartAuction"])
+            else if (pastActions["canStartAuction"]) // If bot does not purchase and can start auction, do accordingly
             {
                 yield return new WaitForSeconds(1f);
                 startAuction();
                 Debug.Log("STARTED AUCTION");
             }
 
-            StartCoroutine(CPULogic(player));
+            StartCoroutine(CPULogic(player)); // After purchase, auction or skip re-equate decisions
         }
-        else if (pastActions["canStartAuction"])
+        else if (pastActions["canStartAuction"]) // If no option of purchasing but option of auctioning, start auction
         {
             yield return new WaitForSeconds(1f);
             startAuction();
@@ -1989,7 +2006,7 @@ public class PlayerMovement : MonoBehaviour
             running = false;
         }
 
-        else if (pastActions["canManage"] && pastActions["canEndTurn"]) // if can manage or end turn
+        else if (pastActions["canManage"] && pastActions["canEndTurn"]) // if can manage or end turn decide whether to purchase houses or not
         {
             // if player owns sets check if they are upgradeable
             if (player.OwnedSets.Count() > 0)
@@ -1998,7 +2015,7 @@ public class PlayerMovement : MonoBehaviour
 
                 foreach (string set in player.OwnedSets)
                 {
-                    // check whether upgrade is possible and decide
+                    // check whether upgrade is possible and decide depending on overflow money
                     housesInGroup(player, set);
 
                     if (player.balance > (player.checkColourPrice(set) + 400))
@@ -2020,11 +2037,12 @@ public class PlayerMovement : MonoBehaviour
                     }
                 }
 
-                // sort upgradeablePositions by property.position
+                // sort upgradeablePositions by property.position so most desirable are first choice
                 upgradeableProperties = upgradeableProperties
                     .OrderByDescending(p => p.Position)
                     .ToList();
 
+                // For every upgradeable position, make decision on upgrade
                 foreach (Property loc in upgradeableProperties)
                 {
                     if (player.balance > (player.checkColourPrice(loc.Group) + 400))
@@ -2034,6 +2052,7 @@ public class PlayerMovement : MonoBehaviour
                     }
                 }
 
+                // If player has a large overflow of money, run again
                 if (player.balance < 1000)
                 {
                     canManage(false);
@@ -2053,14 +2072,14 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
-        else if (pastActions["canManage"] && !pastActions["canEndTurn"]) // if can manage but not end turn
+        else if (pastActions["canManage"] && !pastActions["canEndTurn"]) // if can manage but not end turn therefore requiring selling to the bank
         {
             List<int> sortedProperties = player.properties.OrderBy(p => p).ToList();
 
             List<Property> noSetProperties = new List<Property>();
             List<Property> setProperties = new List<Property>();
 
-            // sort properties
+            // sort properties into sets and no sets
             foreach (int property in sortedProperties)
             {
                 if (player.OwnedSets.Contains(bank.Properties[property].Group))
@@ -2150,6 +2169,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Logic for checking if a player can afford a required transaction
+    /// If player can afford, return normal amount
+    /// If player can't afford but can sell stuff to afford, make that a requirement, return normal amount
+    /// If player can't afford even if liquidified, return liquid value and bankrupt player
+    /// </summary>
+    /// <param name="player">Player who is being checked</param>
+    /// <param name="amount">Amount they are required to send</param>
+    /// <returns></returns>
     public int checkBalance(Player_ player, int amount)
     {
         if (player.balance >= amount) // if player can pay amount, do so
@@ -2165,13 +2193,17 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log($"Paid full amount but requires selling {amount}");
             return amount;
         }
-        else
+        else // if liquid amount is not enough, bankrupt player
         {
             Debug.Log($"Bankrupt");
             return bankrupt(player);
         }
     }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="prop"></param>
     public void SpawnHouse(Property prop)
     {
         if (prop.NumberOfHouses > 4)
@@ -2226,5 +2258,3 @@ public class PlayerMovement : MonoBehaviour
 
     }
 }
-
-// checkBankruptcy replace
