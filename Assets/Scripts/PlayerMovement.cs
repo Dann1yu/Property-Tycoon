@@ -11,6 +11,8 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 using System.Reflection;
 using static UnityEngine.Rendering.DebugUI;
 using static System.Math;
+using System.Threading;
+using System.Collections;
 
 
 public class PlayerMovement : MonoBehaviour
@@ -98,6 +100,15 @@ public class PlayerMovement : MonoBehaviour
     public int highestBid = 0;
     public Player_ highestBidder;
 
+    public List<string> cpuStack = new List<string>();
+
+    private bool end = true;
+    private bool buy = true;
+    private bool auc = true;
+    private bool rol = false;
+
+    private bool running = false;
+
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
     {
@@ -125,7 +136,8 @@ public class PlayerMovement : MonoBehaviour
     // Emulation of two dice rolls (2x 1->6)
     public (int, bool) DiceRoll()
     {
-        showing = false;
+        canRoll(false);
+        //showing = false;
         //diceRoller.RollDice();
         //return (3, false);
         return diceRoller.RollDice();
@@ -141,14 +153,13 @@ public class PlayerMovement : MonoBehaviour
     }
     public void NextTurn()
     {
+        cpuStack.Clear();
         playerTurn++;
 
         if (playerTurn >= playerlist.Count) // Loops back to first player
         {
             playerTurn = 0;
         }
-
-        CurrentPlayer = playerlist[playerTurn].gameObject; // Get GameObject of current player
 
         UpdateBalanceUI();
     }
@@ -178,6 +189,7 @@ public class PlayerMovement : MonoBehaviour
             Player_ playerComponent = spawnedPlayer.AddComponent<Player_>();
             playerComponent.Initialize($"Player {i}", 1500); 
 
+            // CPU LOGIC
             if (i >= Human)
             {
                 playerComponent.AI = true;
@@ -208,13 +220,15 @@ public class PlayerMovement : MonoBehaviour
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
 
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
+
+        // CPU LOGIC
         AIplayerAmount = PlayerAmounts.UpdateGameSettingsAI();
 
         admin = false;
         if (playerAmount == 0)
         {
-            playerAmount = 2;
-            AIplayerAmount = 1;
+            playerAmount = 1;
+            AIplayerAmount = 2;
             admin = true;
             Debug.Log("ADMIN MODE");
 
@@ -228,6 +242,8 @@ public class PlayerMovement : MonoBehaviour
 
         spawnPlayers(playerAmount, AIplayerAmount);
         CurrentPlayer = GameObject.Find("Player 0");
+
+        NextTurn();
     }
 
     // Checks every few frames
@@ -238,21 +254,22 @@ public class PlayerMovement : MonoBehaviour
         {
             diceRoller.ShowDice(true);
             canRoll(true);
-        }
+        } 
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) | (playerlist[playerTurn].AI && !running))
         {
-            if (next && rolledDouble == 0) {
-                next = false;
-                NextTurn();
+            if (next && rolledDouble == 0)
+            {
+                canRoll(false);
 
                 if (admin)
                 {
                     test();
                     admin = false;
                 }
-
-            } else if (!next) {
+            }
+            else if (!next)
+            {
                 return;
             }
 
@@ -262,9 +279,32 @@ public class PlayerMovement : MonoBehaviour
                 return;
             }
 
-            (int roll, bool boolDouble) = DiceRoll();
-            onRoll(roll, boolDouble);
+            CurrentPlayer = playerlist[playerTurn].gameObject;
+            Player_ player = CurrentPlayer.GetComponent<Player_>();
+            
+            running = true;
+            StartCoroutine(diceRollRoutine(player));
         }
+    }
+
+    IEnumerator diceRollRoutine(Player_ player)
+    {
+        if (player.AI)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        (int roll, bool boolDouble) = DiceRoll();
+        yield return new WaitForSeconds(1.5f);
+
+        onRoll(roll, boolDouble);
+        
+        if (player.AI) {
+            Debug.Log("CPU LOGIC");
+            CPULogic(player); 
+        }
+
+        running = false;
     }
 
     public void test()
@@ -320,7 +360,7 @@ public class PlayerMovement : MonoBehaviour
         roll = nextRoll;
         if (boolDouble)
         {
-            showing = true;
+            //showing = true;
             rolledDouble += 1;
             Debug.Log($"You rolled a double! {rolledDouble}");
             displaydouble.text = ($"You rolled a double!");
@@ -458,7 +498,12 @@ public class PlayerMovement : MonoBehaviour
             displayName3.text = ("The Property is for sale!");
             if (!player.passedGo)
             {
-                canEndTurn(true);
+                if (rolledDouble == 0)
+                {
+                    canEndTurn(true);
+                } else canRoll(true);
+
+                    Debug.Log("not passed go yet!");
                 return;
             }
             if (location.Cost < player.balance)
@@ -500,7 +545,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     Debug.Log("CAN ROLL TRUE AND NEXT TRUE");
                     canRoll(true);
-                    next = true;
+                    //next = true;
                 }
             }
         } 
@@ -566,14 +611,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // if no actions are available, next turn
-        Debug.Log($"{location.CanBeBought}, {!bank.BankOwnedProperties.Contains(position)}, {rolledDouble}");    
+        Debug.Log($"{location.CanBeBought}, {!bank.BankOwnedProperties.Contains(position)}, {rolledDouble}");
         if ((location.Group == "" && rolledDouble > 0) | ((location.CanBeBought && !bank.BankOwnedProperties.Contains(position) && (rolledDouble > 0))))
         {
-            Debug.Log("SPECIALX");  
+            Debug.Log("SPECIALX");
             displaydouble.text = "you rolled a double!";
             canRoll(true);
         }
-        else next = false;
+        else canRoll(false);//next = false;
         if ((rolledDouble == 0) && (!jailOption.activeSelf) && (!propertyButton.activeSelf))
         {
             canEndTurn(true);
@@ -744,11 +789,30 @@ public class PlayerMovement : MonoBehaviour
 
     public void canBuyProperty(bool boolean)
     {
+        if (buy == boolean)
+        {
+            return;
+        }
+        else buy = boolean;
+
+        // CPU LOGIC
+        CPUPush($"canBuyProperty {boolean}");
+
+        auctionButton.SetActive(boolean);
         propertyButton.SetActive(boolean);
         canEndTurn(false);
     }
     public void canEndTurn(bool boolean)
     {
+        Debug.Log($"Now {boolean}");
+        // CPU LOGIC
+        if (end == boolean)
+        {
+            return;
+        }
+        else end = boolean;
+
+        CPUPush($"canEndTurn {boolean}");
         endButton.SetActive(boolean);
 
         if (!boolean) // IDK what this does
@@ -757,7 +821,8 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        next = false;
+        canRoll(false);
+        //next = false;
 
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
@@ -771,9 +836,19 @@ public class PlayerMovement : MonoBehaviour
         {
             manageButton.SetActive(false);
         }
+
+        
     }
     public void canStartAuction(bool boolean)
     {
+        if (auc == boolean)
+        {
+            return;
+        }
+        else auc = boolean;
+            // CPU LOGIC
+            CPUPush($"canStartAuction {boolean}");
+
         auctionButton.SetActive(boolean);
     }
 
@@ -805,6 +880,8 @@ public class PlayerMovement : MonoBehaviour
         }
         if (buttonName == "endTurnButton")
         {
+            Debug.Log("HERE 2");
+            canEndTurn(false);
             if (abridgedGamemode && (playerTurn == (playerlist.Count()-1)))
             {
                 if ((Time.time - startTime) > endTime)
@@ -812,11 +889,11 @@ public class PlayerMovement : MonoBehaviour
                     endAbridgedGame();
                 }
             }
-
-             
+ 
             Debug.Log("EndTurn");
-            canRoll(true);
-            canEndTurn(false);
+            NextTurn();
+            UpdateBalanceUI();
+            canRoll(true);  
         }
         if (buttonName == "startAuctionButton")
         {
@@ -1049,6 +1126,9 @@ public class PlayerMovement : MonoBehaviour
     }
     public void _OppKnocksOption(Player_ player, int amount)
     {
+        // CPU LOGIC
+        CPUPush("_OppKnocksOption");
+
         Debug.Log("Pay a $10 fine or take opportunity knocks");
         displayName3.text = ("Pay a $10 fine or take opportunity knocks");
 
@@ -1062,6 +1142,9 @@ public class PlayerMovement : MonoBehaviour
     }
     public void _GoToJail(Player_ player, int amount = 0)
     {
+        // CPU LOGIC
+        CPUPush("_GoToJail");
+
         Debug.Log("_GoToJail");
         _Teleport(player, 10);
         player.inJail = 0;
@@ -1135,9 +1218,16 @@ public class PlayerMovement : MonoBehaviour
 
     public void canRoll(bool canRoll)
     {
+        if (rol == canRoll)
+        {
+            return;
+        }
+        else rol = canRoll;
+            // CPU LOGIC
+            CPUPush($"canRoll {canRoll}");
+
         next = canRoll;
         showing = !canRoll;
-        // showing = diceRoller.ShowDice(canRoll);
     }
     public void startAuction(Player_ player)
     {
@@ -1157,7 +1247,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void nextBid(int bid)
     {
-
         Player_ bidder = bidders[nextBidder];
         if (bid > highestBid)
         {
@@ -1187,6 +1276,8 @@ public class PlayerMovement : MonoBehaviour
             nextBidder = 0;
         } else
         {
+            // CPU LOGIC NEEDED UNIQUE
+
             nextBidder++;
             playerNameText.text = $"{bidders[nextBidder].playerName}, please enter your bid or skip";
         }   
@@ -1392,5 +1483,33 @@ public class PlayerMovement : MonoBehaviour
             jailButton.SetActive(false);
         }
         else jailButton.SetActive(true);
+    }
+   
+    public (string, bool) stackSplit(string input)
+    {
+        string[] parts = input.Split(' ');
+        return (parts[0], bool.Parse(parts[1]));
+    }
+
+    public void CPUPush(string action)
+    {
+        if (cpuStack.Count() > 0)
+        {
+            if (cpuStack[cpuStack.Count() - 1] != action)
+            {
+                cpuStack.Add(action);
+            }
+        } else cpuStack.Add(action);
+    }
+
+    public void CPULogic(Player_ player)
+    {
+        // CPU LOGIC
+        foreach (string str in cpuStack)
+        {
+            Debug.Log(str);
+        }
+
+
     }
 }
