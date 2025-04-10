@@ -1,4 +1,4 @@
-using NUnit.Framework.Internal;
+nexusing NUnit.Framework.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -24,94 +24,88 @@ public class PlayerMovement : MonoBehaviour
     private int playerAmount;
     private int AIplayerAmount;
     private bool abridgedGamemode;
+    public float startTime;
+    public float endTime;
+    private bool admin = false;
 
     // all pointers used through out script
-    public int lowestHouses = 5;
-    public int highestHouses = 0;
+    private int lowestHouses = 5;
+    private int highestHouses = 0;
+    
+    private int roll = -1;
+    private int rolledDouble = 0;
+
+    private bool next = true;
+    private bool showing = true;
+    private bool running = false;
+    private bool gameStarted = false;
+
+    private Player_ highestBidder;
+    private int nextBidder = 0;
+    private int highestBid = 0;
 
     // player variables
     public GameObject CurrentPlayer;
     public int playerTurn = -1;
-    private List<GameObject> characterPrefabs = new List<GameObject>();
+    [SerializeField] private List<GameObject> characterPrefabs = new List<GameObject>();
 
     // display elements
-    public TextMeshProUGUI displayName1;
-    public TextMeshProUGUI displayName2;
-    public TextMeshProUGUI displayName3;
-    public TextMeshProUGUI displaydouble;
+    [SerializeField] private TextMeshProUGUI displayName1;
+    [SerializeField] private TextMeshProUGUI displayName2;
+    [SerializeField] private TextMeshProUGUI displayName3;
+    [SerializeField] private TextMeshProUGUI displaydouble;
 
     // UI assignment
     // Base player options
-    public GameObject auctionButton;
-    public GameObject endButton;
-    public GameObject propertyButton;
-    public GameObject manageButton;
+    [SerializeField] private GameObject auctionButton;
+    [SerializeField] private GameObject endButton;
+    [SerializeField] private GameObject propertyButton;
+    [SerializeField] private GameObject manageButton;
 
     // Managing property options
-    public GameObject managePanel;
-    public GameObject setsPanel;
-    public GameObject propertiesPanel;
-    public GameObject sellHouseButton;
-    public GameObject upgradeHouseButton;
+    [SerializeField] private GameObject managePanel;
+    [SerializeField] private GameObject setsPanel;
+    [SerializeField] private GameObject propertiesPanel;
 
-    public GameObject closeButton;
+    [SerializeField] private TMP_Dropdown propertiesDropdown;
+    [SerializeField] private TMP_Dropdown setsDropdown;
+    [SerializeField] private TextMeshProUGUI mortgageText;
 
-    public GameObject jailButton;
+    [SerializeField] private GameObject sellHouseButton;
+    [SerializeField] private GameObject upgradeHouseButton;
+    [SerializeField] private GameObject closeButton;
 
-    
+    [SerializeField] private GameObject jailButton;
 
-    public GameObject playerBidPanel;
-    public TextMeshProUGUI playerNameText;
-    public TMP_InputField bidInputField;
+    // Auction UI
+    [SerializeField] private GameObject playerBidPanel;
+    [SerializeField] private TextMeshProUGUI playerNameText;
+    [SerializeField] private TMP_InputField bidInputField;
 
-    
-    public GameObject winnerPanel;
+    // Choices UI
+    [SerializeField] private GameObject oppKnocksOption;
+    [SerializeField] private GameObject jailOption;
 
-    public GameObject oppKnocksOption;
-    public GameObject jailOption;
-    public TMP_Dropdown propertiesDropdown;
-    public TMP_Dropdown setsDropdown;
-    public TextMeshProUGUI mortgageText;
+    // Winner panel
+    [SerializeField] private GameObject winnerPanel;
+    [SerializeField] private TextMeshProUGUI winningText;
+    [SerializeField] private TextMeshProUGUI winningBalance;
 
-    public TextMeshProUGUI winningtext;
-    public TextMeshProUGUI winningbalance;
-
-    private bool admin = false;
-    public float startTime;
-    public float endTime;
-
-
-    // Default values
-
+    // Import scripts
     private Bank_ bank;
-
-    public Player_ PlayerInControl;
-    private UI UserInterface;
+    private DiceRoller diceRoller;
 
     // Empty values to be set
     List<Player_> playerlist = new List<Player_>();
     Vector3[] boardPosition = new Vector3[40];
-
-    private DiceRoller diceRoller;
-    public int roll = -1;
-    public int rolledDouble = 0;
-
-    public bool next = true;
-    public bool showing = true;
-
     public List<Player_> bidders = new List<Player_>();
-    public int nextBidder = 0;
-    public int highestBid = 0;
-    public Player_ highestBidder;
-
-    public List<string> cpuStack = new List<string>();
-
-    private bool running = false;
+    public List<string> cpuStack = new List<string>(); // can be replaced by past actions
     public Dictionary<string, bool> pastActions = new Dictionary<string, bool>();
 
-    private bool gameStarted = false;
-
-    // Creates the board as 40 vectors as 4 sides
+    /// <summary>
+    /// Creates the board as 40 vectors across 4 sides
+    /// By creating a new vector for each vector in boardPosition for each position
+    /// </summary>
     public void CreateBoard()
     {
         for (int i = 0; i < 11; i++)
@@ -135,30 +129,30 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Emulation of two dice rolls (2x 1->6)
+    /// <summary>
+    /// Emulation of two dice rolls
+    /// <returns>
+    /// (int, bool) 
+    /// int: Value of the dice roll (2 to 12)
+    /// bool: Boolean value representative of if a double is rolled
+    /// </returns>
+    /// </summary>
     public (int, bool) DiceRoll()
     {
         canRoll(false);
-        //showing = false;
-        //diceRoller.RollDice();
-        //return (3, false);
         return diceRoller.RollDice();
     }
 
-    // Ends current term and starts next player's go
-
-    public void PlayerStartedTheGame(int AmountOfPlayers = 6, int AmountOfAI = 0, int gamemode = 0)
-    {
-        playerAmount = AmountOfPlayers;
-        //add the other stuff here
-        Debug.Log("tests: " + AmountOfPlayers + " " + AmountOfAI + " " + gamemode);
-    }
+    /// <summary>
+    /// Prepares the game loop for the next players turn.
+    /// Updates UI
+    /// </summary>
     public void NextTurn()
     {
         cpuStack.Clear();
         playerTurn++;
 
-        if (playerTurn >= playerlist.Count) // Loops back to first player
+        if (playerTurn >= playerlist.Count) // Loops back to first player if past playerlist count
         {
             playerTurn = 0;
         }
@@ -166,6 +160,14 @@ public class PlayerMovement : MonoBehaviour
         UpdateBalanceUI();
     }
 
+    /// <summary>
+    /// Updates the UI representing: 
+    /// * Current player
+    /// * Player balance
+    /// * If a double has rolled
+    /// 
+    /// Also checks if balance is negative and makes the player perform actions until balance is positive.
+    /// </summary>
     public void UpdateBalanceUI()
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1591,8 +1593,8 @@ public class PlayerMovement : MonoBehaviour
         // new scene with player wins and there value
         // player.checkLiquidation();
         winnerPanel.SetActive(true);
-        winningtext.text = $"You won {winner.playerName}!";
-        winningbalance.text = $"End NetWorth: {winner.checkLiquidation()}";
+        winningText.text = $"You won {winner.playerName}!";
+        winningBalance.text = $"End NetWorth: {winner.checkLiquidation()}";
     }
 
     // Code for which buttons appear when a player first enters jail
