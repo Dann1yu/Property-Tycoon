@@ -3,162 +3,148 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// Class for all functions and variables for the bank to be functional
+/// </summary>
 public class Bank_ : MonoBehaviour
 {
-    public int Balance;
+    // Game loop requirements
     public List<Property> Properties { get; private set; } = new List<Property>();
     public List<Card> PLCards { get; private set; } = new List<Card>();
     public List<Card> OKCards { get; private set; } = new List<Card>();
-    public List<int> BankOwnedProperties = new List<int>();
-    public int FreeParkingBalance = 0;
     public Dictionary<string, int> PropertiesPerSet = new Dictionary<string, int>();
 
+    // Bank ownership
+    public List<int> BankOwnedProperties = new List<int>();
+    public int Balance;
+    public int FreeParkingBalance = 0;
+
+    // RNG import for card shuffling
     private static System.Random rng = new System.Random();
 
+    /// <summary>
+    /// Loads csv of filepath and creates each property with it's required variables
+    /// </summary>
+    /// <param name="filePath">Filepath for property data csv</param>
     public void LoadProperties(string filePath)
     {
-        try
+        // Reads csv into lines
+        string[] lines = File.ReadAllLines(filePath);
+
+        // For every row, create a property with it's values
+        foreach (string line in lines)
         {
-            string[] lines = File.ReadAllLines(filePath);
+            // Splits each row and passes each column of the row to it's information
+            string[] values = line.Split(',');
 
-            foreach (string line in lines)
+            int position = int.Parse(values[0]) - 1;
+            string name = values[1];
+            string group = values[3];
+            string action = values[4];
+            bool canBeBought = values[5].Trim().ToLower() == "yes";
+
+            int cost = int.TryParse(values[7], out int noValue) ? noValue : -1;
+            int rentUnimproved = int.TryParse(values[8], out int noValue1) ? noValue1 : -1;
+            int rent1House = int.TryParse(values[10], out int noValue2) ? noValue2 : -1;
+            int rent2Houses = int.TryParse(values[11], out int noValue3) ? noValue3 : -1;
+            int rent3Houses = int.TryParse(values[12], out int noValue4) ? noValue4 : -1;
+            int rent4Houses = int.TryParse(values[13], out int noValue5) ? noValue5 : -1;
+            int rentHotel = int.TryParse(values[14], out int noValue6) ? noValue6 : -1;
+
+            if (canBeBought)
             {
-                string[] values = line.Split(',');
-                Debug.Log(line);
-
-                //int position = int.TryParse(values[0]) - 1;
-                int position = int.Parse(values[0]) - 1;
-                string name = values[1];
-                string group = values[3];
-                string action = values[4];
-                bool canBeBought = values[5].Trim().ToLower() == "yes";
-
-                int cost = int.TryParse(values[7], out int noValue) ? noValue : -1;
-                int rentUnimproved = int.TryParse(values[8], out int noValue1) ? noValue1 : -1;
-                int rent1House = int.TryParse(values[10], out int noValue2) ? noValue2 : -1;
-                int rent2Houses = int.TryParse(values[11], out int noValue3) ? noValue3 : -1;
-                int rent3Houses = int.TryParse(values[12], out int noValue4) ? noValue4 : -1;
-                int rent4Houses = int.TryParse(values[13], out int noValue5) ? noValue5 : -1;
-                int rentHotel = int.TryParse(values[14], out int noValue6) ? noValue6 : -1;
-
-                if (canBeBought)
-                {
-                    BankOwnedProperties.Add(position);
-                }
-
-                if (PropertiesPerSet.ContainsKey(group))
-                {
-                    PropertiesPerSet[group]++;
-                }
-                else
-                {
-                    PropertiesPerSet[group] = 1;
-                }
-
-                Property property = new Property
-                {
-                    Position = position,
-                    Name = name,
-                    Group = group,
-                    Action = action,
-                    CanBeBought = canBeBought,
-                    Cost = cost,
-                    RentUnimproved = rentUnimproved,
-                    Rent1House = rent1House,
-                    Rent2Houses = rent2Houses,
-                    Rent3Houses = rent3Houses,
-                    Rent4Houses = rent4Houses,
-                    RentHotel = rentHotel
-                };
-
-                Properties.Add(property);
+                BankOwnedProperties.Add(position);
             }
 
-            Debug.Log($"Successfully loaded {Properties.Count} properties.");
+            if (PropertiesPerSet.ContainsKey(group))
+            {
+                PropertiesPerSet[group]++;
+            }
+            else
+            {
+                PropertiesPerSet[group] = 1;
+            }
+
+            // Creates new property
+            Property property = new Property
+            {
+                Position = position,
+                Name = name,
+                Group = group,
+                Action = action,
+                CanBeBought = canBeBought,
+                Cost = cost,
+                RentUnimproved = rentUnimproved,
+                Rent1House = rent1House,
+                Rent2Houses = rent2Houses,
+                Rent3Houses = rent3Houses,
+                Rent4Houses = rent4Houses,
+                RentHotel = rentHotel
+            };
+
+            Properties.Add(property);
         }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error loading properties: {ex.Message}");
-        }
+
+        Debug.Log($"Successfully loaded {Properties.Count} properties.");
     }
 
+    /// <summary>
+    /// Loads csv of filepath and creates each card with it's required variables
+    /// </summary>
+    /// <param name="filePath">Filepath for card data csv</param>
     public void LoadCards(string filePath)
     {
-        try
+        string[] lines = File.ReadAllLines(filePath);
+        int count = 0;
+        bool oppKnocks = false;
+        foreach (string line in lines)
         {
-            string[] lines = File.ReadAllLines(filePath);
-            int count = 0;
-            bool oppKnocks = false;
-            foreach (string line in lines)
+            // Start assigning pot luck cards
+            // When line breaks swap to oppurtunity knocks card assignment
+            if (line == ",,")
             {
-                if (line == ",,") {
-                    Debug.Log($"HERE: {count}");
-                    oppKnocks = true;
-                    count = 0;
-                    continue;
-                }
-                
-
-                string[] values = line.Split(',');
-
-                // Basic logging
-                Debug.Log(line);
-
-                // Parse each field safely
-                int id = count;
-                count += 1;
-                string description = values[0];
-                string action = values[1];
-
-                // Optional integer field — use -1 if not parseable
-                int integerValue = int.TryParse(values[2], out int parsedValue) ? parsedValue : -1;
-
-                Card card = new Card
-                {
-                    Id = id,
-                    Description = description,
-                    Action = action,
-                    Integer = integerValue
-                };
-
-                if (oppKnocks) {
-                    OKCards.Add(card);
-                } else {
-                    PLCards.Add(card);
-                }
+                Debug.Log($"HERE: {count}");
+                oppKnocks = true;
+                count = 0;
+                continue;
             }
 
-            foreach (Card card in PLCards)
-            {
-                Debug.Log($"{card.Id}");
-            }
-            foreach (Card card in OKCards)
-            {
-                Debug.Log($"{card.Id}");
-            }
+            // Splits each row and passes each column of the row to it's information
+            string[] values = line.Split(',');
 
-            shuffle(OKCards);
-            shuffle(PLCards);
+            int id = count;
+            count += 1;
+            string description = values[0];
+            string action = values[1];
+            int integerValue = int.TryParse(values[2], out int parsedValue) ? parsedValue : -1; // passes -1 if no value
 
-            Debug.Log($"Successfully loaded {OKCards.Count} oppurtunity knocks cards.");
-            Debug.Log($"Successfully loaded {PLCards.Count} pot luck cards.");
+            // Creates new card
+            Card card = new Card
+            {
+                Id = id,
+                Description = description,
+                Action = action,
+                Integer = integerValue
+            };
 
-            foreach (Card card in OKCards)
-            {
-                Debug.Log($"{card.Description}");
-            }
-            foreach (Card card in PLCards)
-            {
-                Debug.Log($"{card.Description}");
+            if (oppKnocks) {
+                OKCards.Add(card);
+            } else {
+                PLCards.Add(card);
             }
         }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error loading cards: {ex.Message}");
-        }
+
+        // Shuffles the deck (queue) of the cards
+        shuffle(OKCards);
+        shuffle(PLCards);
+
+        Debug.Log($"Successfully loaded {OKCards.Count} oppurtunity knocks cards.");
+        Debug.Log($"Successfully loaded {PLCards.Count} pot luck cards.");
     }
 
-
+    /// <summary>
+    /// On start, loads board data and card data aswell as initializes bank balance
+    /// </summary>
     void Start()
     {
         Balance = 50000;
@@ -169,26 +155,10 @@ public class Bank_ : MonoBehaviour
         Debug.Log($"Properties Loaded: {Properties.Count}"); // Verify it loaded
     }
 
-
-    public void info(int idx)
-    {
-        Debug.Log(idx);
-        Debug.Log(Properties.Count);
-        var property = Properties[idx];
-        Debug.Log($"Position: {property.Position} \n" +
-            $"Name: {property.Name} \n" +
-            $"Group: {property.Group} \n" +
-            $"Action: {property.Action} \n" +
-            $"Purchasable?: {property.CanBeBought} \n" +
-            $"Cost: {property.Cost} \n" +
-            $"Base Rent: {property.RentUnimproved} \n" +
-            $"One house rent: {property.Rent1House} \n" +
-            $"Two house rent: {property.Rent2Houses} \n" +
-            $"Three house rent: {property.Rent3Houses} \n" +
-            $"Four house rent: {property.Rent4Houses} \n" +
-            $"One hotel rent: {property.RentHotel}");
-    }
-
+    /// <summary>
+    /// Shuffles the list (queue) of cards
+    /// </summary>
+    /// <param name="cards">List of cards to be shuffled</param>
     private void shuffle(List<Card> cards)
     {
         System.Random rng = new System.Random();

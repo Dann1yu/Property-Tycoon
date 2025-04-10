@@ -1,3 +1,6 @@
+/// <summary>
+/// Class for all property values
+/// </summary>
 public class Property
 {
     public int Position { get; set; }

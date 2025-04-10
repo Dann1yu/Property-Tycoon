@@ -1,3 +1,6 @@
+/// <summary>
+/// Class for all card values
+/// </summary>
 public class Card
 {
     public int Id { get; set; }

@@ -18,7 +18,7 @@ using System.Collections;
 /// Controls the main game loop
 /// Including Human and AI logic
 /// </summary>
-public class PlayerMovement : MonoBehaviour
+public class GameLoop : MonoBehaviour
 {
     // private variables that will be changed by load screen
     private int playerAmount;
@@ -2252,9 +2252,5 @@ public class PlayerMovement : MonoBehaviour
             houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
             houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
         }
-
-
-
-
     }
 }

@@ -12322,6 +12322,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startTime: 0
   endTime: 0
+  rolledDouble: 0
+  next: 1
+  showing: 1
+  running: 0
+  gameStarted: 0
   CurrentPlayer: {fileID: 0}
   playerTurn: -1
   characterPrefabs:
@@ -12331,6 +12336,7 @@ MonoBehaviour:
   - {fileID: 2192777311582639289, guid: 9154f8293ae46b0489b7f12d516990dc, type: 3}
   - {fileID: 8244192576166171523, guid: 35ef4e44ea3131a4083dbf90f11d49b8, type: 3}
   - {fileID: 2589260117708862842, guid: 3bd9684c46ef2274491db3683f7b64b4, type: 3}
+  houseprefab: {fileID: 1049787701921769944, guid: 202d3386ff5ba284489113129ff54d1d, type: 3}
   displayName1: {fileID: 1648605600}
   displayName2: {fileID: 305263669}
   displayName3: {fileID: 1212798172}
