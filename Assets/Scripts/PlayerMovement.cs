@@ -778,16 +778,23 @@ public class PlayerMovement : MonoBehaviour
         UpdateBalanceUI();
     }
 
+    /// <summary>
+    /// Pay rent logic, calculates correct amount owed for the property
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="location"></param>
     void payRent(Player_ player, Property location)
     {
         Debug.Log($"{location.Name} {location.NumberOfHouses} {location.RentUnimproved} {location.Rent1House} {location.Rent2Houses} {location.Rent3Houses} {location.Rent4Houses} {location.RentHotel}");
 
+        // If location is a station pay station rent
         if (location.Group == "Station")
         {
             int amount = 25 * System.Convert.ToInt32(System.Math.Pow(2, (location.Owner.Sets["Station"] - 1)));
             PlayerTrans(player, location.Owner, amount);
-            return;
         }
+
+        // Else if location is a utility pay utility rent
         else if (location.Group == "Utilities")
         {
             int amount;
@@ -802,12 +809,12 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        if (location.NumberOfHouses == 0)
+        // Else If checks number of houses and if in a owned set and pays correct amount
+        else if (location.NumberOfHouses == 0)
         {
             if (location.Owner.OwnedSets.Contains(location.Group))
             {
                 PlayerTrans(player, location.Owner, (location.RentUnimproved * 2));
-                return;
             }
             PlayerTrans(player, location.Owner, location.RentUnimproved);
         }
@@ -831,11 +838,17 @@ public class PlayerMovement : MonoBehaviour
         {
             PlayerTrans(player, location.Owner, location.RentHotel);
         }
+
         UpdateBalanceUI();
     }
 
-    // works but only for pay (not go to jail)
-    public void potLuck(Player_ player) {
+    /// <summary>
+    /// Performs first pot luck card in the queue on the player
+    /// </summary>
+    /// <param name="player">Player action will be performed on</param>
+    public void potLuck(Player_ player) 
+    {
+        // Takes first card in the queue
         Card card = bank.PLCards[0];
         bank.PLCards.RemoveAt(0);
 
@@ -844,12 +857,19 @@ public class PlayerMovement : MonoBehaviour
         var action = card.Action;
         var amount = card.Integer;
 
+        // Runs it's equivalent function
         runMethod(player, action, amount);
-
+        
+        // Adds card back to the end of the queue
         bank.PLCards.Add(card);
     }
 
+    /// <summary>
+    /// Performs first oppurtunity knocks card in the queue on the player
+    /// </summary>
+    /// <param name="player">Player action will be performed on</param>
     public void oppKnock(Player_ player) {
+        // Takes first card in the queue
         Card card = bank.OKCards[0];
         bank.OKCards.RemoveAt(0);
 
@@ -859,12 +879,19 @@ public class PlayerMovement : MonoBehaviour
         var action = card.Action;
         var amount = card.Integer;
 
+        // Runs it's equivalent function
         runMethod(player, action, amount);
 
+        // Adds card back to the end of the queue
         bank.OKCards.Add(card);
-
     }
 
+    /// <summary>
+    /// Run method "action"
+    /// </summary>
+    /// <param name="player">Player being affected</param>
+    /// <param name="action">Action occuring</param>
+    /// <param name="Integer">Indicator of by how much or of what kind</param>
     public void runMethod(Player_ player, string action, int Integer)
     {
         var method = this.GetType().GetMethod(action, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -875,7 +902,11 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    // ALL FOR CARD USAGE
+    /// <summary>
+    /// Teleport player to new position without passing go
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="newPosition"></param>
     public void _Teleport(Player_ player, int newPosition)
     {
         player.pos = newPosition;
@@ -889,32 +920,43 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    //ui section tried to make a script for it didnt work
-
+    /// <summary>
+    /// Makes property UI visible or invisible determined by boolean
+    /// </summary>
+    /// <param name="boolean">Whether it should be visible</param>
     public void canBuyProperty(bool boolean)
     {
-        // CPU LOGIC
+        // CPU Logic
         CPUPush($"canBuyProperty {boolean}");
 
         auctionButton.SetActive(boolean);
         propertyButton.SetActive(boolean);
         canEndTurn(false);
     }
+
+    /// <summary>
+    /// Makes end turn UI visible or invisible determined by boolean
+    /// </summary>
+    /// <param name="boolean">Whether it should be visible</param>
     public void canEndTurn(bool boolean)
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
+        // If player balance is negative, do not let player end turn
         if ((player.balance < 0) && boolean)
         {
             canEndTurn(false);
             return;
         }
 
+        // CPU Logic
         CPUPush($"canEndTurn {boolean}");
+
         endButton.SetActive(boolean);
 
-        if (!boolean) // if false disable manage button
+        // If false and balance is positive disables manage properties button
+        if (!boolean)
         {
             if (player.balance < 0)
             {
@@ -925,7 +967,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         canRoll(false);
-
+        
+        // If player can theoretically manage properties allow them
         if (player.properties.Count() > 0)
         {
             canManage(boolean);
@@ -935,12 +978,16 @@ public class PlayerMovement : MonoBehaviour
         {
             canManage(false);
         }
-
-
     }
 
+    /// <summary>
+    /// Makes start auction button visible or invisible determined by boolean
+    /// And game check logic
+    /// </summary>
+    /// <param name="boolean">Whether it should be visible</param>
     public void canStartAuction(bool boolean)
     {
+        // If boolean is false disable auction button
         if (!boolean)
         {
             CPUPush("canStartAuction false");
