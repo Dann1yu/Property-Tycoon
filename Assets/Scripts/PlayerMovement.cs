@@ -40,26 +40,31 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI displayName3;
     public TextMeshProUGUI displaydouble;
 
-    public GameObject ButtonObject;
-    public Transform WhereYouWantButtonsParented;
-
+    // UI assignment
+    // Base player options
     public GameObject auctionButton;
     public GameObject endButton;
     public GameObject propertyButton;
     public GameObject manageButton;
-    public GameObject closeButton;
-    public GameObject jailButton;
 
+    // Managing property options
+    public GameObject managePanel;
+    public GameObject setsPanel;
+    public GameObject propertiesPanel;
     public GameObject sellHouseButton;
     public GameObject upgradeHouseButton;
+
+    public GameObject closeButton;
+
+    public GameObject jailButton;
+
+    
 
     public GameObject playerBidPanel;
     public TextMeshProUGUI playerNameText;
     public TMP_InputField bidInputField;
 
-    public GameObject managePanel;
-    public GameObject setsPanel;
-    public GameObject propertiesPanel;
+    
     public GameObject winnerPanel;
 
     public GameObject oppKnocksOption;
@@ -77,8 +82,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     // Default values
-    public GameObject CurrentPlayer;
-    public int playerTurn = -1;
+
     private Bank_ bank;
 
     public Player_ PlayerInControl;
@@ -250,7 +254,7 @@ public class PlayerMovement : MonoBehaviour
             playerAmount = 0;
             AIplayerAmount = 6;
             endTime = 120f;
-            endAbridgedGame = true;
+            abridgedGamemode = true;
             admin = true;
             Debug.Log("ADMIN MODE");
 
