@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
     // all pointers used through out script
     private int lowestHouses = 5;
     private int highestHouses = 0;
-    
+
     private int roll = -1;
     public int rolledDouble = 0;
 
@@ -49,6 +49,9 @@ public class PlayerMovement : MonoBehaviour
     public GameObject CurrentPlayer;
     public int playerTurn = -1;
     [SerializeField] private List<GameObject> characterPrefabs = new List<GameObject>();
+
+    // housing variables
+    [SerializeField] private GameObject houseprefab;
 
     // display elements
     [SerializeField] private TextMeshProUGUI displayName1;
@@ -182,13 +185,15 @@ public class PlayerMovement : MonoBehaviour
         displayName3.text = "";
 
         // If action is required to go above negative balance
-        if (pastActions["canManage"] && !pastActions["canEndTurn"] && (player.balance >= 0)) {
+        if (pastActions["canManage"] && !pastActions["canEndTurn"] && (player.balance >= 0))
+        {
             canEndTurn(true);
             if (player.AI)
             {
                 CPULogic(player);
             }
-        } else if (pastActions["canManage"] && !pastActions["canEndTurn"])
+        }
+        else if (pastActions["canManage"] && !pastActions["canEndTurn"])
         {
             canEndTurn(false);
         }
@@ -217,7 +222,7 @@ public class PlayerMovement : MonoBehaviour
             // CPU LOGIC
             playerComponent.AI = (i >= (amount - AI));
 
-            Debug.Log($"{playerComponent.playerName} : AI={playerComponent.AI}");   
+            Debug.Log($"{playerComponent.playerName} : AI={playerComponent.AI}");
         }
     }
 
@@ -361,7 +366,8 @@ public class PlayerMovement : MonoBehaviour
         onRoll(roll, boolDouble);
 
         // If player is AI run cpu logic
-        if (player.AI) {
+        if (player.AI)
+        {
             Debug.Log("CPU LOGIC");
             StartCoroutine(CPULogic(player));
         }
@@ -390,15 +396,17 @@ public class PlayerMovement : MonoBehaviour
         //purchaseProperty(player, bank.Properties[12]);
         //purchaseProperty(player, bank.Properties[28]);
 
+        purchaseProperty(player, bank.Properties[37]);
+        purchaseProperty(player, bank.Properties[39]);
+
         //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
         //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
         //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
         //player.upgradeHouse(bank.Properties[1]);
-        //player.upgradeHouse(bank.Properties[1]);
-        //player.upgradeHouse(bank.Properties[3]);
-        //player.upgradeHouse(bank.Properties[3]);
-        //player.upgradeHouse(bank.Properties[3]);
-        //player.upgradeHouse(bank.Properties[3]);
+        //SpawnHouse(bank.Properties[1]);
 
         mortgageProperty(player, bank.Properties[15]);
 
@@ -449,7 +457,8 @@ public class PlayerMovement : MonoBehaviour
                 _GoToJail(CurrentPlayer.GetComponent<Player_>());
                 return;
             }
-        } else rolledDouble = 0;
+        }
+        else rolledDouble = 0;
 
         // Move forward roll
         moveForward(roll, CurrentPlayer.transform.position);
@@ -486,7 +495,7 @@ public class PlayerMovement : MonoBehaviour
         // Calculate new distance, if larger than possible positions player has wrapped board and is treated accordingly
         int oldposition = player.pos;
         int new_position = distance + oldposition;
-        
+
         // If position is negative, make positive
         if (new_position < 0)
         {
@@ -567,7 +576,7 @@ public class PlayerMovement : MonoBehaviour
         // Basic values and UI changes
         var position = player.pos;
         var location = bank.Properties[position];
-        canEndTurn(false)
+        canEndTurn(false);
 
         // If landed on property that can be purchased
         if (location.CanBeBought && bank.BankOwnedProperties.Contains(position))
@@ -582,7 +591,8 @@ public class PlayerMovement : MonoBehaviour
                 if (rolledDouble == 0)
                 {
                     canEndTurn(true);
-                } else canRoll(true);
+                }
+                else canRoll(true);
 
                 Debug.Log("not passed go yet!");
                 return;
@@ -600,21 +610,23 @@ public class PlayerMovement : MonoBehaviour
                 canStartAuction(true); //checks to make sure at least 2 can auction before auctioning
             }
             // Else if not enough players can join the auction, allow end turn
-            else 
-            { 
-                canEndTurn(true); 
+            else
+            {
+                canEndTurn(true);
             }
         }
         // Else if landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
         {
             // If player owns the property do nothing
-            if (player.properties.Contains(position)) {
+            if (player.properties.Contains(position))
+            {
                 Debug.Log("Property owned by the same player");
                 displayName3.text = ("Property owned by the same player");
             }
             // Else payrent
-            else {
+            else
+            {
                 Debug.Log("Property owned by another player");
                 displayName3.text = ("Property owned by another player");
                 if (!location.mortgaged && (location.Owner.inJail == -1))
@@ -758,7 +770,7 @@ public class PlayerMovement : MonoBehaviour
         location.mortgaged = false;
         UpdateBalanceUI();
     }
-    
+
     /// <summary>
     /// Sell property logic
     /// </summary>
@@ -770,7 +782,8 @@ public class PlayerMovement : MonoBehaviour
         if (location.mortgaged)
         {
             BankTrans(location.Cost / 2);
-        } else BankTrans(location.Cost);
+        }
+        else BankTrans(location.Cost);
 
         player.removeProperty(location);
         location.Owner = null;
@@ -846,7 +859,7 @@ public class PlayerMovement : MonoBehaviour
     /// Performs first pot luck card in the queue on the player
     /// </summary>
     /// <param name="player">Player action will be performed on</param>
-    public void potLuck(Player_ player) 
+    public void potLuck(Player_ player)
     {
         // Takes first card in the queue
         Card card = bank.PLCards[0];
@@ -859,7 +872,7 @@ public class PlayerMovement : MonoBehaviour
 
         // Runs it's equivalent function
         runMethod(player, action, amount);
-        
+
         // Adds card back to the end of the queue
         bank.PLCards.Add(card);
     }
@@ -868,7 +881,8 @@ public class PlayerMovement : MonoBehaviour
     /// Performs first oppurtunity knocks card in the queue on the player
     /// </summary>
     /// <param name="player">Player action will be performed on</param>
-    public void oppKnock(Player_ player) {
+    public void oppKnock(Player_ player)
+    {
         // Takes first card in the queue
         Card card = bank.OKCards[0];
         bank.OKCards.RemoveAt(0);
@@ -967,7 +981,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         canRoll(false);
-        
+
         // If player can theoretically manage properties allow them
         if (player.properties.Count() > 0)
         {
@@ -1008,6 +1022,7 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
+        // Create a list of permitted bidders
         bidders.Clear();
         foreach (var item in playerlist)
         {
@@ -1017,53 +1032,69 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (bidders.Count() <= 1)
+        // If less than 2 permitted bidders, disable auction
+        if (bidders.Count() < 2)
         {
             canStartAuction(false);
             return;
         }
 
+        // CPU Logic
         CPUPush("canStartAuction true");
         auctionButton.SetActive(boolean);
     }
 
+    /// <summary>
+    /// If button is clicked it runs this function to determine which button
+    /// and therefore which action is performed
+    /// </summary>
+    /// <param name="button">Button gameobject that was clicked</param>
     public void DecidedToClick(GameObject button)
     {
+        // If dice is rolling no action can occur
         if (diceRoller.isRolling)
         {
             return;
         }
 
+        // Determine which button was clicked
         string buttonName = button.name;
-
         Debug.Log("button name " + buttonName);
+
+        // Self explanatory, will comment when required
         if (buttonName == "buyPropertyButton")
         {
             buyProperty();
         }
-        if (buttonName == "endTurnButton")
+
+        else if (buttonName == "endTurnButton")
         {
             endTurn();
         }
-        if (buttonName == "startAuctionButton")
+
+        else if (buttonName == "startAuctionButton")
         {
             startAuction();
         }
 
-        if (buttonName == "bidButton")
+        else if (buttonName == "bidButton")
         {
             string input = bidInputField.text;
+
+            // If highest bidder is undefined, define it as current player
             if (highestBidder == null)
             {
                 highestBidder = CurrentPlayer.GetComponent<Player_>();
             }
 
+            // If bid is a valid bid parse it to nextbid()
             if (int.TryParse(input, out int bid) && (bid <= highestBidder.balance) && (bid > highestBid))
             {
                 Debug.Log("Bid entered: " + bid);
                 displayName3.text = ("latest bid is " + bid);
                 nextBid(bid);
             }
+            // Else retry
             else
             {
                 Debug.LogWarning("Invalid bid value.");
@@ -1071,17 +1102,18 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (buttonName == "skipButton")
+        else if (buttonName == "skipButton")
         {
             nextBid(-1);
         }
 
-        if (buttonName == "manageButton")
+        else if (buttonName == "manageButton")
         {
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
-
             canEndTurn(false);
+
+            // If player owns no sets, do not give them the option of managing their sets
             if (player.OwnedSets.Count() > 0)
             {
                 managePanel.SetActive(true);
@@ -1090,30 +1122,31 @@ public class PlayerMovement : MonoBehaviour
             else manageProperty(true);
         }
 
-        if (buttonName == "setsButton")
+        else if (buttonName == "setsButton")
         {
+            // This button is actually the change of a dropdown and is handled accordingly
             managePanel.SetActive(false);
             manageSets(true);
             setDropdownChange();
         }
 
-        if (buttonName == "propertiesButton")
+        else if (buttonName == "propertiesButton")
         {
             managePanel.SetActive(false);
             manageProperty(true);
         }
 
-        if (buttonName == "closeButton")
+        else if (buttonName == "closeButton")
         {
             closeOptions();
         }
 
-        if (buttonName == "propertiesDropdown")
+        else if (buttonName == "propertiesDropdown")
         {
             manageProperty(true);
         }
 
-        if (buttonName == "sellPropertyButton")
+        else if (buttonName == "sellPropertyButton")
         {
             var (loc, player) = returnPropertyOnShow("Properties");
 
@@ -1126,55 +1159,54 @@ public class PlayerMovement : MonoBehaviour
             else manageProperty(true);
         }
 
-        if (buttonName == "mortgageButton")
+        else if (buttonName == "mortgageButton")
         {
             var (loc, player) = returnPropertyOnShow("Properties");
 
             if (loc.mortgaged)
             {
                 unMortgageProperty(player, loc);
-            } else mortgageProperty(player, loc);
+            }
+            else mortgageProperty(player, loc);
 
             manageProperty(true);
         }
 
-        if (buttonName == "sellHouseButton")
+        else if (buttonName == "sellHouseButton")
         {
             var (loc, player) = returnPropertyOnShow("Sets");
-
             player.sellHouse(loc);
 
-
-
             setDropdownChange();
         }
 
-        if (buttonName == "upgradeHouseButton")
+        else if (buttonName == "upgradeHouseButton")
         {
             var (loc, player) = returnPropertyOnShow("Sets");
-
             player.upgradeHouse(loc);
+            SpawnHouse(loc);
+
             setDropdownChange();
         }
 
-        if (buttonName == "pay50")
+        else if (buttonName == "pay50")
         {
             pay50();
         }
 
-        if (buttonName == "jailFree")
+        else if (buttonName == "jailFree")
         {
             usedJailFree();
         }
 
-        if (buttonName == "stayInJail")
+        else if (buttonName == "stayInJail")
         {
             jailOption.SetActive(false);
             canEndTurn(true);
             canManage(false);
         }
 
-        if (buttonName == "pay10")
+        else if (buttonName == "pay10")
         {
             oppKnocksOption.SetActive(false);
             CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1192,7 +1224,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
         }
-        if (buttonName == "oppKnock")
+        else if (buttonName == "oppKnock")
         {
             oppKnocksOption.SetActive(false);
             CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1202,6 +1234,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// If used jail free, get out of jail and decrease jail free card count
+    /// </summary>
     public void usedJailFree()
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1283,7 +1318,8 @@ public class PlayerMovement : MonoBehaviour
         sellHouseButton.SetActive(sell);
     }
 
-    public (bool, bool) canChangeHouses(Property loc) {
+    public (bool, bool) canChangeHouses(Property loc)
+    {
         bool sell;
         bool buy;
         if (loc.NumberOfHouses > 0 && loc.NumberOfHouses == highestHouses)
@@ -1341,7 +1377,8 @@ public class PlayerMovement : MonoBehaviour
             if (player.balance >= 10)
             {
                 _DepositToFreeParking(player, 10);
-            } else
+            }
+            else
             {
                 oppKnock(player);
             }
@@ -1423,7 +1460,8 @@ public class PlayerMovement : MonoBehaviour
         {
             amount += 115 * noHotels;
             amount += 40 * noHouses;
-        } else
+        }
+        else
         {
             amount += 100 * noHotels;
             amount += 25 * noHouses;
@@ -1504,7 +1542,7 @@ public class PlayerMovement : MonoBehaviour
         if (nextBidder == bidders.Count - 1)
         {
             nextBidder = -1;
-        } 
+        }
 
         nextBidder++;
 
@@ -1558,7 +1596,7 @@ public class PlayerMovement : MonoBehaviour
             Player_ player = CurrentPlayer.GetComponent<Player_>();
 
             List<string> showProps = new List<string>();
-            
+
             foreach (int loc in player.properties)
             {
                 showProps.Add(bank.Properties[loc].Name);
@@ -1743,11 +1781,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 Debug.Log("Used Jail Free Card");
                 usedJailFree();
-            } else if (player.balance > 50)
+            }
+            else if (player.balance > 50)
             {
                 Debug.Log("Paid 50");
                 pay50();
-            } else
+            }
+            else
             {
                 Debug.Log("Stayed in jail");
                 jailOption.SetActive(false);
@@ -1779,7 +1819,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 cpuStack.Add(action);
             }
-        } else cpuStack.Add(action);
+        }
+        else cpuStack.Add(action);
     }
 
     IEnumerator CPULogic(Player_ player)
@@ -1884,6 +1925,7 @@ public class PlayerMovement : MonoBehaviour
                     if (player.balance > (player.checkColourPrice(loc.Group) + 400))
                     {
                         player.upgradeHouse(loc);
+                        SpawnHouse(loc);
                     }
                 }
 
@@ -2017,12 +2059,66 @@ public class PlayerMovement : MonoBehaviour
 
             Debug.Log($"Paid full amount but requires selling {amount}");
             return amount;
-        } 
+        }
         else
         {
             Debug.Log($"Bankrupt");
             return bankrupt(player);
         }
+    }
+
+    public void SpawnHouse(Property prop)
+    {
+        if (prop.NumberOfHouses > 4)
+        {
+            Debug.Log($"Number of houses {prop.NumberOfHouses}");
+            return;
+        }
+        if (prop.Position > 0 && prop.Position < 10)
+        {
+            Vector3 targetpos = boardPosition[prop.Position];
+            float constant = .23333f;
+            var houseobj = houseprefab;
+            float multiplehouses = constant * (prop.NumberOfHouses - 1);
+            targetpos = new Vector3(targetpos.x - 0.4f + multiplehouses, targetpos.y, targetpos.z + 0.55f);
+            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
+            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+        }
+        if (prop.Position > 10 && prop.Position < 20)
+        {
+
+            Vector3 targetpos = boardPosition[prop.Position];
+            float constant = .23333f;
+            var houseobj = houseprefab;
+            float multiplehouses = constant * (prop.NumberOfHouses - 1);
+            targetpos = new Vector3(targetpos.x + 0.5f, targetpos.y, targetpos.z + 0.4f + multiplehouses);
+            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
+            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+        }
+        if (prop.Position > 20 && prop.Position < 30)
+        {
+            Vector3 targetpos = boardPosition[prop.Position];
+            float constant = .23333f;
+            var houseobj = houseprefab;
+            float multiplehouses = constant * (prop.NumberOfHouses - 1);
+            targetpos = new Vector3(targetpos.x + 0.4f - multiplehouses, targetpos.y, targetpos.z - 0.35f);
+            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
+            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+        }
+        if (prop.Position > 30 && prop.Position < 40)
+        {
+            Vector3 targetpos = boardPosition[prop.Position];
+            float constant = .23333f;
+            var houseobj = houseprefab;
+            float multiplehouses = constant * (prop.NumberOfHouses - 1);
+            targetpos = new Vector3(targetpos.x - 0.5f, targetpos.y, targetpos.z + 0.4f - multiplehouses);
+            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
+            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+        }
+
+
+
+
     }
 }
 
