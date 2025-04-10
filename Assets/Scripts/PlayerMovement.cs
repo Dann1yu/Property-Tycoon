@@ -1249,6 +1249,9 @@ public class PlayerMovement : MonoBehaviour
         canManage(false);
     }
 
+    /// <summary>
+    /// If property is purchased from UI perform neccessary actions
+    /// </summary>
     public void buyProperty()
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1266,6 +1269,10 @@ public class PlayerMovement : MonoBehaviour
         else canRoll(true);
     }
 
+    /// <summary>
+    /// When turn is ended it checks if anyone has one the game if in abridged gamemode
+    /// And makes the neccessary changes to the visible UI
+    /// </summary>
     public void endTurn()
     {
         canEndTurn(false);
@@ -1284,6 +1291,9 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("ended turn");
     }
 
+    /// <summary>
+    /// Pays 50 to free parking to leave jail
+    /// </summary>
     public void pay50()
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
@@ -1296,12 +1306,17 @@ public class PlayerMovement : MonoBehaviour
         canManage(false);
     }
 
-
+    /// <summary>
+    /// When property dropdown is changed, edit what the mortgage button says
+    /// </summary>
     public void propertyDropdownChange()
     {
         editMortgageButton();
     }
 
+    /// <summary>
+    /// If the sets dropdown is changed, edit whether u can see the upgrade or sell house options
+    /// </summary>
     public void setDropdownChange()
     {
         Property loc;
@@ -1310,14 +1325,20 @@ public class PlayerMovement : MonoBehaviour
         (loc, player) = returnPropertyOnShow("Sets");
         Debug.Log($"Name: {loc.Name}");
 
+        // Runs the check on number of houses compared to it's fellow set members and returns whether player can buy/sell a house
         housesInGroup(player, loc.Group);
-
         var (buy, sell) = canChangeHouses(loc);
 
         upgradeHouseButton.SetActive(buy);
         sellHouseButton.SetActive(sell);
     }
 
+
+    /// <summary>
+    /// Check whether a house can be bought or sold on the particular property
+    /// </summary>
+    /// <param name="loc">Location being checked</param>
+    /// <returns>(bool buy, bool sell) whewre they both represent whether you can buy or sell a house</returns>
     public (bool, bool) canChangeHouses(Property loc)
     {
         bool sell;
@@ -1337,6 +1358,11 @@ public class PlayerMovement : MonoBehaviour
         return (buy, sell);
     }
 
+    /// <summary>
+    /// Sets the lowestHouses and highestHouses in the set to their correct values
+    /// </summary>
+    /// <param name="player">Player who owns the set</param>
+    /// <param name="group">The set in question</param>
     public void housesInGroup(Player_ player, string group)
     {
         lowestHouses = 5;
@@ -1358,14 +1384,31 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Is an oppurtunity knocks action and calls bank to player payment of amount
+    /// </summary>
+    /// <param name="player">Player receiving money</param>
+    /// <param name="amount">Amount of money</param>
     public void _ReceiveMoneyFromBank(Player_ player, int amount)
     {
         BankTrans(amount);
     }
+
+    /// <summary>
+    /// Is an oppurtunity knocks action and calls player to bank payment of amount
+    /// </summary>
+    /// <param name="player">Player receiving money</param>
+    /// <param name="amount">Amount of money</param>
     public void _PayBank(Player_ player, int amount)
     {
         BankTrans(-amount);
     }
+
+    /// <summary>
+    /// Is an oppurtunity knocks action and gives the option between paying $10 or taking another oppurtunity knocks card
+    /// </summary>
+    /// <param name="player">Player given the option</param>
+    /// <param name="amount">Amount of money</param>
     public void _OppKnocksOption(Player_ player, int amount)
     {
         Debug.Log("Pay a $10 fine or take opportunity knocks");
@@ -1388,6 +1431,12 @@ public class PlayerMovement : MonoBehaviour
 
         oppKnocksOption.SetActive(true);
     }
+
+    /// <summary>
+    /// Adds amount from player to the free parking balance
+    /// </summary>
+    /// <param name="player">Player sending the money</param>
+    /// <param name="amount">Amount of money being sent</param>
     public void _DepositToFreeParking(Player_ player, int amount)
     {
         Debug.Log("_DepositToFreeParking");
@@ -1396,6 +1445,12 @@ public class PlayerMovement : MonoBehaviour
 
         canEndTurn(true);
     }
+
+    /// <summary>
+    /// Sends player to jail and then gives them the option to get out
+    /// </summary>
+    /// <param name="player">Player to be sent to jail</param>
+    /// <param name="amount">Redundant</param>
     public void _GoToJail(Player_ player, int amount = 0)
     {
         Debug.Log("_GoToJail");
@@ -1405,6 +1460,12 @@ public class PlayerMovement : MonoBehaviour
         canEndTurn(false);
         jailOptions(player);
     }
+
+    /// <summary>
+    /// Player receives money from every other player
+    /// </summary>
+    /// <param name="player">Player receiving money</param>
+    /// <param name="amount">Amount of money the player is receiving from every other player</param>
     public void _ReceiveMoneyFromAll(Player_ player, int amount)
     {
         Debug.Log("_ReceiveMoneyFromAll");
@@ -1416,12 +1477,24 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-    public void _JailFreeCard(Player_ player, int amount)
+
+    /// <summary>
+    /// Append a jail free card to player
+    /// </summary>
+    /// <param name="player">Player receiving the jail free card</param>
+    /// <param name="amount">Redundant</param>
+    public void _JailFreeCard(Player_ player, int amount=1)
     {
         Debug.Log("_JailFreeCard");
         displayName3.text = "You got a Get out of Jail free card!";
         player.JailFreeCards += 1;
     }
+
+    /// <summary>
+    /// Is an oppurtunity knocks action and will calculate how many positions to move to get to the desired square
+    /// </summary>
+    /// <param name="player">Player to move</param>
+    /// <param name="amount">Which location index to move to</param>
     public void _CardMove(Player_ player, int amount)
     {
         var old_pos = player.pos;
@@ -1436,6 +1509,12 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("_CardMove");
 
     }
+
+    /// <summary>
+    /// Is an oppurtunity knocks action that calculates how much repairs would cost player and then charges them said amount
+    /// </summary>
+    /// <param name="player">Player who needs repairs</param>
+    /// <param name="version">0 | else : If 0 $115 per hotel and 40 per house Else $100 per hotel and $25 per house</param>
     public void _Repairs(Player_ player, int version)
     {
         int noHouses = 0;
@@ -1443,6 +1522,7 @@ public class PlayerMovement : MonoBehaviour
 
         int amount = 0;
 
+        // Calculates number of hotels and houses player owns
         foreach (var location in player.properties)
         {
             var temp = bank.Properties[location].NumberOfHouses;
@@ -1456,6 +1536,7 @@ public class PlayerMovement : MonoBehaviour
             else noHouses += temp;
         }
 
+        /// Charges depending on version of the card
         if (version == 0)
         {
             amount += 115 * noHotels;
@@ -1470,6 +1551,10 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Shows the dice depending on boolean
+    /// </summary>
+    /// <param name="canRoll">Boolean whether the player can roll</param>
     public void canRoll(bool canRoll)
     {
         // CPU LOGIC
@@ -1479,22 +1564,32 @@ public class PlayerMovement : MonoBehaviour
         showing = !canRoll;
     }
 
+    /// <summary>
+    /// Shows the management UI depending on boolean
+    /// </summary>
+    /// <param name="boolean">Boolean whether the player can manage properties or not</param>
     public void canManage(bool boolean)
     {
         CPUPush($"canManage {boolean}");
         manageButton.SetActive(boolean);
     }
 
+    /// <summary>
+    /// Starts the auction and shows the auction UI
+    /// </summary>
     public void startAuction()
     {
+        // Disable previous UI
         canBuyProperty(false);
         canStartAuction(false);
 
+        // Sets default values
         highestBid = 0;
         highestBidder = null;
 
         playerBidPanel.SetActive(true);
 
+        // If bidder 1 is AI start the bid
         if (bidders[0].AI)
         {
             CPUAuction();
@@ -1502,29 +1597,36 @@ public class PlayerMovement : MonoBehaviour
 
 
         playerNameText.text = $"{bidders[0].playerName}, please enter your bid or skip";
-
+         
+        // CPU Logic
         CPUPush($"canStartAuction false");
     }
 
+    /// <summary>
+    /// Performs the logic after a bid is entered
+    /// </summary>
+    /// <param name="bid">Amount player has bid</param>
     public void nextBid(int bid)
     {
         Player_ bidder = bidders[nextBidder];
         Debug.Log($"{bidder.playerName} bid {bid}");
 
+        // If bid is higher than highest bid replace it
         if (bid > highestBid)
         {
             highestBid = bid;
             highestBidder = bidder;
-            Debug.Log("Highest bidder");
+            Debug.Log("Highest bidder"); 
         }
+        // Else remove the bidder from the bidding rotation
         else
         {
-            //remove this bidder from the bidding
             bidders.Remove(bidder);
             nextBidder--;
             Debug.Log($"Bidder removed, now only {bidders.Count()} people bidding");
         }
 
+        // If bidder is the final bidder, they won and purchase the property for the highest bid var
         if (bidders.Count() == 1)
         {
             if (highestBid != 0)
@@ -1534,11 +1636,12 @@ public class PlayerMovement : MonoBehaviour
                 purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
             }
 
+            // End the auction and break
             endAuction();
             return;
         }
 
-
+        // If nextbidder is higher than their are bidders, loop back
         if (nextBidder == bidders.Count - 1)
         {
             nextBidder = -1;
@@ -1548,6 +1651,8 @@ public class PlayerMovement : MonoBehaviour
 
         Debug.Log(bidders.Count());
         Debug.Log(nextBidder);
+
+        // CPU Logic
         if (bidders[nextBidder].AI)
         {
             CPUAuction();
