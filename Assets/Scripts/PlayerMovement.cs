@@ -65,11 +65,16 @@ public class PlayerMovement : MonoBehaviour
     public GameObject managePanel;
     public GameObject setsPanel;
     public GameObject propertiesPanel;
+    public GameObject winnerPanel;
+
     public GameObject oppKnocksOption;
     public GameObject jailOption;
     public TMP_Dropdown propertiesDropdown;
     public TMP_Dropdown setsDropdown;
     public TextMeshProUGUI mortgageText;
+
+    public TextMeshProUGUI winningtext;
+    public TextMeshProUGUI winningbalance;
 
     private bool admin;
     public float startTime;
@@ -212,6 +217,7 @@ public class PlayerMovement : MonoBehaviour
         managePanel.SetActive(false);
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
+        winnerPanel.SetActive(false);
         closeButton.SetActive(false);
         oppKnocksOption.SetActive(false);
         jailOption.SetActive(false);
@@ -1472,6 +1478,10 @@ public class PlayerMovement : MonoBehaviour
     {
         // new scene with player wins and there value
         // player.checkLiquidation();
+        winnerPanel.SetActive(true);
+        winningtext.text = $"{CurrentPlayer} !!!";
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+        winningbalance.text = $"End Balance: {player.checkLiquidation()}";
     }
 
     // Code for which buttons appear when a player first enters jail
