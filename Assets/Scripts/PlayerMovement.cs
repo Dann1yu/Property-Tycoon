@@ -65,11 +65,16 @@ public class PlayerMovement : MonoBehaviour
     public GameObject managePanel;
     public GameObject setsPanel;
     public GameObject propertiesPanel;
+    public GameObject winnerPanel;
+
     public GameObject oppKnocksOption;
     public GameObject jailOption;
     public TMP_Dropdown propertiesDropdown;
     public TMP_Dropdown setsDropdown;
     public TextMeshProUGUI mortgageText;
+
+    public TextMeshProUGUI winningtext;
+    public TextMeshProUGUI winningbalance;
 
     private bool admin;
     public float startTime;
@@ -225,6 +230,7 @@ public class PlayerMovement : MonoBehaviour
         managePanel.SetActive(false);
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
+        winnerPanel.SetActive(false);
         closeButton.SetActive(false);
         oppKnocksOption.SetActive(false);
         jailOption.SetActive(false);
@@ -515,7 +521,20 @@ public class PlayerMovement : MonoBehaviour
             {
                 canBuyProperty(true);
             }
-            canStartAuction(true);
+            int totalpassed = 0;
+            for (int i= 0;i<playerlist.Count; i++)
+            {
+                if (playerlist[i].passedGo)
+                {
+                    totalpassed++;
+                }
+   
+            }
+            if (totalpassed > 1)
+            {
+                canStartAuction(true); //checks to make sure at least 2 can auction before auctioning
+            }
+            totalpassed = 0;
             return;
         }
         // Landed on property that is owned by a player
@@ -855,15 +874,21 @@ public class PlayerMovement : MonoBehaviour
         if (buttonName == "bidButton")
         {
             string input = bidInputField.text;
+            if (highestBidder == null)
+            {
+                highestBidder = CurrentPlayer.GetComponent<Player_>();
+            }
 
-            if (int.TryParse(input, out int bid)) // && (amount <= player.balance))
+            if (int.TryParse(input, out int bid) && (bid <= highestBidder.balance) && (bid > highestBid))
             {
                 Debug.Log("Bid entered: " + bid);
+                displayName3.text = ("latest bid is "+ bid);
                 nextBid(bid);
             }
             else
             {
                 Debug.LogWarning("Invalid bid value.");
+                displayName3.text = "invalid bid value please try again";
             }
         }
 
@@ -1271,12 +1296,27 @@ public class PlayerMovement : MonoBehaviour
             highestBid = bid;
             highestBidder = bidder;
         }
-        if (nextBidder == bidders.Count - 1)
+
+        if (bid == -1)
         {
+            //remove this bidder from the bidding
+            bidders.Remove(bidder);
+            nextBidder--;
+        }
+
+        if (bidders.Count == 1)
+        {
+            //if only one left to bid
             endAuction();
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
             if (highestBid != 0) purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
+        }
+
+
+        if (nextBidder == bidders.Count-1)
+        {
+            nextBidder = 0;
         } else
         {
             // CPU LOGIC NEEDED UNIQUE
@@ -1466,6 +1506,10 @@ public class PlayerMovement : MonoBehaviour
     {
         // new scene with player wins and there value
         // player.checkLiquidation();
+        winnerPanel.SetActive(true);
+        winningtext.text = $"{CurrentPlayer} !!!";
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+        winningbalance.text = $"End Balance: {player.checkLiquidation()}";
     }
 
     // Code for which buttons appear when a player first enters jail
