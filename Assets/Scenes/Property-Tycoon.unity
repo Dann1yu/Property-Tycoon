@@ -12326,11 +12326,11 @@ MonoBehaviour:
   playerTurn: -1
   characterPrefabs:
   - {fileID: 5565982008113524239, guid: 610008dc6d8805240bd5cf800baf9c5f, type: 3}
-  - {fileID: 7351789257260901266, guid: c3fab251821a0db4f91a6a4882f93b9c, type: 3}
-  - {fileID: 4263920032023121601, guid: ee0abfb65f6bb7348a5300e26efe1ca2, type: 3}
-  - {fileID: 6130756977411752786, guid: 2e39bac90f5733c4ba663c97b4ef2b2d, type: 3}
-  - {fileID: 4679352489972109727, guid: e9efad721b2c57140a2e7b22a7819735, type: 3}
-  - {fileID: 4470610090606774282, guid: 7a32e7b38f4c26542a89ada5fdcbee51, type: 3}
+  - {fileID: 5883857749073690015, guid: b74325f9b04a40e469b22d9af399bf55, type: 3}
+  - {fileID: 5779459682100483445, guid: 51707b9ae64b6c04cbd228607648e6f8, type: 3}
+  - {fileID: 2192777311582639289, guid: 9154f8293ae46b0489b7f12d516990dc, type: 3}
+  - {fileID: 8244192576166171523, guid: 35ef4e44ea3131a4083dbf90f11d49b8, type: 3}
+  - {fileID: 2589260117708862842, guid: 3bd9684c46ef2274491db3683f7b64b4, type: 3}
   displayName1: {fileID: 1648605600}
   displayName2: {fileID: 305263669}
   displayName3: {fileID: 1212798172}
