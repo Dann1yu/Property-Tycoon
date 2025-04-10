@@ -177,13 +177,13 @@ public class PlayerMovement : MonoBehaviour
         displaydouble.text = "";
         displayName3.text = "";
 
-        if (pastActions["canManage"] && !pastActions["canEnd"] && (player.balance >= 0)){
+        if (pastActions["canManage"] && !pastActions["canEndTurn"] && (player.balance >= 0)) {
             canEndTurn(true);
             if (player.AI)
             {
                 CPULogic(player);
             }
-        } else if (pastActions["canManage"] && !pastActions["canEnd"])
+        } else if (pastActions["canManage"] && !pastActions["canEndTurn"])
         {
             canEndTurn(false);
         }
@@ -223,7 +223,7 @@ public class PlayerMovement : MonoBehaviour
         diceRoller = FindFirstObjectByType<DiceRoller>();
         CreateBoard();
 
-        
+
 
         // Sets all panels to invisible
         playerBidPanel.SetActive(false);
@@ -331,7 +331,7 @@ public class PlayerMovement : MonoBehaviour
         if (player.AI) {
             Debug.Log("CPU LOGIC");
             StartCoroutine(CPULogic(player));
-        }  
+        }
 
     }
 
@@ -482,7 +482,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             player.PayBank(checkBalance(player, -amount));
-        }   
+        }
         UpdateBalanceUI();
     }
 
@@ -521,21 +521,21 @@ public class PlayerMovement : MonoBehaviour
             {
                 canBuyProperty(true);
             }
+
             int totalpassed = 0;
-            for (int i= 0;i<playerlist.Count; i++)
+            for (int i = 0; i < playerlist.Count; i++)
             {
-                if (playerlist[i].passedGo)
+                if (playerlist[i].passedGo && (playerlist[i] != player))
                 {
                     totalpassed++;
+                    Debug.Log($"Player passed: {playerlist[i].playerName} Total passed: {totalpassed}");
                 }
-   
             }
+            
             if (totalpassed > 1)
             {
                 canStartAuction(true); //checks to make sure at least 2 can auction before auctioning
-            }
-            totalpassed = 0;
-            return;
+            } else canEndTurn(true);
         }
         // Landed on property that is owned by a player
         else if (location.CanBeBought && !bank.BankOwnedProperties.Contains(position))
@@ -806,7 +806,7 @@ public class PlayerMovement : MonoBehaviour
     {
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
-        
+
         if ((player.balance < 0) && boolean)
         {
             canEndTurn(false);
@@ -882,7 +882,7 @@ public class PlayerMovement : MonoBehaviour
             if (int.TryParse(input, out int bid) && (bid <= highestBidder.balance) && (bid > highestBid))
             {
                 Debug.Log("Bid entered: " + bid);
-                displayName3.text = ("latest bid is "+ bid);
+                displayName3.text = ("latest bid is " + bid);
                 nextBid(bid);
             }
             else
@@ -1178,6 +1178,8 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("_DepositToFreeParking");
         displayName3.text = ($"Deposited: ${amount} to Free Parking");
         player.DepositToFreeParking(checkBalance(player, amount));
+
+        canEndTurn(true);
     }
     public void _GoToJail(Player_ player, int amount = 0)
     {
@@ -1241,7 +1243,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (version == 0)
         {
-            amount += 115 * noHotels; 
+            amount += 115 * noHotels;
             amount += 40 * noHouses;
         } else
         {
@@ -1274,6 +1276,9 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
+        highestBid = 0;
+        highestBidder = null;
+
         bidders.Clear();
         nextBidder = 0;
         foreach (var item in playerlist)
@@ -1284,6 +1289,16 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         playerBidPanel.SetActive(true);
+
+        if (bidders.Count() < 2)
+        {
+            endAuction();
+            return;
+        }
+        else if (bidders[0].AI)
+        {
+            CPUAuction();
+        }
 
         playerNameText.text = $"{bidders[0].playerName}, please enter your bid or skip";
     }
@@ -1296,15 +1311,14 @@ public class PlayerMovement : MonoBehaviour
             highestBid = bid;
             highestBidder = bidder;
         }
-
-        if (bid == -1)
+        else
         {
             //remove this bidder from the bidding
             bidders.Remove(bidder);
             nextBidder--;
         }
 
-        if (bidders.Count == 1)
+        if (bidders.Count() == 1)
         {
             //if only one left to bid
             endAuction();
@@ -1314,19 +1328,37 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        if (nextBidder == bidders.Count-1)
+        if (nextBidder == bidders.Count - 1)
         {
-            nextBidder = 0;
-        } else
-        {
-            // CPU LOGIC NEEDED UNIQUE
+            nextBidder = -1;
+        } 
 
-            nextBidder++;
-            playerNameText.text = $"{bidders[nextBidder].playerName}, please enter your bid or skip";
+        nextBidder++;
+
+        Debug.Log(bidders.Count());
+        Debug.Log(nextBidder);
+        if (bidders[nextBidder].AI)
+        {
+            CPUAuction();
         }
+
+        playerNameText.text = $"{bidders[nextBidder].playerName}, please enter your bid or skip";
     }
+
+    public void CPUAuction()
+    {
+        if (bidders[nextBidder].balance > 5)
+        {
+            nextBid(5);
+        }
+        else nextBid(-1);
+
+    }
+
     public void endAuction()
     {
+        canStartAuction(false);
+
         if (rolledDouble == 0)
         {
             canRoll(false);
@@ -1347,7 +1379,7 @@ public class PlayerMovement : MonoBehaviour
             Player_ player = CurrentPlayer.GetComponent<Player_>();
 
             List<string> showProps = new List<string>();
-
+            
             foreach (int loc in player.properties)
             {
                 showProps.Add(bank.Properties[loc].Name);
@@ -1398,7 +1430,12 @@ public class PlayerMovement : MonoBehaviour
         setsPanel.SetActive(false);
         propertiesPanel.SetActive(false);
         canManage(true);
-        canEndTurn(true);
+
+        Player_ player = playerlist[playerTurn];
+        if (player.balance >= 0)
+        {
+            canEndTurn(true);
+        }
     }
 
     // Returns the property on show on either the "Sets" or "Properties" dropdown
@@ -1459,8 +1496,6 @@ public class PlayerMovement : MonoBehaviour
             return 0;
         }
 
-        NextTurn();
-
         int amount = player.checkLiquidation();
 
         foreach (int propertyIdx in player.properties)
@@ -1472,6 +1507,8 @@ public class PlayerMovement : MonoBehaviour
 
             player.removeProperty(property);
         }
+
+        endTurn();
         return amount;
     }
 
@@ -1608,7 +1645,7 @@ public class PlayerMovement : MonoBehaviour
 
             StartCoroutine(CPULogic(player));
         }
-        else if ("canStartAuction")
+        else if (pastActions["canStartAuction"])
         {
             yield return new WaitForSeconds(1f);
             startAuction();
@@ -1673,118 +1710,101 @@ public class PlayerMovement : MonoBehaviour
             }
 
         }
-        
-        if (pastActions["canManage"] && !pastActions["canEndTurn"]) // if can manage but not end turn
+
+        else if (pastActions["canManage"] && !pastActions["canEndTurn"]) // if can manage but not end turn
         {
-            while (player.balance < 0)
+            List<int> sortedProperties = player.properties.OrderBy(p => p).ToList();
+
+            List<Property> noSetProperties = new List<Property>();
+            List<Property> setProperties = new List<Property>();
+
+            // sort properties
+            foreach (int property in sortedProperties)
             {
-                List<int> sortedProperties = player.properties.OrderBy(p => p).ToList();
-
-                List<Property> noSetProperties = new List<Property>();
-                List<Property> setProperties = new List<Property>();
-
-                // sort properties
-                foreach (int property in sortedProperties)
+                if (player.OwnedSets.Contains(bank.Properties[property].Group))
                 {
-                    if (player.OwnedSets.Contains(bank.Properties[property].Group))
-                    {
-                        setProperties.Add(bank.Properties[property]);
-                    }
-                    else noSetProperties.Add(bank.Properties[property]);
+                    setProperties.Add(bank.Properties[property]);
                 }
+                else noSetProperties.Add(bank.Properties[property]);
+            }
 
-                // mortgage all unfinished sets first
-                foreach (Property property in noSetProperties)
+            // mortgage all unfinished sets first
+            foreach (Property property in noSetProperties)
+            {
+                if (!property.mortgaged)
                 {
-                    if (!property.mortgaged)
-                    {
-                        mortgageProperty(player, property);
-                        if (player.balance >= 0)
-                        {
-                            canEndTurn(true);
-                            CPULogic(player);
-                        }
-                    }
+                    mortgageProperty(player, property);
+                    if (player.balance >= 0) goto endOfNestedLoops;
                 }
+            }
 
-                // sell all unfinished sets second
-                foreach (Property property in noSetProperties)
+            // sell all unfinished sets second
+            foreach (Property property in noSetProperties)
+            {
+                sellProperty(player, property);
+                if (player.balance >= 0) goto endOfNestedLoops;
+            }
+
+            List<Property> housedProperties = new List<Property>();
+            foreach (Property property in setProperties)
+            {
+                if (property.NumberOfHouses > 0)
                 {
-                    sellProperty(player, property);
-                    if (player.balance >= 0)
-                    {
-                        canEndTurn(true);
-                        CPULogic(player);
-                    }
+                    housedProperties.Add(property);
                 }
+            }
 
-                List<Property> housedProperties = new List<Property>();
-                foreach (Property property in setProperties)
+            // sell houses
+            while (housedProperties.Count() > 0)
+            {
+                var tempList = new List<Property>();
+                foreach (Property property in housedProperties)
                 {
+                    var (buy, sell) = canChangeHouses(property);
+                    while (sell)
+                    {
+                        player.sellHouse(property);
+
+                        if (player.balance >= 0) goto endOfNestedLoops;
+
+                        (buy, sell) = canChangeHouses(property);
+                    }
+
                     if (property.NumberOfHouses > 0)
                     {
-                        housedProperties.Add(property);
+                        tempList.Add(property);
                     }
                 }
-
-                // sell houses
-                while (housedProperties.Count() > 0)
-                {
-                    var tempList = new List<Property>();
-                    foreach (Property property in housedProperties)
-                    {
-                        var (buy, sell) = canChangeHouses(property);
-                        while (sell)
-                        {
-                            player.sellHouse(location);
-
-                            if (player.balance >= 0)
-                            {
-                                canEndTurn(true);
-                                CPULogic(player);
-                            }
-
-                            (buy, sell) = canChangeHouses(property);
-                        }
-                        if (location.NumberOfHouses > 0)
-                        {
-                            tempList.Add(location);
-                        }
-                    }
-                    housedProperties = tempList;
-                }
-
-                // mortgage full sets
-                foreach (Property property in setProperties)
-                {
-                    if (!property.mortgaged)
-                    {
-                        mortgageProperty(player, property);
-                        if (player.balance >= 0)
-                        {
-                            canEndTurn(true);
-                            CPULogic(player);
-                        }
-                    }
-                }
-
-                // sell full sets
-                foreach (Property property in setProperties)
-                {
-                    sellProperty(player, property);
-                    if (player.balance >= 0)
-                    {
-                        canEndTurn(true);
-                        CPULogic(player);
-                    }
-                }
-
+                housedProperties = tempList;
             }
-        } else if (pastActions["canEndTurn"])
+
+            // mortgage full sets
+            foreach (Property property in setProperties)
             {
-                yield return new WaitForSeconds(1f);
-                endTurn();
+                if (!property.mortgaged)
+                {
+                    mortgageProperty(player, property);
+                    if (player.balance >= 0) goto endOfNestedLoops;
+                }
             }
+
+            // sell full sets
+            foreach (Property property in setProperties)
+            {
+                sellProperty(player, property);
+                if (player.balance >= 0) goto endOfNestedLoops;
+            }
+
+
+        endOfNestedLoops:
+            closeOptions();
+        }
+
+        if (pastActions["canEndTurn"])
+        {
+            yield return new WaitForSeconds(1f);
+            endTurn();
+        }
     }
 
     public int checkBalance(Player_ player, int amount)
