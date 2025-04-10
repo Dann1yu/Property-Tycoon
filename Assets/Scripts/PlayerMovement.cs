@@ -406,6 +406,17 @@ public class PlayerMovement : MonoBehaviour
             {
                 player.PayBank(-amount);
             }
+            else if (!checkTotalBankruptcy(player,amount))
+            {
+                managePanel.SetActive(true);
+                displayName3.text = "please sell assets so that you may pay the charge";
+                positionHandling(player);
+                //returns them back to try again
+            }
+            else
+            {
+                player.PayBank(payMax(player));
+            }
         }
         UpdateBalanceUI();
     }
@@ -416,6 +427,17 @@ public class PlayerMovement : MonoBehaviour
         if (!checkBankruptcy(sender, amount))
         {
             sender.PayPlayer(receiver, amount);
+        }
+        else if (!checkTotalBankruptcy(sender, amount))
+        {
+            managePanel.SetActive(true);
+            displayName3.text = "please sell assets so that you may pay the charge";
+            positionHandling(sender);
+            //returns them back to try again
+        }
+        else
+        {
+            sender.PayBank(payMax(sender));
         }
         UpdateBalanceUI();
     }
@@ -443,7 +465,20 @@ public class PlayerMovement : MonoBehaviour
             {
                 canBuyProperty(true);
             }
-            canStartAuction(true);
+            int totalpassed = 0;
+            for (int i= 0;i<playerlist.Count; i++)
+            {
+                if (playerlist[i].passedGo)
+                {
+                    totalpassed++;
+                }
+   
+            }
+            if (totalpassed > 1)
+            {
+                canStartAuction(true); //checks to make sure at least 2 can auction before auctioning
+            }
+            totalpassed = 0;
             return;
         }
         // Landed on property that is owned by a player
@@ -796,15 +831,21 @@ public class PlayerMovement : MonoBehaviour
         if (buttonName == "bidButton")
         {
             string input = bidInputField.text;
+            if (highestBidder == null)
+            {
+                highestBidder = CurrentPlayer.GetComponent<Player_>();
+            }
 
-            if (int.TryParse(input, out int bid)) // && (amount <= player.balance))
+            if (int.TryParse(input, out int bid) && (bid <= highestBidder.balance) && (bid > highestBid))
             {
                 Debug.Log("Bid entered: " + bid);
+                displayName3.text = ("latest bid is "+ bid);
                 nextBid(bid);
             }
             else
             {
                 Debug.LogWarning("Invalid bid value.");
+                displayName3.text = "invalid bid value please try again";
             }
         }
 
@@ -1123,12 +1164,27 @@ public class PlayerMovement : MonoBehaviour
             highestBid = bid;
             highestBidder = bidder;
         }
-        if (nextBidder == bidders.Count-1)
+
+        if (bid == -1)
         {
+            //remove this bidder from the bidding
+            bidders.Remove(bidder);
+            nextBidder--;
+        }
+
+        if (bidders.Count == 1)
+        {
+            //if only one left to bid
             endAuction();
             CurrentPlayer = playerlist[playerTurn].gameObject;
             Player_ player = CurrentPlayer.GetComponent<Player_>();
             if (highestBid != 0) purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
+        }
+
+
+        if (nextBidder == bidders.Count-1)
+        {
+            nextBidder = 0;
         } else
         {
             nextBidder++;
@@ -1260,8 +1316,9 @@ public class PlayerMovement : MonoBehaviour
     // If not return false
     public bool checkBankruptcy(Player_ player, int amount)
     {
-        if (player.checkLiquidation() < amount)
+        if (player.balance < amount)
         {
+
             playerlist[playerTurn].gameObject.SetActive(false);
             
             playerlist.Remove(playerlist[playerTurn]);
@@ -1277,6 +1334,20 @@ public class PlayerMovement : MonoBehaviour
             NextTurn();
             return true;
         } return false;
+    }
+
+    public bool checkTotalBankruptcy(Player_ player, int amount)
+    {
+        if (player.balance < amount && player.checkLiquidation() < amount)
+        {
+            displayName3.text = "bankrupt!";
+            return true;
+        }
+        return true;
+    }
+    public int payMax(Player_ player)
+    {
+        return player.LiquidatePlayer();
     }
    
     // When the time limit is reached, calculate every player's worth and crown the winner

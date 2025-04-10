@@ -180,4 +180,28 @@ public class Player_ : MonoBehaviour
         return total;
     }
 
+    public int LiquidatePlayer()
+    {
+        int total = 0;
+
+        foreach (var locIdx in properties)
+        {
+            var loc = bank.Properties[locIdx];
+            total += checkHousePrice(loc) * loc.NumberOfHouses;
+            if (loc.mortgaged)
+            {
+                total += loc.Cost / 2;
+            }
+            else total += loc.Cost;
+
+            loc.NumberOfHouses = 0;
+            removeProperty(loc);
+        }
+
+        balance += total;
+        Debug.Log($"Liquidation value {balance}");
+
+        return balance;
+    }
+
 }
