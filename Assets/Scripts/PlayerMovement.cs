@@ -193,9 +193,8 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
-    public void spawnPlayers(int Human, int AI)
+    public void spawnPlayers(int amount, int AI)
     {
-        var amount = Human + AI;
         Debug.Log("spawned players");
 
         for (int i = 0; i < amount; i++)
@@ -209,7 +208,7 @@ public class PlayerMovement : MonoBehaviour
             playerComponent.Initialize($"Player {i}", 1500);
 
             // CPU LOGIC
-            if (i >= Human)
+            if (i >= (amount-AI))
             {
                 playerComponent.AI = true;
                 // playerComponent.passedGo = true;
