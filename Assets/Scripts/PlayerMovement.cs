@@ -102,12 +102,10 @@ public class PlayerMovement : MonoBehaviour
 
     public List<string> cpuStack = new List<string>();
 
-    private bool end = true;
-    private bool buy = true;
-    private bool auc = true;
-    private bool rol = false;
-
     private bool running = false;
+    public Dictionary<string, bool> pastActions = new Dictionary<string, bool>();
+
+    private bool gameStarted = false;
 
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
@@ -166,18 +164,31 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateBalanceUI()
     {
-        string current = playerlist[playerTurn].ToString();
+        Player_ player = playerlist[playerTurn];
+        string current = player.ToString();
         current = current.Remove(current.Length - 9);
         displayName1.text = current;
         displayName2.text = "Balance: $" + playerlist[playerTurn].balance.ToString();
         displaydouble.text = "";
         displayName3.text = "";
+
+        if (pastActions["canManage"] && !pastActions["canEnd"] && (player.balance >= 0)){
+            canEndTurn(true);
+            if (player.AI)
+            {
+                CPULogic(player);
+            }
+        } else if (pastActions["canManage"] && !pastActions["canEnd"])
+        {
+            canEndTurn(false);
+        }
     }
 
     // Spawns x players with attached scripts "Player_" to hold required variables
     public void spawnPlayers(int Human, int AI)
     {
         var amount = Human + AI;
+        Debug.Log("spawned players");
 
         for (int i = 0; i < amount; i++)
         {
@@ -195,7 +206,7 @@ public class PlayerMovement : MonoBehaviour
                 playerComponent.AI = true;
                 playerComponent.passedGo = true;
             }
-
+            Debug.Log("add player");
             playerlist.Add(playerComponent);
         }
     }
@@ -207,6 +218,8 @@ public class PlayerMovement : MonoBehaviour
         diceRoller = FindFirstObjectByType<DiceRoller>();
         CreateBoard();
 
+        
+
         // Sets all panels to invisible
         playerBidPanel.SetActive(false);
         managePanel.SetActive(false);
@@ -216,11 +229,16 @@ public class PlayerMovement : MonoBehaviour
         oppKnocksOption.SetActive(false);
         jailOption.SetActive(false);
 
+        pastActions["canEndTurn"] = false;
+        pastActions["canBuyProperty"] = false;
+        pastActions["canStartAuction"] = false;
+        pastActions["canRoll"] = false;
+        pastActions["canManage"] = false;
+
         // Calling the info from the loading scene
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
 
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
-
         // CPU LOGIC
         AIplayerAmount = PlayerAmounts.UpdateGameSettingsAI();
 
@@ -234,21 +252,26 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
+        bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
+
+        spawnPlayers(playerAmount, AIplayerAmount);
+
+        NextTurn();
+
         canBuyProperty(false);
         canEndTurn(false);
         canStartAuction(false);
 
-        bank = FindFirstObjectByType<Bank_>(); // Finds the Bank_ instance in the scene
-
-        spawnPlayers(playerAmount, AIplayerAmount);
-        CurrentPlayer = GameObject.Find("Player 0");
-
-        NextTurn();
+        gameStarted = true;
     }
 
     // Checks every few frames
     public void Update()
     {
+        if (!gameStarted)
+        {
+            return;
+        }
         // Checks if player can roll the dice and if it isn't showing
         if (!diceRoller.isRolling && next && !showing && !propertyButton.activeSelf)
         {
@@ -321,8 +344,12 @@ public class PlayerMovement : MonoBehaviour
         purchaseProperty(player, bank.Properties[5]);
         purchaseProperty(player, bank.Properties[15]);
 
-        purchaseProperty(player, bank.Properties[12]);
-        purchaseProperty(player, bank.Properties[28]);
+        purchaseProperty(player, bank.Properties[6]);
+        purchaseProperty(player, bank.Properties[8]);
+        purchaseProperty(player, bank.Properties[9]);
+
+        //purchaseProperty(player, bank.Properties[12]);
+        //purchaseProperty(player, bank.Properties[28]);
 
         //player.upgradeHouse(bank.Properties[1]);
         //player.upgradeHouse(bank.Properties[1]);
@@ -336,7 +363,12 @@ public class PlayerMovement : MonoBehaviour
 
         mortgageProperty(player, bank.Properties[15]);
 
-        player.balance = 1000;
+        player.balance = 2000;
+
+        purchaseProperty(playerlist[1], bank.Properties[37]);
+        purchaseProperty(playerlist[1], bank.Properties[39]);
+        playerlist[1].balance = 10;
+        playerlist[2].balance = 10;
 
         //player = playerlist[1].gameObject.GetComponent<Player_>();
         //player.balance = 10;
@@ -443,21 +475,15 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            if (!checkBankruptcy(player, amount))
-            {
-                player.PayBank(-amount);
-            }
-        }
+            player.PayBank(checkBalance(player, -amount));
+        }   
         UpdateBalanceUI();
     }
 
     // Transaction from player to player
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
-        if (!checkBankruptcy(sender, amount))
-        {
-            sender.PayPlayer(receiver, amount);
-        }
+        sender.PayPlayer(receiver, checkBalance(sender, amount));
         UpdateBalanceUI();
     }
 
@@ -750,12 +776,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void canBuyProperty(bool boolean)
     {
-        if (buy == boolean)
-        {
-            return;
-        }
-        else buy = boolean;
-
         // CPU LOGIC
         CPUPush($"canBuyProperty {boolean}");
 
@@ -765,27 +785,29 @@ public class PlayerMovement : MonoBehaviour
     }
     public void canEndTurn(bool boolean)
     {
-        // CPU LOGIC
-        if (end == boolean)
+        CurrentPlayer = playerlist[playerTurn].gameObject;
+        Player_ player = CurrentPlayer.GetComponent<Player_>();
+        
+        if ((player.balance < 0) && boolean)
         {
+            canEndTurn(false);
             return;
         }
-        else end = boolean;
 
         CPUPush($"canEndTurn {boolean}");
         endButton.SetActive(boolean);
 
         if (!boolean) // if false disable manage button
         {
-            canManage(boolean);
+            if (player.balance < 0)
+            {
+                canManage(true);
+            }
+            else canManage(false);
             return;
         }
 
         canRoll(false);
-        //next = false;
-
-        CurrentPlayer = playerlist[playerTurn].gameObject;
-        Player_ player = CurrentPlayer.GetComponent<Player_>();
 
         if (player.properties.Count() > 0)
         {
@@ -801,11 +823,6 @@ public class PlayerMovement : MonoBehaviour
     }
     public void canStartAuction(bool boolean)
     {
-        if (auc == boolean)
-        {
-            return;
-        }
-        else auc = boolean;
         // CPU LOGIC
         CPUPush($"canStartAuction {boolean}");
 
@@ -1120,7 +1137,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (player.balance >= 10)
             {
-                _DepositToFreeParking(10);
+                _DepositToFreeParking(player, 10);
             } else
             {
                 oppKnock(player);
@@ -1135,7 +1152,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("_DepositToFreeParking");
         displayName3.text = ($"Deposited: ${amount} to Free Parking");
-        player.DepositToFreeParking(amount);
+        player.DepositToFreeParking(checkBalance(player, amount));
     }
     public void _GoToJail(Player_ player, int amount = 0)
     {
@@ -1199,7 +1216,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (version == 0)
         {
-            amount += 115 * noHotels;
+            amount += 115 * noHotels; 
             amount += 40 * noHouses;
         } else
         {
@@ -1212,11 +1229,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void canRoll(bool canRoll)
     {
-        if (rol == canRoll)
-        {
-            return;
-        }
-        else rol = canRoll;
         // CPU LOGIC
         CPUPush($"canRoll {canRoll}");
 
@@ -1298,7 +1310,6 @@ public class PlayerMovement : MonoBehaviour
 
             foreach (int loc in player.properties)
             {
-                Debug.Log($"{loc}");
                 showProps.Add(bank.Properties[loc].Name);
             }
 
@@ -1370,8 +1381,6 @@ public class PlayerMovement : MonoBehaviour
         foreach (var locIdx in player.properties)
         {
             var loc = bank.Properties[locIdx];
-            Debug.Log(propertyName);
-            Debug.Log(loc.Name);
             if (loc.Name == propertyName)
             {
                 return (loc, player);
@@ -1396,25 +1405,34 @@ public class PlayerMovement : MonoBehaviour
 
     // If bankrupt, remove player and start next turn
     // If not return false
-    public bool checkBankruptcy(Player_ player, int amount)
+    public int bankrupt(Player_ player)
     {
-        if (player.checkLiquidation() < amount)
+        playerlist[playerTurn].gameObject.SetActive(false);
+
+        playerlist.Remove(playerlist[playerTurn]);
+        playerTurn--;
+        playerTurn--;
+
+        if (playerlist.Count == 1)
         {
-            playerlist[playerTurn].gameObject.SetActive(false);
+            endLongGame();
+            return 0;
+        }
 
-            playerlist.Remove(playerlist[playerTurn]);
-            playerTurn--;
-            playerTurn--;
+        NextTurn();
 
-            if (playerlist.Count == 1)
-            {
-                endLongGame();
-                return true;
-            }
+        int amount = player.checkLiquidation();
 
-            NextTurn();
-            return true;
-        } return false;
+        foreach (int propertyIdx in player.properties)
+        {
+            var property = bank.Properties[propertyIdx];
+            property.mortgaged = false;
+            property.NumberOfHouses = 0;
+            property.Owner = null;
+
+            player.removeProperty(property);
+        }
+        return amount;
     }
 
     // When the time limit is reached, calculate every player's worth and crown the winner
@@ -1514,37 +1532,30 @@ public class PlayerMovement : MonoBehaviour
 
         Property location = bank.Properties[player.pos];
 
-        Dictionary<string, bool> actions = new Dictionary<string, bool>{
-            { "canEndTurn", false },
-            { "canBuyProperty", false },
-            { "canStartAuction", false },
-            { "canRoll", false },
-            { "canManage", false }
-        };
-
         for (int i = 0; i < cpuStack.Count; i++)
         {
             (tempAction, tempBool) = stackSplit(cpuStack[i]);
 
-            actions[tempAction] = tempBool;
+            pastActions[tempAction] = tempBool;
         }
 
         Debug.Log("--------------------");
-        foreach (KeyValuePair<string, bool> pair in actions)
+        foreach (KeyValuePair<string, bool> pair in pastActions)
         {
             Debug.Log($"Key: {pair.Key}, Value: {pair.Value}");
         }
         Debug.Log("--------------------");
 
-        if (actions["canBuyProperty"])
+        if (pastActions["canBuyProperty"]) // if can buy property
         {
             if (location.Cost <= player.balance) // Logic whether to purchase
             {
                 yield return new WaitForSeconds(1f);
+                Debug.Log($"COST: {location.Cost}");
                 buyProperty();
                 Debug.Log("BOT PURCHASED");
             }
-            else if (actions["canStartAuction"])
+            else if (pastActions["canStartAuction"])
             {
                 yield return new WaitForSeconds(1f);
                 startAuction();
@@ -1553,14 +1564,20 @@ public class PlayerMovement : MonoBehaviour
 
             StartCoroutine(CPULogic(player));
         }
+        else if ("canStartAuction")
+        {
+            yield return new WaitForSeconds(1f);
+            startAuction();
+            Debug.Log("STARTED AUCTION");
+        }
 
-        else if (actions["canRoll"])
+        else if (pastActions["canRoll"]) // if can roll, roll
         {
             running = false;
         }
 
-        else if (actions["canEndTurn"] && actions["canManage"])
-        {   
+        else if (pastActions["canManage"] && pastActions["canEndTurn"]) // if can manage or end turn
+        {
             // if player owns sets check if they are upgradeable
             if (player.OwnedSets.Count() > 0)
             {
@@ -1595,7 +1612,6 @@ public class PlayerMovement : MonoBehaviour
                     .OrderByDescending(p => p.Position)
                     .ToList();
 
-                Debug.Log("here");
                 foreach (Property loc in upgradeableProperties)
                 {
                     if (player.balance > (player.checkColourPrice(loc.Group) + 400))
@@ -1607,13 +1623,147 @@ public class PlayerMovement : MonoBehaviour
                 if (player.balance < 1000)
                 {
                     canManage(false);
-                } 
+                }
 
                 StartCoroutine(CPULogic(player));
             }
 
-            
+        }
+        
+        if (pastActions["canManage"] && !pastActions["canEndTurn"]) // if can manage but not end turn
+        {
+            while (player.balance < 0)
+            {
+                List<int> sortedProperties = player.properties.OrderBy(p => p).ToList();
 
+                List<Property> noSetProperties = new List<Property>();
+                List<Property> setProperties = new List<Property>();
+
+                // sort properties
+                foreach (int property in sortedProperties)
+                {
+                    if (player.OwnedSets.Contains(bank.Properties[property].Group))
+                    {
+                        setProperties.Add(bank.Properties[property]);
+                    }
+                    else noSetProperties.Add(bank.Properties[property]);
+                }
+
+                // mortgage all unfinished sets first
+                foreach (Property property in noSetProperties)
+                {
+                    if (!property.mortgaged)
+                    {
+                        mortgageProperty(player, property);
+                        if (player.balance >= 0)
+                        {
+                            canEndTurn(true);
+                            CPULogic(player);
+                        }
+                    }
+                }
+
+                // sell all unfinished sets second
+                foreach (Property property in noSetProperties)
+                {
+                    sellProperty(player, property);
+                    if (player.balance >= 0)
+                    {
+                        canEndTurn(true);
+                        CPULogic(player);
+                    }
+                }
+
+                List<Property> housedProperties = new List<Property>();
+                foreach (Property property in setProperties)
+                {
+                    if (property.NumberOfHouses > 0)
+                    {
+                        housedProperties.Add(property);
+                    }
+                }
+
+                // sell houses
+                while (housedProperties.Count() > 0)
+                {
+                    var tempList = new List<Property>();
+                    foreach (Property property in housedProperties)
+                    {
+                        var (buy, sell) = canChangeHouses(property);
+                        while (sell)
+                        {
+                            player.sellHouse(location);
+
+                            if (player.balance >= 0)
+                            {
+                                canEndTurn(true);
+                                CPULogic(player);
+                            }
+
+                            (buy, sell) = canChangeHouses(property);
+                        }
+                        if (location.NumberOfHouses > 0)
+                        {
+                            tempList.Add(location);
+                        }
+                    }
+                    housedProperties = tempList;
+                }
+
+                // mortgage full sets
+                foreach (Property property in setProperties)
+                {
+                    if (!property.mortgaged)
+                    {
+                        mortgageProperty(player, property);
+                        if (player.balance >= 0)
+                        {
+                            canEndTurn(true);
+                            CPULogic(player);
+                        }
+                    }
+                }
+
+                // sell full sets
+                foreach (Property property in setProperties)
+                {
+                    sellProperty(player, property);
+                    if (player.balance >= 0)
+                    {
+                        canEndTurn(true);
+                        CPULogic(player);
+                    }
+                }
+
+            }
+        } else if (pastActions["canEndTurn"])
+            {
+                yield return new WaitForSeconds(1f);
+                endTurn();
+            }
+    }
+
+    public int checkBalance(Player_ player, int amount)
+    {
+        if (player.balance >= amount) // if player can pay amount, do so
+        {
+            Debug.Log($"Paid full amount {amount}");
+            return amount;
+        }
+        else if (player.checkLiquidation() >= amount) // if player's liquid value can pay off amount, wait for money
+        {
+            manageProperty(true);
+            canEndTurn(false);
+
+            Debug.Log($"Paid full amount but requires selling {amount}");
+            return amount;
+        } 
+        else
+        {
+            Debug.Log($"Bankrupt");
+            return bankrupt(player);
         }
     }
 }
+
+// checkBankruptcy replace

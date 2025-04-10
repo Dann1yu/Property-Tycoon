@@ -52,29 +52,19 @@ public class Player_ : MonoBehaviour
     }
 
     // Pay money to the bank
-    public bool PayBank(int amount)
+    public void PayBank(int amount)
     {
-        if (BalanceCheck(amount))
-        {
-            balance -= amount;
-            bank.Balance += amount;
-            Debug.Log($"{playerName} paid ${amount} to the bank. New balance: ${balance}");
-            return true;
-        }
-        return false;
+        balance -= amount;
+        bank.Balance += amount;
+        Debug.Log($"{playerName} paid ${amount} to the bank. New balance: ${balance}");
     }
 
     // Send money to another player
-    public bool PayPlayer(Player_ receiver, int amount)
+    public void PayPlayer(Player_ receiver, int amount)
     {
-        if (BalanceCheck(amount))
-        {
-            balance -= amount;
-            receiver.ReceiveMoney(amount);
-            Debug.Log($"{playerName} paid ${amount} to {receiver.playerName}. New balance: ${balance}");
-            return true;
-        }
-        return false;
+        balance -= amount;
+        receiver.ReceiveMoney(amount);
+        Debug.Log($"{playerName} paid ${amount} to {receiver.playerName}. New balance: ${balance}");
     }
 
     // Adds property to player aswell as removing from bank and appending to sets / ownedsets
