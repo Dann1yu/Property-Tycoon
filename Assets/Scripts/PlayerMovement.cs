@@ -112,6 +112,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool gameStarted = false;
 
+    public Transform[] boardTiles;
+
     // Creates the board as 40 vectors as 4 sides
     public void CreateBoard()
     {
@@ -225,6 +227,14 @@ public class PlayerMovement : MonoBehaviour
         diceRoller = FindFirstObjectByType<DiceRoller>();
         CreateBoard();
 
+        //Board Positions
+        boardPosition = new Vector3[boardTiles.Length];
+
+        for (int i = 0; i < boardTiles.Length; i++)
+        {
+            boardPosition[i] = boardTiles[i].position;
+            Debug.Log($"Tile {i}: {boardPosition[i]}");
+        }
 
 
         // Sets all panels to invisible
@@ -443,6 +453,9 @@ public class PlayerMovement : MonoBehaviour
             canEndTurn(true);
             return;
         }
+        
+        StartCoroutine(AnimateMovement(player, distance));
+        
 
         int oldposition = player.pos;
         int new_position = distance + oldposition;
@@ -472,6 +485,36 @@ public class PlayerMovement : MonoBehaviour
 
         positionHandling(player);
     }
+
+    private IEnumerator AnimateMovement(Player_ player, int steps)
+    {
+        int currentPos = player.pos;
+
+        for (int i = 0; i < steps; i++)
+        {
+            int nextPos = (currentPos + 1) % boardPosition.Length;
+            Vector3 target = boardPosition[nextPos];
+
+            // Move smoothly toward the next tile
+            while (Vector3.Distance(CurrentPlayer.transform.position, target) > 0.05f)
+            {
+                CurrentPlayer.transform.position = Vector3.MoveTowards(
+                    CurrentPlayer.transform.position,
+                    target,
+                    5f * Time.deltaTime // Adjust speed here
+                );
+                yield return null;
+            }
+
+            CurrentPlayer.transform.position = target;
+            currentPos = nextPos;
+            yield return new WaitForSeconds(0.1f); // Small pause between tiles
+        }
+
+        player.pos = currentPos;
+        positionHandling(player); // Call the next game logic after movement
+    }
+
 
     // Transaction to or from bank 
     // +ve amount is from the bank, -ve amount is to the bank
