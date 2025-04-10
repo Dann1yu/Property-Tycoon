@@ -14,38 +14,33 @@ using static System.Math;
 using System.Threading;
 using System.Collections;
 
-
+/// <summary>
+/// Controls the main game loop
+/// Including Human and AI logic
+/// </summary>
 public class PlayerMovement : MonoBehaviour
 {
+    // private variables that will be changed by load screen
+    private int playerAmount;
+    private int AIplayerAmount;
+    private bool abridgedGamemode;
 
-
-    /*
-    -   detect whether going to jail versu just visinng, also going to have to telelport players to different spots onthe ajil tile depending
-        on why they are there
-    -   ergo add a teleprotation fucntion
-    -   checking at start of each turn if you are in jaile (will use global int for each player) in next turn function probably
-    -   add doubles fucntionalitly
-    */
-
-
-    // In unity objects / vars
-    [SerializeField] private int playerAmount;
-    [SerializeField] private GameObject PlayerObject;
-    public int AIplayerAmount;
-    public bool abridgedGamemode = true;
-
-    public List<GameObject> characterPrefabs = new List<GameObject>();
-
+    // all pointers used through out script
     public int lowestHouses = 5;
     public int highestHouses = 0;
 
+    // player variables
+    public GameObject CurrentPlayer;
+    public int playerTurn = -1;
+    private List<GameObject> characterPrefabs = new List<GameObject>();
+
+    // display elements
     public TextMeshProUGUI displayName1;
     public TextMeshProUGUI displayName2;
     public TextMeshProUGUI displayName3;
     public TextMeshProUGUI displaydouble;
 
     public GameObject ButtonObject;
-    public TextMeshProUGUI txt;
     public Transform WhereYouWantButtonsParented;
 
     public GameObject auctionButton;
@@ -76,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI winningtext;
     public TextMeshProUGUI winningbalance;
 
-    private bool admin;
+    private bool admin = false;
     public float startTime;
     public float endTime;
 
@@ -199,7 +194,7 @@ public class PlayerMovement : MonoBehaviour
 
         for (int i = 0; i < amount; i++)
         {
-            PlayerObject = characterPrefabs[i];
+            var PlayerObject = characterPrefabs[i];
             var spawnedPlayer = Instantiate(PlayerObject, new Vector3(10, 0.5f, 0), Quaternion.identity);
             spawnedPlayer.name = $"Player {i}";
 
@@ -250,12 +245,12 @@ public class PlayerMovement : MonoBehaviour
         // CPU LOGIC
         AIplayerAmount = PlayerAmounts.UpdateGameSettingsAI();
 
-        admin = false;
         if (playerAmount == 0)
         {
             playerAmount = 0;
             AIplayerAmount = 6;
             endTime = 120f;
+            endAbridgedGame = true;
             admin = true;
             Debug.Log("ADMIN MODE");
 
@@ -1117,7 +1112,7 @@ public class PlayerMovement : MonoBehaviour
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
-        BankTrans(-50, player);
+        _DepositToFreeParking(player, -50);
         player.inJail = -1;
         jailOption.SetActive(false);
         canEndTurn(true);
