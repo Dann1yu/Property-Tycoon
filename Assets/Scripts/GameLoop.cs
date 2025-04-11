@@ -328,9 +328,12 @@ public class GameLoop : MonoBehaviour
             canRoll(true);
         }
 
-        if ((propertyButton.activeSelf | auctionButton.activeSelf) && endButton.activeSelf)
+        if (propertyButton.activeSelf && auctionButton.activeSelf && endButton.activeSelf)
         {
             canEndTurn(false);
+        } else if (propertyButton.activeSelf && !auctionButton.activeSelf )
+        {
+            canEndTurn(true);
         }
 
         // If UpArrow pressed OR player is an AI and logic isn't running
@@ -647,13 +650,13 @@ public class GameLoop : MonoBehaviour
             if (location.Cost < player.balance)
             {
                 canBuyProperty(true);
+                canStartAuction(true);
             }
 
             // If total number of people passed go that aren't player is 2 or more auction can start
-            if ((totalpassed - (player.passedGo ? 1 : 0)) >= 2)
-            {
-                canStartAuction(true); //checks to make sure at least 2 can auction before auctioning
-            }
+            //checks to make sure at least 2 can auction before auctioning
+            
+
             // Else if not enough players can join the auction, allow end turn
             else
             {
@@ -1014,7 +1017,6 @@ public class GameLoop : MonoBehaviour
         // CPU Logic
         pastActions["canBuyProperty"] = boolean;
 
-        auctionButton.SetActive(boolean);
         propertyButton.SetActive(boolean);
         canEndTurn(false);
     }
@@ -1094,9 +1096,15 @@ public class GameLoop : MonoBehaviour
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
         // Create a list of permitted bidders
+
         bidders.Clear();
         foreach (var item in playerlist)
         {
+            Debug.Log($"ITEM {item.playerName}");
+            Debug.Log((item != playerlist[playerTurn]));
+            Debug.Log(item.passedGo);
+            Debug.Log((item.inJail == -1));
+
             if ((item != playerlist[playerTurn]) && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
             {
                 bidders.Add(item);
@@ -1106,7 +1114,7 @@ public class GameLoop : MonoBehaviour
         // If less than 2 permitted bidders, disable auction
         if (bidders.Count() < 2)
         {
-            canStartAuction(false);
+            canStartAuction(false); 
             return;
         }
 
@@ -1718,6 +1726,7 @@ public class GameLoop : MonoBehaviour
             highestBidder = bidder;
             Debug.Log("Highest bidder");
             moves.Add($"New highest bidder {bidder.playerName} with a bid of {highestBid}");
+            displayName3.text = $"New highest bidder {bidder.playerName} with a bid of {highestBid}";
         }
         // Else remove the bidder from the bidding rotation
         else
@@ -1726,6 +1735,7 @@ public class GameLoop : MonoBehaviour
             nextBidder--;
             Debug.Log($"Bidder removed, now only {bidders.Count()} people bidding");
             moves.Add($"Bidder removed, now only {bidders.Count()} people bidding");
+            displayName3.text = $"Bidder removed, now only {bidders.Count()} people bidding";
         }
 
         // If bidder is the final bidder, they won and purchase the property for the highest bid var
