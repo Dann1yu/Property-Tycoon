@@ -27,6 +27,8 @@ public class LoadScene : MonoBehaviour
 
     public List<int> gameLengths = new List<int> { 5, 10, 20, 30, 45, 60, 75, 90, 120, 150, 180 };
 
+
+
     /// <summary>
     /// When start button is pressed checks dropdowns and stores their values for future access
     /// </summary>

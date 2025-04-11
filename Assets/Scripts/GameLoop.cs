@@ -1690,13 +1690,47 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void CPUAuction()
     {
-        // TODO make more complex
-        if (bidders[nextBidder].balance > 5)
-        {
-            nextBid(5);
-        }
-        else nextBid(-1);
+        int position = playerlist[playerTurn].pos;
 
+        Property property = bank.Properties[position];
+        Player_ player = bidders[nextBidder];
+
+        string set = property.Group;
+        float randomValue;
+        
+        // If player has atleast one of the set
+        if (player.Sets.ContainsKey(set))
+        {
+            // If player is one off full set
+            if (bank.PropertiesPerSet[set] == (player.Sets[set] + 1))
+            {
+                randomValue = Random.Range(1.5f, 2f);
+                if ((property.Cost * randomValue) <= player.balance)
+                {
+                    nextBid(Mathf.CeilToInt(property.Cost * randomValue));
+                    return;
+                }
+            }
+
+            // Else
+            randomValue = Random.Range(1f, 1.5f);
+            if ((property.Cost * randomValue) <= player.balance)
+            {
+                nextBid(Mathf.CeilToInt(property.Cost * randomValue));
+                return;
+            }
+        }
+
+        // Else
+        randomValue = Random.Range(0.6f, 1f);
+        if ((property.Cost * randomValue) <= player.balance)
+        {
+            nextBid(Mathf.CeilToInt(property.Cost * randomValue));
+            return;
+        }
+
+        // Else
+        nextBid(-1);
     }
 
     /// <summary>
