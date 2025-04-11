@@ -328,7 +328,7 @@ public class GameLoop : MonoBehaviour
             canRoll(true);
         }
 
-        if ((propertyButton.activeSelf | auctionButton.activeSelf) && endButton)
+        if ((propertyButton.activeSelf | auctionButton.activeSelf) && endButton.activeSelf)
         {
             canEndTurn(false);
         }
@@ -1097,7 +1097,7 @@ public class GameLoop : MonoBehaviour
         bidders.Clear();
         foreach (var item in playerlist)
         {
-            if ((item != player) && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
+            if ((item != playerlist[playerTurn]) && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
             {
                 bidders.Add(item);
             }
@@ -1674,6 +1674,15 @@ public class GameLoop : MonoBehaviour
         canBuyProperty(false);
         canStartAuction(false);
 
+        bidders.Clear();
+        foreach (var item in playerlist)
+        {
+            if ((item != playerlist[playerTurn]) && item.passedGo && (item.inJail == -1)) //checks to make sure players that have passed go added
+            {
+                bidders.Add(item);
+            }
+        }
+
         // Sets default values
         highestBid = 0;
         highestBidder = null;
@@ -2166,6 +2175,8 @@ public class GameLoop : MonoBehaviour
                     }
                 }
 
+
+
                 // sort upgradeablePositions by property.position so most desirable are first choice
                 upgradeableProperties = upgradeableProperties
                     .OrderByDescending(p => p.Position)
@@ -2182,7 +2193,7 @@ public class GameLoop : MonoBehaviour
                 }
 
                 // If player has a large overflow of money, run again
-                if (player.balance < 1000)
+                if ((player.balance < 1000) | (upgradeableProperties.Count() == 0))
                 {
                     canManage(false);
 
