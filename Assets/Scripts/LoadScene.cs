@@ -25,6 +25,8 @@ public class LoadScene : MonoBehaviour
 
     private int Length;
 
+    private static int finalLength;
+
     public List<int> gameLengths = new List<int> { 5, 10, 20, 30, 45, 60, 75, 90, 120, 150, 180 };
 
 
@@ -43,6 +45,8 @@ public class LoadScene : MonoBehaviour
         int menuIndex2 = DropdownAI.GetComponent<Dropdown>().value;
         List<Dropdown.OptionData> menuOptions2 = DropdownAI.GetComponent<Dropdown>().options;
         Avalue = int.Parse(menuOptions2[menuIndex2].text);
+
+        finalLength = Length;
 
         // Start game
         SceneManager.LoadScene("Property-Tycoon");
@@ -72,7 +76,7 @@ public class LoadScene : MonoBehaviour
     /// <returns>Gvalue: Game type vakue</returns>
     public int UpdateGameSettingsGame()
     {
-        return Length;
+        return finalLength;
     }
 
     public void shortGameClicked()

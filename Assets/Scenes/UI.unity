@@ -1483,6 +1483,7 @@ GameObject:
   - component: {fileID: 878329246}
   - component: {fileID: 878329245}
   - component: {fileID: 878329249}
+  - component: {fileID: 878329250}
   m_Layer: 1
   m_Name: Canvas
   m_TagString: Untagged
@@ -1595,6 +1596,20 @@ MonoBehaviour:
   shortGameToggle: {fileID: 1842260839}
   lengthText: {fileID: 2052538261}
   gameLengths: 050000000a0000000f000000140000001e00000028000000320000003c0000004b0000005a00000078000000
+--- !u!114 &878329250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878329244}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef839759f15a4e14193990bc4e49d2a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  humanDropdown: {fileID: 1952249660}
+  aiDropdown: {fileID: 1599784506}
 --- !u!1 &984652619
 GameObject:
   m_ObjectHideFlags: 0

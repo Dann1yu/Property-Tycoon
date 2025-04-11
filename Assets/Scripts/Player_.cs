@@ -192,7 +192,12 @@ public class Player_ : MonoBehaviour
         foreach (var locIdx in properties)
         {
             var loc = bank.Properties[locIdx];
-            total += checkHousePrice(loc) * loc.NumberOfHouses;
+
+            if (loc.NumberOfHouses > 0)
+            {
+                total += checkHousePrice(loc) * loc.NumberOfHouses;
+            }
+            
             if (loc.mortgaged)
             {
                 total += loc.Cost / 2;

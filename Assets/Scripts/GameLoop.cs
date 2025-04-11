@@ -23,7 +23,7 @@ public class GameLoop : MonoBehaviour
     // private variables that will be changed by load screen
     private int playerAmount;
     private int AIplayerAmount;
-    private bool abridgedGamemode;
+    public bool abridgedGamemode;
     public float startTime;
     public float endTime;
     private bool testing = false;
@@ -66,7 +66,6 @@ public class GameLoop : MonoBehaviour
     [SerializeField] private GameObject endButton;
     [SerializeField] private GameObject propertyButton;
     [SerializeField] private GameObject manageButton;
-    [SerializeField] private GameObject leaveGameButton;
 
     // Managing property options
     [SerializeField] private GameObject managePanel;
@@ -107,6 +106,7 @@ public class GameLoop : MonoBehaviour
     public List<Player_> bidders = new List<Player_>();
     public List<string> cpuStack = new List<string>(); // can be replaced by past actions
     public Dictionary<string, bool> pastActions = new Dictionary<string, bool>();
+    public List<string> moves = new List<string>();
 
     /// <summary>
     /// Creates the board as 40 vectors across 4 sides
@@ -247,7 +247,6 @@ public class GameLoop : MonoBehaviour
         closeButton.SetActive(false);
         oppKnocksOption.SetActive(false);
         jailOption.SetActive(false);
-        leaveGameButton.SetActive(false);
 
         pastActions["canEndTurn"] = false;
         pastActions["canBuyProperty"] = false;
@@ -268,14 +267,16 @@ public class GameLoop : MonoBehaviour
             abridgedGamemode = false;
         }
 
+        Debug.Log($"abridged: {abridgedGamemode} | endtime: {endTime}");
+
         // TODO get gamemode and therefore length of game
 
         // Checks if script is ran from Property-Tycoon scene and puts into testing mode
         if (playerAmount == 0)
         {
             playerAmount = 6;
-            AIplayerAmount = 0;
-            endTime = 120f;
+            AIplayerAmount = 6;
+            endTime = 320f;
             abridgedGamemode = true;
             testing = true;
             Debug.Log("TESTING MODE");
@@ -390,71 +391,72 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void test()
     {
-        Debug.Log("TEST");
-        Player_ player = playerlist[0];
-        player.balance = 100000;
-        _Teleport(player, 2);
-        player = playerlist[1];
-        _Teleport(player, 3);
-        player = playerlist[2];
-        _Teleport(player, 4);
-        player = playerlist[3];
-        _Teleport(player, 5);
-        player = playerlist[4];
-        _Teleport(player, 6);
-        player = playerlist[5];
-        _Teleport(player, 7);
 
-        player = playerlist[0];
+        //Debug.Log("TEST");
+        //Player_ player = playerlist[0];
+        //player.balance = 100000;
+        //_Teleport(player, 2);
+        //player = playerlist[1];
+        //_Teleport(player, 3);
+        //player = playerlist[2];
+        //_Teleport(player, 4);
+        //player = playerlist[3];
+        //_Teleport(player, 5);
+        //player = playerlist[4];
+        //_Teleport(player, 6);
+        //player = playerlist[5];
+        //_Teleport(player, 7);
 
-        purchaseProperty(player, bank.Properties[1]);
+        //player = playerlist[0];
 
-        player.upgradeHouse(bank.Properties[1]);
-        SpawnHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        SpawnHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        SpawnHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        SpawnHouse(bank.Properties[1]);
-        player.upgradeHouse(bank.Properties[1]);
-        SpawnHouse(bank.Properties[1]);
+        //purchaseProperty(player, bank.Properties[1]);
 
-        player.upgradeHouse(bank.Properties[11]);
-        SpawnHouse(bank.Properties[11]);
-        player.upgradeHouse(bank.Properties[11]);
-        SpawnHouse(bank.Properties[11]);
-        player.upgradeHouse(bank.Properties[11]);
-        SpawnHouse(bank.Properties[11]);
-        player.upgradeHouse(bank.Properties[11]);
-        SpawnHouse(bank.Properties[11]);
-        player.upgradeHouse(bank.Properties[11]);
-        SpawnHouse(bank.Properties[11]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
+        //player.upgradeHouse(bank.Properties[1]);
+        //SpawnHouse(bank.Properties[1]);
 
-        player.upgradeHouse(bank.Properties[21]);
-        SpawnHouse(bank.Properties[21]);
-        player.upgradeHouse(bank.Properties[21]);
-        SpawnHouse(bank.Properties[21]);
-        player.upgradeHouse(bank.Properties[21]);
-        SpawnHouse(bank.Properties[21]);
-        player.upgradeHouse(bank.Properties[21]);
-        SpawnHouse(bank.Properties[21]);
-        player.upgradeHouse(bank.Properties[21]);
-        SpawnHouse(bank.Properties[21]);
+        //player.upgradeHouse(bank.Properties[11]);
+        //SpawnHouse(bank.Properties[11]);
+        //player.upgradeHouse(bank.Properties[11]);
+        //SpawnHouse(bank.Properties[11]);
+        //player.upgradeHouse(bank.Properties[11]);
+        //SpawnHouse(bank.Properties[11]);
+        //player.upgradeHouse(bank.Properties[11]);
+        //SpawnHouse(bank.Properties[11]);
+        //player.upgradeHouse(bank.Properties[11]);
+        //SpawnHouse(bank.Properties[11]);
 
-        player.upgradeHouse(bank.Properties[31]);
-        SpawnHouse(bank.Properties[31]);
-        player.upgradeHouse(bank.Properties[31]);
-        SpawnHouse(bank.Properties[31]);
-        player.upgradeHouse(bank.Properties[31]);
-        SpawnHouse(bank.Properties[31]);
-        player.upgradeHouse(bank.Properties[31]);
-        SpawnHouse(bank.Properties[31]);
-        player.upgradeHouse(bank.Properties[31]);
-        SpawnHouse(bank.Properties[31]);
+        //player.upgradeHouse(bank.Properties[21]);
+        //SpawnHouse(bank.Properties[21]);
+        //player.upgradeHouse(bank.Properties[21]);
+        //SpawnHouse(bank.Properties[21]);
+        //player.upgradeHouse(bank.Properties[21]);
+        //SpawnHouse(bank.Properties[21]);
+        //player.upgradeHouse(bank.Properties[21]);
+        //SpawnHouse(bank.Properties[21]);
+        //player.upgradeHouse(bank.Properties[21]);
+        //SpawnHouse(bank.Properties[21]);
 
-        player.sellHouse(bank.Properties[31]);
-        DeSpawnHouse(bank.Properties[31]);
+        //player.upgradeHouse(bank.Properties[31]);
+        //SpawnHouse(bank.Properties[31]);
+        //player.upgradeHouse(bank.Properties[31]);
+        //SpawnHouse(bank.Properties[31]);
+        //player.upgradeHouse(bank.Properties[31]);
+        //SpawnHouse(bank.Properties[31]);
+        //player.upgradeHouse(bank.Properties[31]);
+        //SpawnHouse(bank.Properties[31]);
+        //player.upgradeHouse(bank.Properties[31]);
+        //SpawnHouse(bank.Properties[31]);
+
+        //player.sellHouse(bank.Properties[31]);
+        //DeSpawnHouse(bank.Properties[31]);
 
     }
 
@@ -465,11 +467,15 @@ public class GameLoop : MonoBehaviour
     /// <param name="boolDouble">Boolean for whether player rolled a double</param>
     public void onRoll(int rollValue, bool boolDouble)
     {
+        moves.Add($"Player rolled {rollValue}");
+        
         roll = rollValue;
 
         // If rolled a double increase rolledDouble
         if (boolDouble)
         {
+            moves.Add($"It was a double!");
+
             rolledDouble += 1;
             Debug.Log($"You rolled a double! {rolledDouble}");
             displaydouble.text = ($"You rolled a double!");
@@ -477,6 +483,7 @@ public class GameLoop : MonoBehaviour
             // If player has rolled 3 doubles go to jail and stop logic
             if (rolledDouble == 3)
             {
+                moves.Add($"Player rolled a double three times in a row...");
                 rolledDouble = 0;
                 _GoToJail(CurrentPlayer.GetComponent<Player_>());
                 return;
@@ -504,11 +511,13 @@ public class GameLoop : MonoBehaviour
         // If player has been in jail for 2 rounds then let free
         if (player.inJail == 2)
         {
+            moves.Add($"Player leaves jail");
             player.inJail = -1;
         }
         // Else if player is in jail but not for 2 rounds stay in jail, can end turn and stop logic
         else if (player.inJail > -1)
         {
+            moves.Add($"Player is in jail, can't do anything!");
             player.inJail += 1;
             Debug.Log($"YOU ARE IN JAIL LOSER NO GO FOR YOU {player.inJail}");
             displayName3.text = ($"YOU ARE IN JAIL NO GO FOR YOU! {player.inJail}");
@@ -530,6 +539,7 @@ public class GameLoop : MonoBehaviour
         {
             new_position = new_position - 40;
 
+            moves.Add($"Player passed go!");
             Debug.Log("You passed go!");
             displayName3.text = ("You passed go!");
             BankTrans(200);
@@ -568,11 +578,13 @@ public class GameLoop : MonoBehaviour
         // If amount is positive, bank sends money to the player
         if (amount > 0)
         {
+            moves.Add($"Player received {amount} from bank");
             player.ReceiveMoneyFromBank(amount);
         }
         // Else paybank amount
         else
         {
+            moves.Add($"Player paid {-amount} to bank");
             player.PayBank(checkBalance(player, -amount));
         }
         // Update UI
@@ -587,6 +599,7 @@ public class GameLoop : MonoBehaviour
     /// <param name="amount">Amount that is being sent / received</param>
     public void PlayerTrans(Player_ sender, Player_ receiver, int amount)
     {
+        moves.Add($"{sender.playerName} sent {amount} to {receiver.playerName}");
         sender.PayPlayer(receiver, checkBalance(sender, amount));
         UpdateBalanceUI();
     }
@@ -651,6 +664,7 @@ public class GameLoop : MonoBehaviour
             // Else payrent
             else
             {
+                moves.Add($"Property owned by another player");
                 Debug.Log("Property owned by another player");
                 displayName3.text = ("Property owned by another player");
                 if (!location.mortgaged && (location.Owner.inJail == -1))
@@ -669,6 +683,7 @@ public class GameLoop : MonoBehaviour
         // Landed on oppurtunity knocks 7, 22, 36
         else if (position == 7 | position == 22 | position == 36)
         {
+            moves.Add($"Landed on oppurtunity knocks");
             Debug.Log("Landed on oppurtunity knocks");
             displayName3.text = ("Landed on oppurtunity knocks");
             oppKnock(player);
@@ -677,6 +692,7 @@ public class GameLoop : MonoBehaviour
         // Landed on pot luck 2, 17, 33
         else if (position == 2 | position == 17 | position == 33)
         {
+            moves.Add($"Landed on pot luck");
             Debug.Log("Landed on pot luck");
             displayName3.text = ("Landed on pot luck");
             potLuck(player);
@@ -685,7 +701,9 @@ public class GameLoop : MonoBehaviour
         // Landed on income tax 4
         else if (position == 4)
         {
-            Debug.Log("Landed on Income Tax and charged $200");
+            moves.Add($"Landed on income tax and charged $200");
+
+           Debug.Log("Landed on Income Tax and charged $200");
             displayName3.text = ("Landed on Income Tax and charged $200");
             _DepositToFreeParking(player, 200);
             Debug.Log($"New balance: {player.balance}");
@@ -694,6 +712,8 @@ public class GameLoop : MonoBehaviour
         // Landed on free parking 20
         else if (position == 20)
         {
+            moves.Add($"Landed on free parking you have gained {bank.FreeParkingBalance}");
+
             Debug.Log($"Landed on free parking you have gained {bank.FreeParkingBalance}");
             displayName3.text = ($"Landed on free parking you have gained {bank.FreeParkingBalance}");
             player.balance += bank.FreeParkingBalance;
@@ -704,6 +724,7 @@ public class GameLoop : MonoBehaviour
         // Landed on go to jail 30
         else if (position == 30)
         {
+            moves.Add($"Landed on go to jail!");
             Debug.Log("Go to jail");
             displayName3.text = ("Go to jail");
             _GoToJail(player);
@@ -712,6 +733,7 @@ public class GameLoop : MonoBehaviour
         // Landed on super tax 38
         else if (position == 38)
         {
+            moves.Add($"Landed on Super Tax and charged $100");
             Debug.Log("Landed on Super Tax and charged $100");
             Debug.Log(player.balance);
             _DepositToFreeParking(player, 100);
@@ -722,6 +744,7 @@ public class GameLoop : MonoBehaviour
         else if (position == 0)
         {
             // Doesn't need any logic because pass go logic implemented in moveForward()
+            moves.Add($"Landed on GO");
             Debug.Log("Landed on GO");
             displayName3.text = ("Landed on GO");
         }
@@ -752,11 +775,14 @@ public class GameLoop : MonoBehaviour
     /// <param name="amount">How much the property is for, if no amount set will default to a -ve value to flag</param>
     void purchaseProperty(Player_ player, Property location, int amount = -1)
     {
+        
         // If amount not set, amount is location default cost
         if (amount == -1)
         {
             amount = location.Cost;
         }
+
+        moves.Add($"{player.playerName} bought {location.Name} for {amount}");
 
         player.addProperty(location);
         BankTrans(-amount, player);
@@ -771,6 +797,7 @@ public class GameLoop : MonoBehaviour
     /// <param name="location">Location being mortgaged</param>
     void mortgageProperty(Player_ player, Property location)
     {
+        moves.Add($"{player.playerName} mortgaged {location.Name} for {location.Cost / 2}");
         BankTrans(location.Cost / 2);
         location.mortgaged = true;
         UpdateBalanceUI();
@@ -790,6 +817,8 @@ public class GameLoop : MonoBehaviour
             return;
         }
 
+        moves.Add($"{player.playerName} unmortgaged {location.Name} for {location.Cost / 2}");
+
         BankTrans(-(location.Cost / 2));
         location.mortgaged = false;
         UpdateBalanceUI();
@@ -802,12 +831,19 @@ public class GameLoop : MonoBehaviour
     /// <param name="location">Property being sold</param>
     void sellProperty(Player_ player, Property location)
     {
+
         // If location is mortgaged only reward 1/2 the price
         if (location.mortgaged)
         {
+            moves.Add($"{player.playerName} sold {location.Name} for {location.Cost / 2}");
             BankTrans(location.Cost / 2);
         }
-        else BankTrans(location.Cost);
+        else {
+
+            moves.Add($"{player.playerName} sold {location.Name} for {location.Cost}");
+            BankTrans(location.Cost); 
+        
+        }
 
         player.removeProperty(location);
         location.Owner = null;
@@ -822,6 +858,8 @@ public class GameLoop : MonoBehaviour
     void payRent(Player_ player, Property location)
     {
         Debug.Log($"{location.Name} {location.NumberOfHouses} {location.RentUnimproved} {location.Rent1House} {location.Rent2Houses} {location.Rent3Houses} {location.Rent4Houses} {location.RentHotel}");
+
+        moves.Add($"{player.playerName} has to pay rent to {location.Owner.playerName}");
 
         // If location is a station pay station rent
         if (location.Group == "Station")
@@ -888,6 +926,7 @@ public class GameLoop : MonoBehaviour
         Card card = bank.PLCards[0];
         bank.PLCards.RemoveAt(0);
 
+        moves.Add($"{card.Description}");
         Debug.Log($"{card.Description}");
 
         var action = card.Action;
@@ -910,6 +949,7 @@ public class GameLoop : MonoBehaviour
         Card card = bank.OKCards[0];
         bank.OKCards.RemoveAt(0);
 
+        moves.Add($"{card.Description}");
         Debug.Log($"{card.Description}");
         displayName3.text = ($"{card.Description}");
 
@@ -989,7 +1029,6 @@ public class GameLoop : MonoBehaviour
 
         // CPU Logic
         pastActions["canEndTurn"] = boolean;
-        leaveGameButton.SetActive(boolean);
         endButton.SetActive(boolean);
 
         // If false and balance is positive disables manage properties button
@@ -1263,6 +1302,7 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void usedJailFree()
     {
+        moves.Add($"Player used get out of jail free");
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -1299,6 +1339,16 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void endTurn()
     {
+        moves.Add($"Player ended turn");
+
+        Debug.Log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        foreach (string item in moves)
+        {
+            Debug.Log(item);
+        }
+        Debug.Log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        moves.Clear();
+
         canEndTurn(false);
         if (abridgedGamemode && (playerTurn == (playerlist.Count() - 1)))
         {
@@ -1320,6 +1370,7 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void pay50()
     {
+        moves.Add($"Player paid 50 to leave jail");
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -1463,6 +1514,7 @@ public class GameLoop : MonoBehaviour
     /// <param name="amount">Amount of money being sent</param>
     public void _DepositToFreeParking(Player_ player, int amount)
     {
+        moves.Add($"Player deposited: ${amount} to Free Parking");
         Debug.Log("_DepositToFreeParking");
         displayName3.text = ($"Deposited: ${amount} to Free Parking");
         player.DepositToFreeParking(checkBalance(player, amount));
@@ -1477,6 +1529,7 @@ public class GameLoop : MonoBehaviour
     /// <param name="amount">Redundant</param>
     public void _GoToJail(Player_ player, int amount = 0)
     {
+        moves.Add($"Player is in jail!");
         Debug.Log("_GoToJail");
         _Teleport(player, 10);
         player.inJail = 0;
@@ -1603,6 +1656,7 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void startAuction()
     {
+        moves.Add($"Auction started!");
         // Disable previous UI
         canBuyProperty(false);
         canStartAuction(false);
@@ -1640,7 +1694,8 @@ public class GameLoop : MonoBehaviour
         {
             highestBid = bid;
             highestBidder = bidder;
-            Debug.Log("Highest bidder"); 
+            Debug.Log("Highest bidder");
+            moves.Add($"New highest bidder {bidder.playerName} with a bid of {highestBid}");
         }
         // Else remove the bidder from the bidding rotation
         else
@@ -1648,6 +1703,7 @@ public class GameLoop : MonoBehaviour
             bidders.Remove(bidder);
             nextBidder--;
             Debug.Log($"Bidder removed, now only {bidders.Count()} people bidding");
+            moves.Add($"Bidder removed, now only {bidders.Count()} people bidding");
         }
 
         // If bidder is the final bidder, they won and purchase the property for the highest bid var
@@ -1656,7 +1712,7 @@ public class GameLoop : MonoBehaviour
             if (highestBid != 0)
             {
                 Player_ player = playerlist[playerTurn];
-
+                moves.Add($"{bidder.playerName} won with a bid of {highestBid}!");
                 purchaseProperty(highestBidder, bank.Properties[player.pos], highestBid);
             }
 
@@ -1901,6 +1957,7 @@ public class GameLoop : MonoBehaviour
     /// <returns>Amount the can afford to pay</returns>
     public int bankrupt(Player_ player)
     {
+        moves.Add($"{player.playerName} went bankrupt!");
         playerlist[playerTurn].gameObject.SetActive(false);
 
         playerlist.Remove(playerlist[playerTurn]);
@@ -1987,6 +2044,7 @@ public class GameLoop : MonoBehaviour
         {
             if (player.JailFreeCards > 0)
             {
+
                 Debug.Log("Used Jail Free Card");
                 usedJailFree();
             }
