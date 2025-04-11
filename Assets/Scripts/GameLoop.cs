@@ -328,6 +328,11 @@ public class GameLoop : MonoBehaviour
             canRoll(true);
         }
 
+        if ((propertyButton.activeSelf | auctionButton.activeSelf) && endButton)
+        {
+            canEndTurn(false);
+        }
+
         // If UpArrow pressed OR player is an AI and logic isn't running
         if (Input.GetKeyDown(KeyCode.UpArrow) | (playerlist[playerTurn].AI && !running))
         {
@@ -392,9 +397,9 @@ public class GameLoop : MonoBehaviour
     public void test()
     {
 
-        //Debug.Log("TEST");
-        //Player_ player = playerlist[0];
-        //player.balance = 100000;
+        Debug.Log("TEST");
+        Player_ player = playerlist[0];
+        player.balance = 100000;
         //_Teleport(player, 2);
         //player = playerlist[1];
         //_Teleport(player, 3);
@@ -407,9 +412,12 @@ public class GameLoop : MonoBehaviour
         //player = playerlist[5];
         //_Teleport(player, 7);
 
-        //player = playerlist[0];
+        purchaseProperty(player, bank.Properties[1]);
+        purchaseProperty(player, bank.Properties[3]);
+        purchaseProperty(player, bank.Properties[6]);
+        purchaseProperty(player, bank.Properties[8]);
+        purchaseProperty(player, bank.Properties[9]);
 
-        //purchaseProperty(player, bank.Properties[1]);
 
         //player.upgradeHouse(bank.Properties[1]);
         //SpawnHouse(bank.Properties[1]);
@@ -1017,6 +1025,7 @@ public class GameLoop : MonoBehaviour
     /// <param name="boolean">Whether it should be visible</param>
     public void canEndTurn(bool boolean)
     {
+        Debug.Log($"CANENDTURN {boolean}");
         CurrentPlayer = playerlist[playerTurn].gameObject;
         Player_ player = CurrentPlayer.GetComponent<Player_>();
 
@@ -1433,6 +1442,7 @@ public class GameLoop : MonoBehaviour
         }
         else buy = true;
 
+        Debug.Log($"{loc.NumberOfHouses} : {buy}");
         return (buy, sell);
     }
 
@@ -2136,8 +2146,6 @@ public class GameLoop : MonoBehaviour
                 foreach (string set in player.OwnedSets)
                 {
                     // check whether upgrade is possible and decide depending on overflow money
-                    housesInGroup(player, set);
-
                     if (player.balance > (player.checkColourPrice(set) + 400))
                     {
                         foreach (int position in player.properties)
@@ -2146,7 +2154,8 @@ public class GameLoop : MonoBehaviour
 
                             if ((property.Group == set))
                             {
-                                var (buy, sell) = canChangeHouses(location);
+                                housesInGroup(player, set);
+                                var (buy, sell) = canChangeHouses(property);
 
                                 if (buy)
                                 {
