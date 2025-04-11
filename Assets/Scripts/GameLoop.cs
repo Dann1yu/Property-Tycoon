@@ -146,6 +146,7 @@ public class GameLoop : MonoBehaviour
     public (int, bool) DiceRoll()
     {
         canRoll(false);
+        displayName3.text = "";
         return diceRoller.RollDice();
     }
 
@@ -184,7 +185,6 @@ public class GameLoop : MonoBehaviour
         displayName1.text = current;
         displayName2.text = "Balance: $" + playerlist[playerTurn].balance.ToString();
         displaydouble.text = "";
-        displayName3.text = "";
 
         // If action is required to go above negative balance
         if (pastActions["canManage"] && !pastActions["canEndTurn"] && (player.balance >= 0))
@@ -368,7 +368,7 @@ public class GameLoop : MonoBehaviour
         // If player is AI wait a second to mimic a human
         if (player.AI)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2.5f);
         }
 
         // Roll the dice and wait 1.5s for it to finish
@@ -1342,10 +1342,13 @@ public class GameLoop : MonoBehaviour
         moves.Add($"Player ended turn");
 
         Debug.Log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        string items = "";
         foreach (string item in moves)
         {
-            Debug.Log(item);
+            items = $"{items}\n{item}";
+            Debug.Log(item); ;
         }
+        displayName3.text = items;
         Debug.Log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         moves.Clear();
 
@@ -2081,6 +2084,7 @@ public class GameLoop : MonoBehaviour
     {
         UpdateBalanceUI();
         yield return new WaitForSeconds(1f);
+        displayName3.text = "";
         Property location = bank.Properties[player.pos];
 
         // Outputs all possible UI options to console
