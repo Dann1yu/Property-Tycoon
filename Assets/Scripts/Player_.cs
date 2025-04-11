@@ -177,19 +177,7 @@ public class Player_ : MonoBehaviour
     /// <returns>Cost to upgrade/downgrade set</returns>
     public int checkColourPrice(string colour)
     {
-        if (colour == "Brown" | colour == "Blue")
-        {
-            return 50;
-        }
-        else if (colour == "Purple" | colour == "Orange")
-        {
-            return 100;
-        }
-        else if (colour == "Red" | colour == "Yellow")
-        {
-            return 150;
-        }
-        else return 200;
+        return bank.setPrices[colour];
     }
 
     /// <summary>

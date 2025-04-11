@@ -22,6 +22,9 @@ public class Bank_ : MonoBehaviour
     // RNG import for card shuffling
     private static System.Random rng = new System.Random();
 
+    // Info variables
+    public Dictionary<string, int> setPrices = new Dictionary<string, int>();
+
     /// <summary>
     /// Loads csv of filepath and creates each property with it's required variables
     /// </summary>
@@ -32,10 +35,23 @@ public class Bank_ : MonoBehaviour
         string[] lines = File.ReadAllLines(filePath);
 
         // For every row, create a property with it's values
+        var colours = false;
         foreach (string line in lines)
         {
+            if (line == ",,")
+            {
+                colours = true;
+                continue;
+            }
+
             // Splits each row and passes each column of the row to it's information
             string[] values = line.Split(',');
+
+            if (colours)
+            {
+                setPrices[values[0]] = int.Parse(values[1]);
+                continue;
+            }
 
             int position = int.Parse(values[0]) - 1;
             string name = values[1];
@@ -86,6 +102,11 @@ public class Bank_ : MonoBehaviour
         }
 
         Debug.Log($"Successfully loaded {Properties.Count} properties.");
+
+        foreach (KeyValuePair<string, int> pair in setPrices)
+        {
+            Debug.Log("Key: " + pair.Key + ", Value: " + pair.Value);
+        }
     }
 
     /// <summary>
