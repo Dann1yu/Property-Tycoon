@@ -2352,7 +2352,7 @@ public class GameLoop : MonoBehaviour
     }
 
     /// <summary>
-    /// TODO
+    /// Spawns a house on the given property, if a hotel is purchased it removes all the houses of the property
     /// </summary>
     /// <param name="prop"></param>
     public void SpawnHouse(Property prop, bool hotel = false, int house = -1)
@@ -2444,6 +2444,10 @@ public class GameLoop : MonoBehaviour
         obj.name = $"House {prop.Position}: {prop.NumberOfHouses}";
     }
 
+    /// <summary>
+    /// Despawns the most recent house of a property, replaces a hotel with 4 houses if needed
+    /// </summary>
+    /// <param name="prop">Property to downgrade</param>
     public void DeSpawnHouse(Property prop)
     {
         Debug.Log("DESPAWN");
