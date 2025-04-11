@@ -52,6 +52,7 @@ public class GameLoop : MonoBehaviour
 
     // housing variables
     [SerializeField] private GameObject houseprefab;
+    [SerializeField] private GameObject hotelprefab;
 
     // display elements
     [SerializeField] private TextMeshProUGUI displayName1;
@@ -304,6 +305,8 @@ public class GameLoop : MonoBehaviour
             return;
         } else if (testing){
                     test();
+
+
                     testing = false;
         }
 
@@ -379,6 +382,7 @@ public class GameLoop : MonoBehaviour
     {
         Debug.Log("TEST");
         Player_ player = playerlist[0];
+        player.balance = 100000;
         _Teleport(player, 2);
         player = playerlist[1];
         _Teleport(player, 3);
@@ -390,6 +394,58 @@ public class GameLoop : MonoBehaviour
         _Teleport(player, 6);
         player = playerlist[5];
         _Teleport(player, 7);
+
+        player = playerlist[0];
+
+        purchaseProperty(player, bank.Properties[1]);
+
+        player.upgradeHouse(bank.Properties[1]);
+        SpawnHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        SpawnHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        SpawnHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        SpawnHouse(bank.Properties[1]);
+        player.upgradeHouse(bank.Properties[1]);
+        SpawnHouse(bank.Properties[1]);
+
+        player.upgradeHouse(bank.Properties[11]);
+        SpawnHouse(bank.Properties[11]);
+        player.upgradeHouse(bank.Properties[11]);
+        SpawnHouse(bank.Properties[11]);
+        player.upgradeHouse(bank.Properties[11]);
+        SpawnHouse(bank.Properties[11]);
+        player.upgradeHouse(bank.Properties[11]);
+        SpawnHouse(bank.Properties[11]);
+        player.upgradeHouse(bank.Properties[11]);
+        SpawnHouse(bank.Properties[11]);
+
+        player.upgradeHouse(bank.Properties[21]);
+        SpawnHouse(bank.Properties[21]);
+        player.upgradeHouse(bank.Properties[21]);
+        SpawnHouse(bank.Properties[21]);
+        player.upgradeHouse(bank.Properties[21]);
+        SpawnHouse(bank.Properties[21]);
+        player.upgradeHouse(bank.Properties[21]);
+        SpawnHouse(bank.Properties[21]);
+        player.upgradeHouse(bank.Properties[21]);
+        SpawnHouse(bank.Properties[21]);
+
+        player.upgradeHouse(bank.Properties[31]);
+        SpawnHouse(bank.Properties[31]);
+        player.upgradeHouse(bank.Properties[31]);
+        SpawnHouse(bank.Properties[31]);
+        player.upgradeHouse(bank.Properties[31]);
+        SpawnHouse(bank.Properties[31]);
+        player.upgradeHouse(bank.Properties[31]);
+        SpawnHouse(bank.Properties[31]);
+        player.upgradeHouse(bank.Properties[31]);
+        SpawnHouse(bank.Properties[31]);
+
+        player.sellHouse(bank.Properties[31]);
+        DeSpawnHouse(bank.Properties[31]);
+
     }
 
     /// <summary>
@@ -1133,6 +1189,7 @@ public class GameLoop : MonoBehaviour
         {
             var (loc, player) = returnPropertyOnShow("Sets");
             player.sellHouse(loc);
+            DeSpawnHouse(loc);
 
             setDropdownChange();
         }
@@ -2082,6 +2139,7 @@ public class GameLoop : MonoBehaviour
                     while (sell)
                     {
                         player.sellHouse(property);
+                        DeSpawnHouse(property);
 
                         if (player.balance >= 0) goto endOfNestedLoops;
 
@@ -2161,53 +2219,112 @@ public class GameLoop : MonoBehaviour
     /// TODO
     /// </summary>
     /// <param name="prop"></param>
-    public void SpawnHouse(Property prop)
+    public void SpawnHouse(Property prop, bool hotel = false, int house = -1)
     {
-        if (prop.NumberOfHouses > 4)
+        var houses = prop.NumberOfHouses;
+        var position = prop.Position;
+
+        float constant = .23333f;
+        var obj = houseprefab;
+
+        if (house != -1)
+        {
+            houses = house;
+        }
+
+        if (hotel)
+        {
+            houses = 1;
+            obj = hotelprefab;
+        }
+        else if (houses > 4)
         {
             Debug.Log($"Number of houses {prop.NumberOfHouses}");
+            Destroy(GameObject.Find($"House {prop.Position}: 4"));
+            Destroy(GameObject.Find($"House {prop.Position}: 3"));
+            Destroy(GameObject.Find($"House {prop.Position}: 2"));
+            Destroy(GameObject.Find($"House {prop.Position}: 1"));
+            SpawnHouse(prop, true);
             return;
         }
-        if (prop.Position > 0 && prop.Position < 10)
-        {
-            Vector3 targetpos = boardPosition[prop.Position];
-            float constant = .23333f;
-            var houseobj = houseprefab;
-            float multiplehouses = constant * (prop.NumberOfHouses - 1);
-            targetpos = new Vector3(targetpos.x - 0.4f + multiplehouses, targetpos.y, targetpos.z + 0.55f);
-            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
-            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
-        }
-        if (prop.Position > 10 && prop.Position < 20)
-        {
 
-            Vector3 targetpos = boardPosition[prop.Position];
-            float constant = .23333f;
-            var houseobj = houseprefab;
-            float multiplehouses = constant * (prop.NumberOfHouses - 1);
-            targetpos = new Vector3(targetpos.x + 0.5f, targetpos.y, targetpos.z + 0.4f + multiplehouses);
-            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
-            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+        
+
+        Vector3 targetpos = boardPosition[position];
+        float multiplehouses = constant * (houses - 1);
+        var trans = false;
+
+        if (!hotel) {
+            if (position > 0 && position < 10)
+            {
+                targetpos = new Vector3(targetpos.x - 0.4f + multiplehouses, targetpos.y, targetpos.z + 0.55f);
+            }
+            else if (position > 10 && position < 20)
+            {
+                targetpos = new Vector3(targetpos.x + 0.5f, targetpos.y, targetpos.z + 0.4f + multiplehouses);
+                trans = true;
+            }
+            else if (position > 20 && position < 30)
+            {
+                targetpos = new Vector3(targetpos.x + 0.4f - multiplehouses, targetpos.y, targetpos.z - 0.35f);
+
+            }
+            else if (position > 30 && position < 40)
+            {
+                targetpos = new Vector3(targetpos.x - 0.5f, targetpos.y, targetpos.z + 0.4f - multiplehouses);
+                trans = true;
+            } 
         }
-        if (prop.Position > 20 && prop.Position < 30)
+        else
         {
-            Vector3 targetpos = boardPosition[prop.Position];
-            float constant = .23333f;
-            var houseobj = houseprefab;
-            float multiplehouses = constant * (prop.NumberOfHouses - 1);
-            targetpos = new Vector3(targetpos.x + 0.4f - multiplehouses, targetpos.y, targetpos.z - 0.35f);
-            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
-            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+      
+            if (position > 0 && position < 10)
+            {
+                targetpos = new Vector3(targetpos.x, targetpos.y, targetpos.z + 0.5f);
+                
+            }
+            else if (position > 10 && position < 20)
+            {
+                targetpos = new Vector3(targetpos.x + 0.4f, targetpos.y, targetpos.z);
+                trans = true;
+            }
+            else if (position > 20 && position < 30)
+            {
+                targetpos = new Vector3(targetpos.x, targetpos.y, targetpos.z - 0.35f);
+            }
+            else if (position > 30 && position < 40)
+            {
+                targetpos = new Vector3(targetpos.x - 0.5f, targetpos.y, targetpos.z);
+                trans = true;
+            }
         }
-        if (prop.Position > 30 && prop.Position < 40)
+        
+        obj = Instantiate(obj, targetpos, Quaternion.identity);
+        if (trans)
         {
-            Vector3 targetpos = boardPosition[prop.Position];
-            float constant = .23333f;
-            var houseobj = houseprefab;
-            float multiplehouses = constant * (prop.NumberOfHouses - 1);
-            targetpos = new Vector3(targetpos.x - 0.5f, targetpos.y, targetpos.z + 0.4f - multiplehouses);
-            houseobj = Instantiate(houseobj, targetpos, Quaternion.identity);
-            houseobj.name = $"House {prop}: {prop.NumberOfHouses}";
+            obj.transform.Rotate(0f, 90f, 0f);
         }
+        
+        obj.name = $"House {prop.Position}: {prop.NumberOfHouses}";
+    }
+
+    public void DeSpawnHouse(Property prop)
+    {
+        Debug.Log("DESPAWN");
+        Debug.Log($"House {prop.Position}: 5");
+        if (prop.NumberOfHouses == 4)
+        {
+            Destroy(GameObject.Find($"House {prop.Position}: 5"));
+            Debug.Log("Destroyed");
+            SpawnHouse(prop, house: 1);
+            SpawnHouse(prop, house: 2);
+            SpawnHouse(prop, house: 3);
+            SpawnHouse(prop, house: 4);
+        } else
+        {
+            Destroy(GameObject.Find($"House {prop.Position}: {prop.NumberOfHouses+1}"));
+        }
+
+        
     }
 }

@@ -2895,7 +2895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28cff9e65c769ee4385e3990ec1b286b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  diceImage1: {fileID: 1410514847}
+  diceCanvasGroup: {fileID: 0}
   diceFaces1:
   - {fileID: 21300000, guid: 085274738a9996443be5a5f6bd6d89e4, type: 3}
   - {fileID: 21300000, guid: 54ea3d8077a8e5a46a752d27732f74c2, type: 3}
@@ -2903,8 +2903,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5b40838a6163cde4181f39d373362eb7, type: 3}
   - {fileID: 21300000, guid: cbf813b2e2f907340953de604d053886, type: 3}
   - {fileID: 21300000, guid: 79056da9808eeec42886610ab6cbf885, type: 3}
-  rollDiceSprite1: {fileID: 21300000, guid: 52042bd1af11b064fa6b0ee82383941b, type: 3}
-  diceImage2: {fileID: 1905236365}
   diceFaces2:
   - {fileID: 21300000, guid: 085274738a9996443be5a5f6bd6d89e4, type: 3}
   - {fileID: 21300000, guid: 54ea3d8077a8e5a46a752d27732f74c2, type: 3}
@@ -2912,12 +2910,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5b40838a6163cde4181f39d373362eb7, type: 3}
   - {fileID: 21300000, guid: cbf813b2e2f907340953de604d053886, type: 3}
   - {fileID: 21300000, guid: 79056da9808eeec42886610ab6cbf885, type: 3}
+  rollDiceSprite1: {fileID: 21300000, guid: 52042bd1af11b064fa6b0ee82383941b, type: 3}
   rollDiceSprite2: {fileID: 21300000, guid: 52042bd1af11b064fa6b0ee82383941b, type: 3}
-  isRolling: 0
+  diceImage1: {fileID: 1410514847}
+  diceImage2: {fileID: 1905236365}
   dice1ImagesParent: {fileID: 196529112}
   dice2ImagesParent: {fileID: 1018915893}
-  diceCanvasGroup: {fileID: 0}
-  handCursor: {fileID: 2800000, guid: 62655358e6a19b04f8e2cc8e82685031, type: 3}
+  isRolling: 0
 --- !u!224 &442983806
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9592,7 +9591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 680c05060ef322847bfe3deea74dfee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovement: {fileID: 0}
+  gameLoop: {fileID: 0}
 --- !u!1 &1422173949
 GameObject:
   m_ObjectHideFlags: 0
@@ -12337,6 +12336,7 @@ MonoBehaviour:
   - {fileID: 8244192576166171523, guid: 35ef4e44ea3131a4083dbf90f11d49b8, type: 3}
   - {fileID: 2589260117708862842, guid: 3bd9684c46ef2274491db3683f7b64b4, type: 3}
   houseprefab: {fileID: 1049787701921769944, guid: 202d3386ff5ba284489113129ff54d1d, type: 3}
+  hotelprefab: {fileID: 1429028297794750734, guid: b0fd794b0304c4446bb881927c2fd78a, type: 3}
   displayName1: {fileID: 1648605600}
   displayName2: {fileID: 305263669}
   displayName3: {fileID: 1212798172}
@@ -12377,8 +12377,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f78bcf5bcdd51ce4489e2a8cfb7b834b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Balance: 0
   BankOwnedProperties: 
+  Balance: 0
   FreeParkingBalance: 0
 --- !u!114 &1754829408
 MonoBehaviour:
@@ -12392,7 +12392,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a18e417a0b4b2c8428fcea65fe55bb6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovement: {fileID: 1754829406}
   DropdownPlayer: {fileID: 0}
   DropdownAI: {fileID: 0}
   DropdownGame: {fileID: 0}
