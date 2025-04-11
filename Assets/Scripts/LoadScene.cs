@@ -13,12 +13,19 @@ public class LoadScene : MonoBehaviour
     // Dropdowns
     [SerializeField] private Dropdown DropdownPlayer;
     [SerializeField] private Dropdown DropdownAI;
-    [SerializeField] private Dropdown DropdownGame;
+    [SerializeField] private UnityEngine.UI.Toggle gameCheckBox;
+    [SerializeField] private Scrollbar gameLengthScrollbar;
+
+    [SerializeField] private GameObject shortGameToggle;
+    [SerializeField] private TextMeshProUGUI lengthText;
 
     // Input value storage
     private static int Pvalue;
     private static int Avalue;
-    private static int Gvalue;
+
+    private int Length;
+
+    public List<int> gameLengths = new List<int> { 5, 10, 20, 30, 45, 60, 75, 90, 120, 150, 180 };
 
     /// <summary>
     /// When start button is pressed checks dropdowns and stores their values for future access
@@ -34,9 +41,6 @@ public class LoadScene : MonoBehaviour
         int menuIndex2 = DropdownAI.GetComponent<Dropdown>().value;
         List<Dropdown.OptionData> menuOptions2 = DropdownAI.GetComponent<Dropdown>().options;
         Avalue = int.Parse(menuOptions2[menuIndex2].text);
-
-        // Get gamemode dropdown value
-        Gvalue = DropdownGame.GetComponent<Dropdown>().value;
 
         // Start game
         SceneManager.LoadScene("Property-Tycoon");
@@ -66,6 +70,33 @@ public class LoadScene : MonoBehaviour
     /// <returns>Gvalue: Game type vakue</returns>
     public int UpdateGameSettingsGame()
     {
-        return Gvalue;
+        return Length;
+    }
+
+    public void shortGameClicked()
+    {
+        shortGameToggle.SetActive(gameCheckBox.isOn);
+
+        if (!gameCheckBox.isOn)
+        {
+            Length = -1;
+        }
+
+
+    }
+
+    public void gameLengthChange()
+    {
+        float floatidx = gameLengthScrollbar.value * 10;
+        int idx = Mathf.RoundToInt(floatidx);
+
+        if (Length != gameLengths[idx])
+        {
+            Length = gameLengths[idx];
+            lengthText.text = $"Game Length: {Length} minutes";
+
+        }
+        
+        Debug.Log(gameLengths[idx]);
     }
 }

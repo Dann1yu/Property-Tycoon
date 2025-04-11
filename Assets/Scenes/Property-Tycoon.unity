@@ -12345,6 +12345,7 @@ MonoBehaviour:
   endButton: {fileID: 182305955}
   propertyButton: {fileID: 2074625690}
   manageButton: {fileID: 1562396607}
+  leaveGameButton: {fileID: 0}
   managePanel: {fileID: 422586695}
   setsPanel: {fileID: 883058626}
   propertiesPanel: {fileID: 983730888}

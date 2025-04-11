@@ -66,6 +66,7 @@ public class GameLoop : MonoBehaviour
     [SerializeField] private GameObject endButton;
     [SerializeField] private GameObject propertyButton;
     [SerializeField] private GameObject manageButton;
+    [SerializeField] private GameObject leaveGameButton;
 
     // Managing property options
     [SerializeField] private GameObject managePanel;
@@ -246,6 +247,7 @@ public class GameLoop : MonoBehaviour
         closeButton.SetActive(false);
         oppKnocksOption.SetActive(false);
         jailOption.SetActive(false);
+        leaveGameButton.SetActive(false);
 
         pastActions["canEndTurn"] = false;
         pastActions["canBuyProperty"] = false;
@@ -257,6 +259,14 @@ public class GameLoop : MonoBehaviour
         var PlayerAmounts = GameObject.Find("GameController").GetComponent<LoadScene>();
         playerAmount = PlayerAmounts.UpdateGameSettingsPlayers();
         AIplayerAmount = PlayerAmounts.UpdateGameSettingsAI();
+        endTime = PlayerAmounts.UpdateGameSettingsGame() * 60;
+        if (endTime > 0)
+        {
+            abridgedGamemode = true;
+        } else
+        {
+            abridgedGamemode = false;
+        }
 
         // TODO get gamemode and therefore length of game
 
@@ -979,7 +989,7 @@ public class GameLoop : MonoBehaviour
 
         // CPU Logic
         pastActions["canEndTurn"] = boolean;
-
+        leaveGameButton.SetActive(boolean);
         endButton.SetActive(boolean);
 
         // If false and balance is positive disables manage properties button
