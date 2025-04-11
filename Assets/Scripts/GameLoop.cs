@@ -262,8 +262,8 @@ public class GameLoop : MonoBehaviour
         // Checks if script is ran from Property-Tycoon scene and puts into testing mode
         if (playerAmount == 0)
         {
-            playerAmount = 3;
-            AIplayerAmount = 3;
+            playerAmount = 6;
+            AIplayerAmount = 0;
             endTime = 120f;
             abridgedGamemode = true;
             testing = true;
@@ -289,6 +289,8 @@ public class GameLoop : MonoBehaviour
         {
             CPULogic(playerlist[0]);
         }
+
+
     }
 
     /// <summary>
@@ -300,6 +302,9 @@ public class GameLoop : MonoBehaviour
         if (!gameStarted)
         {
             return;
+        } else if (testing){
+                    test();
+                    testing = false;
         }
 
         // If player can roll the dice and if it isn't showing
@@ -316,12 +321,6 @@ public class GameLoop : MonoBehaviour
             if (next && rolledDouble == 0)
             {
                 canRoll(false);
-
-                if (testing)
-                {
-                    test();
-                    testing = false;
-                }
             }
             else if (!next)
             {
@@ -378,60 +377,19 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     public void test()
     {
-        CurrentPlayer = playerlist[playerTurn].gameObject;
-        Player_ player = CurrentPlayer.GetComponent<Player_>();
-
-        player.balance = 100000;
-
-        purchaseProperty(player, bank.Properties[1]);
-        purchaseProperty(player, bank.Properties[3]);
-
-        purchaseProperty(player, bank.Properties[5]);
-        purchaseProperty(player, bank.Properties[15]);
-
-        purchaseProperty(player, bank.Properties[6]);
-        purchaseProperty(player, bank.Properties[8]);
-        purchaseProperty(player, bank.Properties[9]);
-
-        //purchaseProperty(player, bank.Properties[12]);
-        //purchaseProperty(player, bank.Properties[28]);
-
-        purchaseProperty(player, bank.Properties[37]);
-        purchaseProperty(player, bank.Properties[39]);
-
-        //player.upgradeHouse(bank.Properties[1]);
-        //SpawnHouse(bank.Properties[1]);
-        //player.upgradeHouse(bank.Properties[1]);
-        //SpawnHouse(bank.Properties[1]);
-        //player.upgradeHouse(bank.Properties[1]);
-        //SpawnHouse(bank.Properties[1]);
-        //player.upgradeHouse(bank.Properties[1]);
-        //SpawnHouse(bank.Properties[1]);
-
-        mortgageProperty(player, bank.Properties[15]);
-
-        player.balance = 2000;
-
-        //purchaseProperty(playerlist[1], bank.Properties[37]);
-        //purchaseProperty(playerlist[1], bank.Properties[39]);
-        playerlist[1].balance = 10;
-        playerlist[2].balance = 10;
-
-        //player = playerlist[1].gameObject.GetComponent<Player_>();
-        //player.balance = 10;
-        //player = playerlist[2].gameObject.GetComponent<Player_>();
-        //player.balance = 10;
-        //player = playerlist[3].gameObject.GetComponent<Player_>();
-        //player.balance = 10;
-        //player = playerlist[4].gameObject.GetComponent<Player_>();
-        //player.balance = 10;
-        //player = playerlist[5].gameObject.GetComponent<Player_>();
-        //player.balance = 10;
-
-        //Debug.Log(player.checkLiquidation());
-
-        //_Repairs(player, 0);
-        //_Repairs(player, 1);
+        Debug.Log("TEST");
+        Player_ player = playerlist[0];
+        _Teleport(player, 2);
+        player = playerlist[1];
+        _Teleport(player, 3);
+        player = playerlist[2];
+        _Teleport(player, 4);
+        player = playerlist[3];
+        _Teleport(player, 5);
+        player = playerlist[4];
+        _Teleport(player, 6);
+        player = playerlist[5];
+        _Teleport(player, 7);
     }
 
     /// <summary>
@@ -787,7 +745,6 @@ public class GameLoop : MonoBehaviour
 
         player.removeProperty(location);
         location.Owner = null;
-        bank.BankOwnedProperties.Add(player.pos);
         UpdateBalanceUI();
     }
 
@@ -924,7 +881,7 @@ public class GameLoop : MonoBehaviour
     public void _Teleport(Player_ player, int newPosition)
     {
         player.pos = newPosition;
-        CurrentPlayer.transform.position = boardPosition[newPosition];
+        player.gameObject.transform.position = boardPosition[newPosition];
         positionHandling(player);
 
         if (newPosition == 0)

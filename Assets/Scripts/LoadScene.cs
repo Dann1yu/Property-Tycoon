@@ -11,9 +11,9 @@ using UnityEngine.SceneManagement;
 public class LoadScene : MonoBehaviour
 {
     // Dropdowns
-    private Dropdown DropdownPlayer;
-    private Dropdown DropdownAI;
-    private Dropdown DropdownGame;
+    [SerializeField] private Dropdown DropdownPlayer;
+    [SerializeField] private Dropdown DropdownAI;
+    [SerializeField] private Dropdown DropdownGame;
 
     // Input value storage
     private static int Pvalue;
